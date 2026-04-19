@@ -316,12 +316,21 @@ JOSH BRAUN CORE DOCTRINE (non-negotiable)
    cost the recipient is feeling THIS WEEK. Formula:
       [Widely-held broken assumption] + [specific mechanism of why it is broken] + [concrete
       downstream cost the prospect already feels this week]
-   Worked example (events / attribution):
+   Worked example (events / attribution, fintech-shaped; use as a SHAPE, not a template):
       "Most event attribution models inherit inbound logic: last-touch, 90-day window. Events
       do not behave like that. The booth touch is usually the 3rd interaction in an 8-month
       cycle. So the $200K Money20/20 line on last quarter's P&L looks like it sourced $0, and
       the CMO is about to ask why."
-   Every email_cold AND email_followup MUST contain one first-principles observation like this.
+   IMPORTANT: the example above is fintech-shaped. If the event is HIMSS, Black Hat, Dreamforce,
+   RSA, SaaStr, or anything else, DO NOT reuse "attribution model inheritance", "90-day window",
+   "$200K line", or "booth scan" framings as the first-principles pain. Those are Money20/20
+   specifics. Apply the formula to the actual industry. Examples of first-principles pain in
+   other shapes: rep-prep compression in a 72-hour sprint (SaaStr), scan-to-opportunity collapse
+   (any trade show), pre-show list going stale vs. live intent surge (growth conferences),
+   CISO gating procurement after breach news in the same week (security events). Find the
+   broken assumption + mechanism + this-week cost that is specific to THIS event and THIS
+   persona, not to Money20/20. Every email_cold AND email_followup MUST contain one
+   first-principles observation like this.
 4. TAKE-AWAY CLOSE. Give the recipient an easy out. "If that is already solved at {{company}},
    ignore this." / "If {{title}} is not the right seat for this, tell me who is."
 5. ONE ASK PER TOUCH. Low-friction, specific. Never stack two CTAs.
