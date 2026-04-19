@@ -24,7 +24,10 @@ This document synthesizes key findings from the Gong / 30MPC / Outbound Squad da
 - **Ask for Meeting:** -44% reply rate
 
 ## Banned Words and Phrases (Hard Filter)
-- "happy to", "excited to", "hope this finds you well", "just checking in", "circling back", "touching base", "wanted to reach out", "quick question", "at your convenience", "revolutionary", "leverage", "synergy", "solution", "best-in-class", "paradigm", "game-changer", "transform", "unlock", "supercharge"
+- Sales-cliche fillers: "happy to", "excited to", "hope this finds you well", "hope this", "hope you", "just checking in", "circling back", "touching base", "wanted to reach out", "quick question", "at your convenience", "looking forward to hearing"
+- Buzzword verbs/nouns: "revolutionary", "leverage", "synergy", "solution", "best-in-class", "paradigm", "game-changer", "transform", "unlock", "supercharge"
+- Gating phrases (Josh Braun doctrine — attach or link the asset, never gate it): "want me to send", "want me to drop", "want me to meet", "yours to keep", "if it's of interest"
+- Defensive throat-clearing: "not a pitch", "no pitch", "peer channel", "no strings", "no pressure"
 
 ## Exclamation Marks & Emoji
 - **Exclamation Marks:** Zero

@@ -38,7 +38,11 @@
     "happy to", "excited to", "hope this finds you well", "just checking in",
     "circling back", "touching base", "wanted to reach out", "quick question",
     "at your convenience", "revolutionary", "leverage", "synergy", "solution",
-    "best-in-class", "paradigm", "game-changer", "transform", "unlock", "supercharge"
+    "best-in-class", "paradigm", "game-changer", "transform", "unlock", "supercharge",
+    "want me to send", "want me to drop", "want me to meet",
+    "no strings", "peer channel", "not a pitch", "no pitch",
+    "yours to keep", "if it's of interest", "looking forward to hearing",
+    "no pressure", "hope this", "hope you"
   ],
   "exclamation_marks_banned": true,
   "emoji_banned": true,
