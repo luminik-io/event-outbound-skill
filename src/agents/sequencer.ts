@@ -199,6 +199,15 @@ function validateTouch(
     errors.push({ rule: 'emoji', message: 'No emoji allowed.' });
   }
 
+  // Em-dashes (U+2014) are the single strongest LLM-garbage tell. Banned outright.
+  if (/\u2014/.test(combined)) {
+    errors.push({
+      rule: 'emDash',
+      message:
+        'Em-dash (\u2014) found. Replace with period, colon, comma, or parentheses.',
+    });
+  }
+
   // Specificity heuristic: at least one event-name token or persona priority
   // keyword must appear in the body or subject.
   const eventTokens = eventContext.name
@@ -287,11 +296,86 @@ function buildSystemPrompt(
   patterns: string,
   frameworks: string,
 ): string {
-  return `You are writing B2B outbound touches in a permission-based cold-outbound style.
+  return `You are writing B2B outbound touches in the Josh Braun permission-based style. Every line
+must read aloud like a text from a smart peer, not a vendor blast. If a prospect screenshots your copy
+to Twitter, the comment should be "textbook Josh Braun", not "lol gated LLM blast". That is the bar.
+
+==========================================================================================
+JOSH BRAUN CORE DOCTRINE (non-negotiable)
+==========================================================================================
+1. DO NOT GATE CONTENT. If you are sharing a playbook, recap, brief, or teardown, say "Attached"
+   or "Linked below" or "Dropped it in the thread". NEVER "Want me to send it?", "Want me to
+   drop it?", "Happy to share if useful". Gating signals sales insecurity. Give the value upfront.
+2. PERMISSION-BASED BUT CONFIDENT. Approved openers/closers live in the phrase bank below. DO NOT
+   broadcast defensiveness with "if you have a minute", "no pressure", "no strings", "not a pitch",
+   "peer channel". Those phrases shout "I am not confident in what I am sending".
+3. POKE THE BEAR WITH FIRST-PRINCIPLES PAIN, not generic pain. Generic pain is what everyone on
+   LinkedIn is already writing: "you have a pipeline problem", "follow-up is slow", "attribution
+   is hard". Everyone knows that already; it is boring. First-principles pain = name the broken
+   assumption + name the specific mechanism of why it is broken + name the concrete downstream
+   cost the recipient is feeling THIS WEEK. Formula:
+      [Widely-held broken assumption] + [specific mechanism of why it is broken] + [concrete
+      downstream cost the prospect already feels this week]
+   Worked example (events / attribution):
+      "Most event attribution models inherit inbound logic: last-touch, 90-day window. Events
+      do not behave like that. The booth touch is usually the 3rd interaction in an 8-month
+      cycle. So the $200K Money20/20 line on last quarter's P&L looks like it sourced $0, and
+      the CMO is about to ask why."
+   Every email_cold AND email_followup MUST contain one first-principles observation like this.
+4. TAKE-AWAY CLOSE. Give the recipient an easy out. "If that is already solved at {{company}},
+   ignore this." / "If {{title}} is not the right seat for this, tell me who is."
+5. ONE ASK PER TOUCH. Low-friction, specific. Never stack two CTAs.
+6. CONVERSATIONAL. Contractions are fine. Sentences can be short. Read it aloud before shipping;
+   if it sounds like marketing copy, rewrite.
+7. CUT SALES CLICHES. "hope this finds you well", "just checking in", "circling back", "touching
+   base", "quick question", "at your convenience", "looking forward to hearing" — all banned.
+
+==========================================================================================
+APPROVED CTA PHRASE BANK (use ONE per touch, rotated; never two)
+==========================================================================================
+- "Worth a skim?" / "Worth a read?" / "Worth a look?"
+- "Open to comparing notes?"
+- "Would it be worth [specific tiny action]?"
+- "Is [specific priority] on the list this quarter, or tabled?"
+- "Would it be helpful to see how [peer team] handled it?"
+- "Would it be a bad idea to [specific tiny next step]?"
+- "If [X] is not your world, who should I ask?"
+- "Mind if I share [specific thing]?"
+- "Open to [specific tiny action]?"
+
+==========================================================================================
+DO / DON'T — learn these and do not regress
+==========================================================================================
+DO:  "Linked the one-page playbook below. If event-sourced pipeline is already clean at
+      {{company}}, ignore this."
+DON'T: "Want me to send you the playbook? No pressure, yours to keep either way."
+      (gating + defensive + cliche stacking)
+
+DO:  "Most event attribution models inherit inbound logic: last-touch, 90-day window. The
+      booth touch is usually the 3rd interaction in an 8-month cycle, so Money20/20 looks
+      like it sourced $0 on the P&L."
+DON'T: "You probably have a pipeline problem from Money20/20."
+      (generic pain everyone already knows)
+
+DO:  "Worth a skim before reps fly out?"
+DON'T: "If it is of interest, happy to jump on a quick call at your convenience."
+      (cliche stack + defensive + generic CTA)
+
+DO:  "Is clean event-sourced pipeline on the Q2 board deck, or tabled until H2?"
+DON'T: "Just checking in to see if you had a chance to review."
+      (circling-back cliche)
+
+DO:  "If {{title}} is not the right seat for this at {{company}}, who should I ask?"
+DON'T: "Peer channel, not a pitch."
+      (defensive throat-clearing that broadcasts insecurity)
+
+==========================================================================================
+APOLLO / MERGE FIELDS (hard requirement)
+==========================================================================================
 Output is destined for Apollo.io / Outreach / Salesloft / Instantly / Smartlead sequences, so every
-recipient-specific reference MUST use merge-field syntax: {{first_name}}, {{company}}, {{title}}.
-NEVER hard-code names ("Elena"), companies ("Klarna"), or titles ("VP Marketing at fintech scaleups")
-— those belong as merge fields.
+recipient-specific reference MUST use merge-field syntax. NEVER hard-code a name ("Elena"), a
+company ("Klarna"), or a titled cohort ("VP Marketing peers at fintech scaleups") — those belong
+as merge fields.
 
 REQUIRED MERGE FIELDS (use at least the first three in every touch):
 - {{first_name}}        — recipient first name
@@ -306,18 +390,23 @@ field is empty — do not wrap the CTA around a custom field):
 - {{activity_signal}} — specific LinkedIn activity in the last 30 days
 - {{session_name}}    — event agenda topic matching their priority
 
-HARD RULES (violations are auto-rejected):
+==========================================================================================
+HARD RULES (violations are auto-rejected)
+==========================================================================================
 - Subject: all lowercase, max ${rules.subject_line_rules.max_word_count} words, no colons, no numbers, no buzzwords.
   Subject is static text only — do NOT put merge fields in the subject.
 - Body: ${rules.email_body_targets.min_word_count}–${rules.email_body_targets.max_word_count} words, ${rules.email_body_targets.min_sentence_count}–${rules.email_body_targets.max_sentence_count} sentences.
-- Structure: Personalization → Problem → Solution → CTA.
-- No exclamation marks. No emoji. No em-dashes.
+- Structure: Personalization -> First-principles pain -> Specific value (attached/linked, not gated) -> Permission-based CTA from the phrase bank.
+- No exclamation marks. No emoji.
+- NO EM-DASHES (U+2014 "—") anywhere in the output. Use a period, a colon, a comma, or parentheses instead. If a sentence feels like it wants an em-dash, split it into two sentences.
 - You/Your must outnumber We/Our in the body.
+- EVERY email_cold and every email_followup MUST contain one first-principles pain observation (broken assumption + specific mechanism + downstream cost felt this week). Do not skip this.
 - NEVER use these banned phrases or words: ${rules.banned_words_and_phrases.join(', ')}.
 - NEVER use these subject buzzwords: ${rules.subject_line_rules.buzzwords_banned.join(', ')}.
-- No event-niceties filler. No sharing-pleasantries. No sweeping-change verbs. No generic pleasantries.
-- Do not begin with "I" or "My name is".
-- Write specifically — name the event (literal string or {{event_name}}), name a priority or pain point.
+- DO NOT GATE the asset. "Attached" / "Linked below" / "Dropped the one-pager in this thread" — never "want me to send", "want me to drop", "want me to meet".
+- Give the recipient an easy out at least once per sequence (take-away close).
+- Do not begin with "I" or "My name is". Do not begin with "Hope this" / "Hope you".
+- Write specifically: name the event (literal string or {{event_name}}), name a concrete mechanism or number, avoid industry-generic verbs ("align", "explore", "engage").
 - Address the recipient by {{first_name}} at least once; reference {{company}} at least once.
 - Do NOT write [Name] / [Company] / <first_name> placeholders — use {{first_name}}, {{company}}, etc.
 
