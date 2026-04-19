@@ -32,29 +32,63 @@ Every touch is written by Gemini 2.5 Flash, then validated. Failed touches are r
 
 ## Quickstart
 
+From inside a Claude Code session:
+
+```
+/plugin marketplace add luminik-io/claude-plugins
+/plugin install event-outbound@luminik-plugins
+```
+
+Then invoke the skill by telling Claude what you need:
+
+```
+Create an outbound sequence for RSA Conference 2026 targeting VP Security at Series B fintechs. 4 week lead time, email plus LinkedIn.
+```
+
+The skill picks up the request, asks for any missing input fields (sending identity, lead time, channels), and returns a full `SequencerOutput` along with a rendered markdown preview you can paste straight into Apollo, Outreach, Salesloft, Instantly, or Smartlead.
+
+### Local development install
+
+If you want to hack on the skill before the marketplace listing lands:
+
 ```bash
-# Install
-claude plugin install event-outbound
-
-# Or point at a local checkout
-claude plugin install --path ~/Claude_Workspace/event-outbound-skill
+git clone https://github.com/luminik-io/event-outbound-skill.git
+cd event-outbound-skill
+npm install && npm run build
+claude --plugin-dir $(pwd)
 ```
 
-Then from Claude Code:
+## What the output looks like
+
+A single touch from the Money20/20 Europe 2026 example (full sequence is 12 touches across two personas):
 
 ```
-Create an outbound sequence for RSA Conference 2026 targeting VP Security at Series B fintechs. Four week lead time, email plus LinkedIn.
+Touch 2 · T-14d · email cold
+
+Subject: money20/20 attribution
+
+{{first_name}}, most event attribution models inherit inbound logic: last-touch,
+90-day window. Events don't behave like that at {{company}}'s size. The booth
+touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K
+{{event_name}} line on the P&L looks like it sourced $0 and the CMO is about to
+ask why. Attached is a one-page teardown of how three {{title}}s rebuilt the
+attribution window to surface the real number before the {{event_city}} show
+opens. Worth a skim before your board prep locks?
+
+channel: email · offset: -14d · type: email_cold · cta: make_offer · words: 96
 ```
 
-The skill picks up the request, asks for any missing input fields, and returns the full `SequencerOutput` along with a rendered markdown preview.
+That's Apollo-ready merge-field syntax. The copy opens with a first-principles
+observation about event attribution, not a generic pipeline pitch. The CTA is a
+concrete offer (one-page teardown), not a meeting-ask. It passes the validator
+at 5/5 on every Josh Braun heuristic.
 
-## Full example
+## Full examples
 
-See `examples/money2020-europe-2026/` in the source repo for a real run:
+- `examples/money2020-europe-2026/final_sequence.md`: fintech ICP, two personas (VP Marketing + Demand Gen Lead), 12 touches.
+- `examples/saastr-annual-2026/final_sequence.md`: SaaS ICP, two personas (VP Marketing + Sales Development Director), 12 touches.
 
-- `inputs.json`: Money20/20 Europe 2026 as the event, a fintech ICP with two personas (VP Marketing + Demand Gen Lead)
-- `generation.log`: every Gemini 2.5 Flash call, including the retry trail when a touch failed validation
-- `final_sequence.md`: the final 12 touches, ready to paste into your outreach tool
+Both sequences are hand-verified against Josh Braun's permission-based criteria: 24/24 checks at 5/5 across every touch.
 
 ## Parameters
 

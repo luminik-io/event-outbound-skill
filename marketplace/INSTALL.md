@@ -1,33 +1,36 @@
 # Installation
 
-## From the Claude marketplace (recommended)
+## From the Luminik marketplace (recommended)
 
-Once the skill is listed on `claude.com/marketplace` (expected post-v0.1.0 review):
+Inside any Claude Code session, add the marketplace and install the plugin:
 
-```bash
-claude plugin install event-outbound
+```
+/plugin marketplace add luminik-io/claude-plugins
+/plugin install event-outbound@luminik-plugins
 ```
 
-Claude Code will pull the plugin, register the skill, and make it available in any session. Confirm it is registered:
+Claude Code pulls the plugin, registers the skill, and makes it available in any session. Confirm from a new shell:
 
 ```bash
 claude plugin list | grep event-outbound
 ```
 
-## From a local checkout (developers, or for running the live examples)
+## From a local checkout (developers)
 
 ```bash
-git clone https://github.com/prasad-pilla/event-outbound-skill.git
+git clone https://github.com/luminik-io/event-outbound-skill.git
 cd event-outbound-skill
 npm install
 npm run build
 ```
 
-Register the local skill with Claude Code:
+Load the local plugin directly:
 
 ```bash
-claude plugin install --path $(pwd)/dist/marketplace
+claude --plugin-dir $(pwd)
 ```
+
+Inside the session, `/plugin list` will show `event-outbound` loaded from your local path.
 
 To run the bundled live example end-to-end (requires a Gemini API key):
 
@@ -36,11 +39,11 @@ export GEMINI_API_KEY=...
 node scripts/generate-live-demo.mjs
 ```
 
-This regenerates `examples/money2020-europe-2026/final_sequence.md` from scratch against the real LLM. A successful run should take 2–4 minutes and finish with `0 flagged rules_violated`.
+This regenerates `examples/money2020-europe-2026/final_sequence.md` from scratch against the real LLM. A successful run takes 2 to 4 minutes and finishes with `0 flagged rules_violated`.
 
 ## Requirements
 
-- Claude Code CLI 2026.03 or later
+- Claude Code CLI 2.1 or later
 - Node.js 20+ (for local development only; the published skill runs inside Claude Code)
 - A Gemini API key (free tier is sufficient for small runs; paid tier recommended for agencies running dozens of events per quarter). Set as `GEMINI_API_KEY`.
 
@@ -49,7 +52,7 @@ This regenerates `examples/money2020-europe-2026/final_sequence.md` from scratch
 In any Claude Code session:
 
 ```
-/skills list
+/plugin list
 ```
 
 You should see `event-outbound` in the list.
@@ -57,13 +60,13 @@ You should see `event-outbound` in the list.
 Try it:
 
 ```
-Create an outbound sequence for SaaStr Annual 2026 targeting VP Marketing at 50–200-person SaaS companies. 4 week lead time. Email and LinkedIn.
+Create an outbound sequence for SaaStr Annual 2026 targeting VP Marketing at 50 to 200 person SaaS companies. 4 week lead time. Email and LinkedIn.
 ```
 
 If the skill responds by asking for the sending identity (name, title, company) and then produces a multi-touch sequence, install was successful.
 
 ## Uninstall
 
-```bash
-claude plugin uninstall event-outbound
+```
+/plugin uninstall event-outbound@luminik-plugins
 ```
