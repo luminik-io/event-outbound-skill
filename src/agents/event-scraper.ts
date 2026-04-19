@@ -20,9 +20,14 @@ export async function scrapeEvent(url: string): Promise<EventContext> {
     const article = reader.parse();
 
     if (article) {
-      eventName = dom.window.document.querySelector('title')?.textContent || article.title;
-      // Attempt to extract dates and location from the article text or meta tags
-      // This is a basic attempt and can be improved with more sophisticated NLP or regex
+      // Prefer an explicit event title (h1) over the raw document <title>, which is
+      // often a shorter / branded variant. Fall back to Readability's article title,
+      // then to the document <title>.
+      const h1Title = dom.window.document.querySelector('h1.event-title, .event-header h1, #event-title, h1')?.textContent?.trim();
+      const docTitle = dom.window.document.querySelector('title')?.textContent?.trim() || null;
+      eventName = h1Title || article.title || docTitle;
+      // Attempt to extract dates and location from the article text or meta tags.
+      // This is a basic attempt and can be improved with more sophisticated NLP or regex.
       dates = dom.window.document.querySelector('meta[property="article:published_time"]')?.getAttribute('content') ||
               dom.window.document.querySelector('meta[name="event:start_date"]')?.getAttribute('content') ||
               dom.window.document.querySelector('time')?.textContent ||
@@ -45,9 +50,15 @@ export async function scrapeEvent(url: string): Promise<EventContext> {
     if (!dates) {
       dates = $('time.dtstart, .event-dates, .event-date, [itemprop="startDate"]').first().text().trim();
       if (!dates) {
-        // Try to find a date range or single date in the text
-        const dateMatch = html.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}(?:st|nd|rd|th)?(?:-\s*\d{1,2}(?:st|nd|rd|th)?)?,?\s+\d{4}\b/);
-        if (dateMatch) dates = dateMatch[0];
+        // Try to find a named-month date or range.
+        const namedMonthMatch = html.match(/\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2}(?:st|nd|rd|th)?(?:-\s*\d{1,2}(?:st|nd|rd|th)?)?,?\s+\d{4}\b/);
+        if (namedMonthMatch) {
+          dates = namedMonthMatch[0];
+        } else {
+          // Fallback: ISO-8601 style date (YYYY-MM-DD).
+          const isoMatch = html.match(/\b\d{4}-\d{2}-\d{2}\b/);
+          if (isoMatch) dates = isoMatch[0];
+        }
       }
     }
 
@@ -61,7 +72,9 @@ export async function scrapeEvent(url: string): Promise<EventContext> {
     }
 
     // Agenda Titles
-    $('h2.agenda-title, .session-title h3, .agenda-item h4').each((_, element) => {
+    // Cover common patterns: explicit agenda/session classes, plus session-card
+    // style wrappers used by Luma-like layouts.
+    $('h2.agenda-title, .session-title h3, .session-title, .agenda-item h4, .agenda-item h3, .agenda-item h2, .session-card h3, .session-card h4, .session h3').each((_, element) => {
       const title = $(element).text().trim();
       if (title) agendaTitles.push(title);
     });
