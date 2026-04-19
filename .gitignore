@@ -2,10 +2,11 @@ node_modules/
 dist/
 .env
 
-# Internal artefacts — not for public distribution
+# Internal artefacts, not for public distribution
 marketing/
 plans/
-scripts/
+scripts/*
+!scripts/verify-install.sh
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log
