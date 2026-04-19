@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+
+# Internal artefacts — not for public distribution
+marketing/
+plans/
+scripts/
+data/gong-cold-email-data-report.pdf
+examples/*/raw_output.json
+examples/*/generation.log
+examples/*/inputs.json
+marketplace/SUBMISSION_CHECKLIST.md

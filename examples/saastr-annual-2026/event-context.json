@@ -1,0 +1,21 @@
+{
+  "eventName": "SaaStr Annual 2026",
+  "dates": "September 16-18, 2026",
+  "location": "San Francisco Bay Area, CA",
+  "agendaTitles": [
+    "Scaling Revenue & Growth",
+    "Product-Led Growth Strategies",
+    "Future of SaaS"
+  ],
+  "speakers": [
+    "Sarah Friar (CEO, Nextdoor)",
+    "Stewart Butterfield (Co-founder, Slack)",
+    "Melanie Perkins (CEO, Canva)"
+  ],
+  "exhibitorList": [
+    "Salesforce",
+    "HubSpot",
+    "Intercom",
+    "Stripe"
+  ]
+}

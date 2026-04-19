@@ -1,0 +1,48 @@
+{
+  "subject_line_rules": {
+    "max_word_count": 4,
+    "all_lowercase": true,
+    "priority_based": true,
+    "empty_subjects_banned": true,
+    "buzzwords_banned": [
+      "AI", "platform", "leverage", "synergy", "solution", "best-in-class",
+      "revolutionary", "paradigm", "game-changer", "transform", "unlock", "supercharge",
+      "data", "growth", "scale", "innovate", "optimize", "efficiency", "ROI", "metrics",
+      "strategy", "ecosystem", "empower", "drive", "cutting-edge", "next-gen",
+      "future-proof", "disrupt", "seamless", "dynamic", "holistic", "integrated",
+      "proactive", "reactive", "robust", "scalable", "streamlined", "turnkey",
+      "value-added", "vertical", "horizontal", "omnichannel", "frictionless",
+      "low-hanging fruit", "move the needle", "deep dive", "bandwidth", "brainstorm",
+      "circle back", "synergize", "win-win", "thought leadership", "bleeding edge"
+    ],
+    "numbers_banned": true,
+    "social_proof_banned": true
+  },
+  "email_body_targets": {
+    "min_word_count": 50,
+    "max_word_count": 100,
+    "min_sentence_count": 3,
+    "max_sentence_count": 4,
+    "structure": "Personalization \u2192 Problem \u2192 Solution \u2192 CTA"
+  },
+  "pronoun_ratio": {
+    "majority_you_your": true
+  },
+  "cta_type_ranking": [
+    {"type": "make_offer", "reply_rate_delta": 0.28},
+    {"type": "ask_for_interest", "reply_rate_delta": 0.07},
+    {"type": "ask_for_problem", "reply_rate_delta": -0.29},
+    {"type": "ask_for_meeting", "reply_rate_delta": -0.44}
+  ],
+  "banned_words_and_phrases": [
+    "happy to", "excited to", "hope this finds you well", "just checking in",
+    "circling back", "touching base", "wanted to reach out", "quick question",
+    "at your convenience", "revolutionary", "leverage", "synergy", "solution",
+    "best-in-class", "paradigm", "game-changer", "transform", "unlock", "supercharge"
+  ],
+  "exclamation_marks_banned": true,
+  "emoji_banned": true,
+  "personalization_tier_ranking": [
+    "activity-based", "company", "individual", "industry", "baseline"
+  ]
+}

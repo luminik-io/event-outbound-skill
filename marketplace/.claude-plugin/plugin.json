@@ -1,0 +1,26 @@
+{
+  "name": "event-outbound",
+  "description": "Generate multi-channel outbound sequences for AEs, SDRs, and event marketers working B2B trade shows, conferences, and industry events. Takes an event URL + your company URL + a target persona and produces email + LinkedIn sequences across a parameterised lead time (1-8 weeks). Built on 20k+ personalised touches across 50+ events that sourced $6M+ in pipeline across fintech (identity verification), cybersecurity, and B2B SaaS. Every touch is validated before it lands: subject under 4 words, body 50-100 words, banned-words blocklist, pronoun ratio favouring the reader, CTA pattern favouring concrete offers over meeting-asks.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Luminik",
+    "email": "prasad@luminik.io",
+    "url": "https://www.luminik.io"
+  },
+  "homepage": "https://www.luminik.io/tools/event-outbound",
+  "repository": "https://github.com/luminik-io/event-outbound-skill",
+  "license": "MIT",
+  "keywords": [
+    "sdr",
+    "ae",
+    "event-marketing",
+    "cold-email",
+    "cold-outbound",
+    "linkedin",
+    "trade-shows",
+    "conferences",
+    "sales-enablement",
+    "field-marketing",
+    "demand-generation"
+  ]
+}

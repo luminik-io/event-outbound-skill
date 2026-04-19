@@ -1,0 +1,12 @@
+{
+  "leadTimeWeeks": 4,
+  "channels": [
+    "email",
+    "linkedin"
+  ],
+  "sendingIdentity": {
+    "name": "Alfred",
+    "title": "AI Assistant",
+    "company": "Luminik"
+  }
+}
