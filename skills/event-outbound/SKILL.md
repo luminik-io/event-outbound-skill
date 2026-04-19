@@ -12,7 +12,7 @@ Built for AEs, SDRs, and event marketers working B2B trade shows, conferences, a
 - **Event marketers**: run dinner invites, booth-visit nudges, speaker meet-and-greet outreach, and side-event marketing at large trade shows.
 - **Founders doing their own outbound**: same workflow, same validated output.
 
-Grounded in 20k+ personalised emails and LinkedIn messages across 50+ trade shows, conferences, and industry events — $6M+ in sourced pipeline across fintech (identity verification), cybersecurity, and B2B SaaS. This plugin is the validated version of what actually worked.
+Grounded in 20k+ personalised emails and LinkedIn messages across 50+ trade shows, conferences, and industry events. $6M+ in sourced pipeline across fintech (identity verification), cybersecurity, and B2B SaaS. This plugin is the validated version of what actually worked.
 
 ## Purpose
 
@@ -72,7 +72,7 @@ This skill adheres to the following internal validation criteria:
 
 **Teachers and sources we learned from**:
 
-- **[Josh Braun](https://joshbraun.com)** — whose public writing on permission-based cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
-- **Gong's "Ultimate Cold Email Data Report"** — 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
+- **[Josh Braun](https://joshbraun.com)**, whose public writing on permission-based cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
+- **Gong's "Ultimate Cold Email Data Report"**: 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
 
 This plugin does not redistribute any proprietary content. It encodes general craft principles from publicly-taught material and published research into validation rules that run at generation time.
