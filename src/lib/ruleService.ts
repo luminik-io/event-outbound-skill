@@ -57,6 +57,7 @@ export type ColdOutboundRules = {
     manufactured_intimacy?: string[];
     marketing_buzzwords?: string[];
     cold_email_overused?: string[];
+    lazy_generalization_openers?: string[];
     llm_transition_tics?: string[];
     gpt_vocabulary?: string[];
     hedge_softener_warnings?: string[];
@@ -70,6 +71,7 @@ export type LlmClicheCategory =
   | 'manufactured_intimacy'
   | 'marketing_buzzwords'
   | 'cold_email_overused'
+  | 'lazy_generalization_openers'
   | 'llm_transition_tics'
   | 'gpt_vocabulary'
   | 'hedge_softener_warnings';
@@ -81,6 +83,7 @@ const HARD_BAN_CATEGORIES: LlmClicheCategory[] = [
   'manufactured_intimacy',
   'marketing_buzzwords',
   'cold_email_overused',
+  'lazy_generalization_openers',
   'llm_transition_tics',
   'gpt_vocabulary',
 ];

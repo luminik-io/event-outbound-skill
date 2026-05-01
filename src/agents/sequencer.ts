@@ -457,9 +457,9 @@ function buildSystemPrompt(rules: ColdEmailBenchmarks, jb: ColdOutboundRules): s
     })
     .join('\n');
 
-  return `You are writing B2B outbound touches in the **the cold-outbound canon 4T framework**. Every line must read
+  return `You are writing B2B outbound touches using the **permission-based 4T framework**. Every line must read
 aloud like a text from a smart peer noticing something specific, not a vendor blast. The bar: if the
-recipient screenshots your copy, the comment should be "textbook the cold-outbound canon", not "another LLM blast".
+recipient screenshots your copy, the comment should be "this is permission-based outreach done right", not "another LLM blast".
 
 ==========================================================================================
 THE 4T FRAMEWORK (every cold email and post-event email follows this; LinkedIn DMs follow it
@@ -572,6 +572,15 @@ HARD VALIDATOR RULES (auto-rejected)
   blueprint, north star, north-star metric, table stakes, low-hanging fruit, double-click on,
   "do you have bandwidth". These read clever in vendor-deck contexts and pattern-match to
   mass outbound. Use the literal asset noun instead ("1-pager", "writeup", "recap", "case").
+- NO LAZY GENERALIZATION OPENERS. Auto-rejected if the touch opens with "Most teams",
+  "Most companies", "Most fintechs", "Most {{title}}s", "Most folks I talk to",
+  "Many of you", "Almost nobody", "Nobody is", "Everyone is", "Every team", "In our experience"
+  or any sibling generalization. These are population-shape statements that any vendor could
+  send to any prospect. The Trigger step REQUIRES a specific observation about THIS recipient,
+  THIS company, THIS event session, THIS hire, THIS funding round. If you do not have a
+  specific anchor, reach for a situation trigger sized to the recipient's role
+  ("end of Q3 and the CFO is locking the FY27 plan") before reaching for a generalization.
+  Never open with "Most X..." even if the X is ICP-shaped.
 - ONE problem per email. Don't mash multiple value props in one touch.
 - Address {{first_name}} at least once; reference {{company}} at least once.
 - Lean-back CTA from the approved list. ONE per touch.

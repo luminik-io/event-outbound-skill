@@ -40,8 +40,8 @@
 **Priorities** · prove event-sourced pipeline to CMO and CFO · shorten the gap between booth scan and CRM record · build a repeatable pre-event meeting motion · standardise rep prep across regional AE teams
 
 **First-principles pain observations (ammo for the copy below)**
-1. *Attribution model inheritance.* Most event attribution inherits inbound logic: last-touch, 90-day window. Events don't behave like that. The booth touch is usually the 3rd interaction in an 8-month fintech sales cycle, so the $200K Money20/20 line looks like it sourced $0 on the P&L and the CMO is about to ask why.
-2. *Sponsorship ROI asymmetry.* Fintech sponsor packages are priced on booth footage and banner impressions. The number that actually correlates with closed-won is reply rate in the 14 days after the show. Almost nobody tracks it.
+1. *Attribution model inheritance.* Event attribution at fintechs scaling APAC routinely inherits the inbound stack's last-touch, 90-day window. Events do not behave that way. The booth touch is usually the 3rd interaction in an 8-month fintech sales cycle, so the $200K Money20/20 line on the P&L reads as sourcing $0 by the time the CMO opens board prep.
+2. *Sponsorship ROI asymmetry.* Fintech sponsor packages are priced on booth footage and banner impressions. The number that actually correlates with closed-won is reply rate in the 14 days after the show. The teams who track it can count their booth attribution accurately. The teams who do not are reconstructing the number 8 weeks late from Salesforce notes.
 
 ### Touch 1: T-28d · LinkedIn connection request
 
@@ -57,7 +57,7 @@ _Subject:_ (none)
 
 _Subject:_ `money20/20 attribution`
 
-> {{first_name}}, most event attribution models inherit inbound logic: last-touch, 90-day window. Events don't behave like that at {{company}}'s size. The booth touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K {{event_name}} line on the P&L looks like it sourced $0 and the CMO is about to ask why. Attached is a 1-pager on how three {{title}}s rebuilt the attribution window to surface the real number before the {{event_city}} show opens. Worth a skim before your board prep locks?
+> {{first_name}}, the {{event_name}} line item on {{company}}'s P&L is going to land in front of the CFO under the same last-touch, 90-day attribution rules your inbound runs on. The booth touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K {{event_name}} spend reads as sourcing $0 by the time {{company}}'s board prep opens. Attached is a 1-pager on how three {{title}}s rebuilt the attribution window to surface the real number before the {{event_city}} show. Worth a skim before your board prep locks?
 
 `channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 96`
 
@@ -77,7 +77,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, on the floor at {{event_name}} today. The attribution track is right next to the {{event_venue}} press room, and most fintech marketing teams leave it with more questions than answers. If you're between sessions and thinking about how this week's booth scans actually land in {{company}}'s CRM, open to ten minutes near the press room?
+> {{first_name}}, on the floor at {{event_name}} today. The attribution track sits right next to the {{event_venue}} press room and historically leaves operators with more questions than answers about end-to-end booth-to-pipeline math. If you're between sessions and thinking about how this week's booth scans actually land in {{company}}'s CRM, open to ten minutes near the press room?
 
 `channel: linkedin` · `offset: 0d` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 59`
 
@@ -87,7 +87,7 @@ _Subject:_ (none)
 
 _Subject:_ `amsterdam recap`
 
-> {{first_name}}, two days post-{{event_name}}. Here's the first-principles problem the CMO is about to surface: fintech sponsor packages are priced on booth footage and banner impressions, but the number that actually correlates with closed-won is reply rate in the 14 days after the show, and almost nobody tracks it. Attached is a short recap of the three post-event motions that pushed that reply rate from 4% to 18% for marketing leaders at {{peer_company}}'s tier. If {{company}} already has that number, ignore. If not, worth a read this week?
+> {{first_name}}, two days post-{{event_name}}. The first-principles problem the CMO is about to surface: {{company}}'s fintech sponsor package was priced on booth footage and banner impressions, but the number that actually correlates with closed-won is reply rate in the 14 days after the show. The teams that track that number can defend the {{event_name}} line on the P&L cleanly; the teams that don't are reconstructing it 8 weeks later from Salesforce notes. Attached is a short recap of the three post-event motions that pushed that reply rate from 4% to 18% at {{peer_company}}'s tier. If {{company}} already has that number, ignore. If not, worth a read this week?
 
 `channel: email` · `offset: +2d` · `type: email_followup` · `cta: make_offer` · `words: 97`
 
@@ -110,7 +110,7 @@ _Subject:_ (none)
 - Event week: 22,000 people on the floor, 1,500 exhibitors, reps walk in without a named-account list and come back with a booth scan that doesn't map to opportunity stages.
 - Post-event: RevOps pings them asking why event leads show up in Salesforce three weeks later with missing fields.
 
-**Priorities** · fill rep calendars with target accounts before day one · standardise pre-event prep across the team · tie booth meetings back to pipeline in Salesforce · run the same playbook across RSA, Money20/20, and Finovate
+**Priorities** · fill rep calendars with target accounts before day one · standardise pre-event prep across the team · tie booth meetings back to pipeline in Salesforce · run the same motion across RSA, Money20/20, and Finovate
 
 **First-principles pain observations (ammo for the copy below)**
 1. *Booth-scan half-life.* A booth scan rots in 72 hours. By day 11 the lead is cold, the rep cannot remember the conversation, and the voice memo is on a phone someone already wiped. Treating scans like MQLs assumes a web-lead latency tolerance events do not have.
@@ -170,7 +170,7 @@ _Subject:_ `amsterdam scan decay`
 
 _Subject:_ (none)
 
-> {{first_name}}, one week post-{{event_name}}. The recap I linked is what three demand-gen leads at fintechs {{company}}'s size used to get scans into Salesforce as stage-2 opps inside 48 hours. If RevOps has already closed {{event_city}} reconciliation, ignore. If it's still open, worth a look before the playbook becomes next year's apology?
+> {{first_name}}, one week post-{{event_name}}. The recap I linked is what three demand-gen leads at fintechs {{company}}'s size used to get scans into Salesforce as stage-2 opps inside 48 hours. If RevOps has already closed {{event_city}} reconciliation, ignore. If it's still open, worth a look before next year's apology gets written?
 
 `channel: linkedin` · `offset: +7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 57`
 

@@ -45,7 +45,7 @@
   <text x="80" y="208" font-family="Inter, Helvetica, Arial, sans-serif" font-size="72" font-weight="700" fill="#F5F5F3">event-outbound</text>
 
   <!-- Tagline -->
-  <text x="80" y="258" font-family="Inter, Helvetica, Arial, sans-serif" font-size="26" fill="#D9DCE1">Josh-Braun-grounded outbound sequences for B2B events.</text>
+  <text x="80" y="258" font-family="Inter, Helvetica, Arial, sans-serif" font-size="26" fill="#D9DCE1">Permission-based outbound sequences for B2B events.</text>
   <text x="80" y="292" font-family="Inter, Helvetica, Arial, sans-serif" font-size="26" fill="#D9DCE1">Email + LinkedIn, Apollo-ready, validated before it lands.</text>
 
   <!-- Paper card with an email draft -->
@@ -54,9 +54,9 @@
     <text x="110" y="380" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" fill="#8A8F98" letter-spacing="2">SUBJECT</text>
     <text x="110" y="408" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0B0D10">money20/20 attribution</text>
     <line x1="110" y1="420" x2="200" y2="420" stroke="#FF4F8B" stroke-width="3"/>
-    <text x="110" y="456" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">{{first_name}}, most event attribution models inherit inbound logic:</text>
-    <text x="110" y="478" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">last-touch, 90-day window. Events don't behave like that at</text>
-    <text x="110" y="500" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">{{company}}'s size. Attached is a one-page teardown...</text>
+    <text x="110" y="456" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">{{first_name}}, the {{event_name}} line item on {{company}}'s P&amp;L</text>
+    <text x="110" y="478" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">is going to land in front of the CFO under the same last-touch,</text>
+    <text x="110" y="500" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">90-day attribution rules. Attached is a one-page recap...</text>
   </g>
 
   <!-- Validator checklist panel -->

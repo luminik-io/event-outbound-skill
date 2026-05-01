@@ -95,6 +95,27 @@ SaaS-vendor speak that triggers prospect spam-detection.
 | `drive (results\|outcomes\|growth)` | Buzzword chain |
 | `move the needle` | Idiom; banned by voice-rules |
 
+### 5a. Lazy generalization openers
+A new hard-ban category. Cold-email writers (and LLMs imitating them) reach for "Most teams...", "Most companies...", "Most fintechs...", "Almost nobody...", "Everyone is..." as openers because it lets them skip the work of saying something specific to *this* recipient. The result reads as a category-wide observation any vendor could write to any prospect: it pattern-matches to mass blast. The 4T framework's Trigger step requires a specific observation about the recipient or their company. Generalization openers fail the Trigger requirement by definition.
+
+The hard-ban scope is **the opening sentence of any touch body**. Inline use mid-paragraph in long-form prose is fine; opening a cold email or first DM with these patterns is the failure mode.
+
+| Banned (as opener) | Why it fails |
+|---|---|
+| `Most teams` | Generalization that any vendor could send to any recipient |
+| `Most companies` | Same |
+| `Most fintechs` / `Most cybersecurity teams` / `Most B2B SaaS` | Same; even ICP-shaped, still not specific to recipient |
+| `Most VPs` / `Most CMOs` / `Most founders` / `Most operators` / `Most AEs` / `Most SDRs` | Title-shape generalization |
+| `Most {{title}}s I talk to` / `Most folks I work with` / `Most people I speak to` | Self-aggrandising generalization that performs experience without proving it |
+| `Almost nobody` / `Almost no one` | Same shape, negative direction |
+| `Nobody is` / `Nobody on the team` / `Nobody talks about` | Universal-negative claim impossible to verify |
+| `Everyone is` / `Everyone says` / `Everyone knows` | Universal-positive claim impossible to verify |
+| `Every team` / `Every company` / `Every fintech` | Universal-positive; same failure mode |
+| `Many teams` / `Many companies` / `Many of you` | Hedged generalization; same failure |
+| `In our experience` (as opener) | Self-positioning before the recipient observation |
+
+**The right shape**: open with a specific observation about *this* recipient or *this* event. Use the recipient's company name, a public detail about their team, a specific session at the event, or a recent product/funding/hiring signal. If you don't have a specific anchor, reach for a situation trigger ("end of the month and lots of commissions to pay" sized to the recipient's role) before reaching for a generalization. Never open with the population shape.
+
 ### 5b. Cold-email "fake-substantive" words
 A distinct hard-ban category for words that LOOK substantive in cold-email contexts (so writers reach for them, thinking they sound credible) but are so heavily abused in mass outbound that prospects pattern-match them to vendor-deck speak. Different from generic marketing buzzwords because they pretend to describe a concrete asset.
 

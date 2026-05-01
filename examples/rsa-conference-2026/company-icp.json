@@ -13,8 +13,8 @@
         "standardise rep prep across regional AE teams before flights"
       ],
       "painPoints": [
-        "attribution model inheritance: most event attribution inherits inbound logic (last-touch, 90-day window). The booth touch in cyber is the 3rd interaction in a 9-month CISO sales cycle, so the $250K RSA line on the P&L looks like it sourced $0",
-        "sponsorship ROI asymmetry: cyber sponsor packages priced on booth footage and stage time, but the number that correlates with closed-won is reply rate in the 21 days post-show; almost nobody tracks it",
+        "attribution model inheritance: event attribution at cyber companies typically inherits the inbound stack's last-touch, 90-day window. The booth touch in cyber is the 3rd interaction in a 9-month CISO sales cycle, so the $250K RSA line on the P&L reads as sourcing $0",
+        "sponsorship ROI asymmetry: cyber sponsor packages priced on booth footage and stage time, but the number that correlates with closed-won is reply rate in the 21 days post-show. The teams that track it can defend their booth attribution at the next QBR; the teams that do not are reconstructing the number 8 weeks later from Salesforce notes",
         "CISO buying-committee opacity: the attendee list shows VP Sec / Director InfoSec / SecOps lead, but the actual signer is a CISO who didn't attend. Pre-event sequencing without committee mapping is theatre",
         "post-show attribution fade: by week 4 post-RSA, every vendor in the buyer's stack is claiming credit; the rep who actually moved the deal can't prove it"
       ],
@@ -32,7 +32,7 @@
       "priorities": [
         "fill rep calendars with target accounts before day one of the show",
         "tie booth meetings back to opportunity stages in Salesforce/HubSpot",
-        "run the same pre-event playbook across RSA, Black Hat, and re:Invent",
+        "run the same pre-event motion across RSA, Black Hat, and re:Invent",
         "kill the spreadsheet step between booth scan and SDR follow-up"
       ],
       "painPoints": [

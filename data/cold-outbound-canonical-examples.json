@@ -184,6 +184,36 @@
       "source": "synthesis-doc:fail-8",
       "expected_failures": ["over_200_chars", "self_introduction", "looking_forward_to_hearing", "exclamation"],
       "annotation": "Way over 200 chars (~370). Self-introduction. Pitch-shaped."
+    },
+    {
+      "id": "lazy_gen_most_teams",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "event roi",
+      "body": "Pete, most teams treat events like a gamble. how are you measuring booth-to-pipeline at Warmbox? Series B fintechs we worked with cut cost-per-opp by 38%. open to a look?",
+      "source": "synthesis-doc:fail-9",
+      "expected_failures": ["lazy_generalization_openers"],
+      "annotation": "Opens with population-shape generalization that any vendor could send to any prospect. Auto-rejected."
+    },
+    {
+      "id": "lazy_gen_most_titles_i_talk_to",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "rsa attribution",
+      "body": "Sarah, most VP Fraud folks I talk to walk into RSA already knowing the rule-engine pitch. how are you sizing the false-positive tradeoff at Plaid? Three Series B fintechs cut false-positive rate 35%. open to learning more?",
+      "source": "synthesis-doc:fail-10",
+      "expected_failures": ["lazy_generalization_openers"],
+      "annotation": "Opens with title-shape generalization that performs experience without proving it. Auto-rejected."
+    },
+    {
+      "id": "lazy_gen_almost_nobody",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "fintech reply rate",
+      "body": "Anna, almost nobody tracks reply rate in the 14 days after a fintech conference. how are you tracking that number at Plaid? Three demand-gen leads pushed it from 4% to 18%. open to a look?",
+      "source": "synthesis-doc:fail-11",
+      "expected_failures": ["lazy_generalization_openers"],
+      "annotation": "Opens with universal-negative claim impossible to verify. Auto-rejected."
     }
   ]
 }
