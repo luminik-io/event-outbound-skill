@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://www.luminik.io"><img src="https://www.luminik.io/luminik-icon.svg" alt="Luminik" width="72" height="72" /></a>
+<a href="https://www.luminik.io"><img src="https://www.luminik.io/luminik-logo.svg" alt="Luminik" height="56" /></a>
 
 # event-outbound
 
