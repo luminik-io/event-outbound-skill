@@ -8,9 +8,9 @@
 
 ## Sequence quality summary
 
-- **Touches:** 12 total · 3 flagged `rules_violated` · 7 scored `top-tier` (>=4.5/5)
-- **Average quality:** 3.96/5
-- **Score bands:** 2 ship, 7 top-tier, 3 rewrite
+- **Touches:** 12 total · 1 flagged `rules_violated` · 9 scored `top-tier` (>=4.5/5)
+- **Average quality:** 4.54/5
+- **Score bands:** 2 ship, 9 top-tier, 1 rewrite
 - **CTA mix:** 2 none, 6 make_offer, 4 ask_for_interest
 - **Illumination-question coverage:** 83% of touches
 
@@ -30,7 +30,7 @@
 
 _Subject:_ (none)
 
-> Looks like {{company}} is preparing for RSA Conference 2026. Your peers often struggle with proving pipeline directly from events.
+> Looks like {{company}} is prepping for RSA Conference 2026, {{first_name}}, so you're likely working on proving its pipeline impact.
 
 `channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 19` · `quality: 4.0/5 (ship)`
 
@@ -38,11 +38,11 @@ _Subject:_ (none)
 
 ### Touch 2: T-14d · email_cold
 
-_Subject:_ `rsa pipeline attribution`
+_Subject:_ `event pipeline attribution`
 
-> looks like {{company}} will be at RSA, which suggests {{first_name}}, you're likely thinking about how to prove pipeline impact from the event. how are you ensuring the $250K RSA budget line shows up as pipeline sourced, not just influenced, in your board deck? Okta and Palo Alto Networks are using us to attribute 60% more pipeline directly to events like RSA, compared to their old last-touch models. it involves mapping early-stage event interactions to specific buying committee members, even if they didn't scan. open to comparing notes on how?
+> noticed {{first_name}}, {{company}} is preparing for {{event_name}} this year, which often means an upcoming push for event-sourced pipeline. how are you ensuring your {{event_name}} investment translates into provable pipeline credit, especially with long sales cycles? Cisco and Palo Alto Networks are using us to increase post-event reply rates from 5% to over 25% within 21 days. it involves a pre-event committee mapping and post-show sequencing engine. open to comparing notes?
 
-`channel: email` · `offset: T-14d` · `type: email_cold` · `cta: make_offer` · `words: 89` · `quality: 5.0/5 (top-tier)`
+`channel: email` · `offset: T-14d` · `type: email_cold` · `cta: make_offer` · `words: 70` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -50,9 +50,9 @@ _Subject:_ `rsa pipeline attribution`
 
 _Subject:_ (none)
 
-> Noticing RSA Conference is next week, {{first_name}}. How are you ensuring your event efforts at {{company}} turn booth scans into trackable pipeline, not just contacts? Okta and Crowdstrike use us to attribute 60% more closed-won deals to their events. Worth an exchange?
+> noticed {{first_name}}, {{company}} is heading to RSA Conference next week. how are you ensuring that event budget translates into a clear, board-ready attribution story for {{company}}? open to comparing notes?
 
-`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 42` · `quality: 1.5/5 (rewrite)` · `validation: rules_violated`
+`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 30` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -60,19 +60,19 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> Noticed {{company}} is at RSA Conference this week, {{first_name}}; how are you tracking post-event pipeline beyond last-touch attribution? Okta and CrowdStrike use us to directly attribute 65% more pipeline from events like this, compared to 10% before. It connects every booth interaction directly to your CRM. Open to comparing notes?
+> {{first_name}}, looks like you're at {{event_name}} today in {{event_city}}, so how are you ensuring the pipeline from this event translates into a clear board-ready attribution story for {{company}}? Palo Alto Networks and Crowdstrike use us to show 3x more event-sourced pipeline. Worth a quick exchange?
 
-`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 50` · `quality: 1.5/5 (rewrite)` · `validation: rules_violated`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 45` · `quality: 5.0/5 (top-tier)`
 
 ---
 
 ### Touch 5: T+2d · email_followup
 
-_Subject:_ `rsa event pipeline`
+_Subject:_ `rsa pipeline`
 
-> noticed the RSA Conference agenda included sessions on AI in cybersecurity, which suggests {{company}} is exploring new ways to measure event impact. how are you tracking the actual pipeline sourced from events like RSA, especially with long sales cycles and opaque buying committees? CrowdStrike and Palo Alto Networks are using us to attribute 70% of their event-influenced pipeline, compared to 20% before, by connecting event interactions to full buying committees in their CRM. worth a look at how {{company}} could do this, {{first_name}}?
+> noticed RSA Conference 2026 just wrapped, {{first_name}}, which likely means you're evaluating the pipeline impact of your team's efforts at {{company}}. How are you connecting the dots between those booth interactions and attributed pipeline for {{company}}'s next board deck? Cloudflare and Palo Alto Networks use us to attribute 30% of their event-sourced pipeline to specific touches, compared to 5% before. It involves a post-event scoring model that identifies true deal momentum. Worth a skim?
 
-`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 83` · `quality: 5.0/5 (top-tier)`
+`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 74` · `quality: 1.5/5 (rewrite)` · `validation: rules_violated`
 
 ---
 
@@ -80,9 +80,9 @@ _Subject:_ `rsa event pipeline`
 
 _Subject:_ (none)
 
-> noticed a few VPs like {{first_name}} at RSA discussing how tough it is to attribute pipeline back to specific event touches. how are you ensuring your team at {{company}} can attribute pipeline beyond first or last touch, especially after a show like RSA? companies like Palo Alto Networks and CrowdStrike use us to show 3x faster pipeline attribution from events by mapping buyer committee engagement. worth a look at how other VPs of Marketing are solving this?
+> noticed RSA Conference 2026 wrapped up last week, {{first_name}}, which often brings the question of proving pipeline sourced from events for {{company}}. How are you ensuring the investment in {{event_name}} shows up as sourced pipeline for {{company}}'s board, given the long cyber sales cycle? Palo Alto and Crowdstrike use us to prove 70% more event-sourced pipeline to their CFOs compared to traditional last-touch models by mapping early interactions to late-stage deals, even with long sales cycles. Worth a look at how other cyber companies do this?
 
-`channel: linkedin` · `offset: T+7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 77` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T+7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 86` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -96,7 +96,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> Hi {{first_name}}, noticed you're likely planning for RSA Conference 2026 at {{company}}. Connecting with other demand gen leaders focused on maximizing event ROI.
+> Hi {{first_name}}, noticed you're likely planning for RSA Conference 2026 at {{company}}. Ensuring those booth meetings consistently convert to pipeline can be tough.
 
 `channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 23` · `quality: 4.0/5 (ship)`
 
@@ -104,11 +104,11 @@ _Subject:_ (none)
 
 ### Touch 2: T-14d · email_cold
 
-_Subject:_ `rsa conference meetings`
+_Subject:_ `rsa meetings pipeline`
 
-> noticed {{company}} is heading to RSA Conference soon, which suggests you're probably focused on filling rep calendars with target accounts. how are you making sure your reps secure enough meetings with target accounts before day one of RSA? Cisco and Palo Alto Networks are using us to book 3x more target account meetings for their reps at events like RSA compared to random booth traffic before. it involves identifying high-intent accounts and automating outreach to secure those meetings. worth a look?
+> noticed {{first_name}}, you're likely gearing up for RSA Conference 2026, which suggests getting target accounts on rep calendars before the show is a priority for {{company}}. How are you ensuring your reps are only meeting with named accounts, not just random booth traffic? Demand gen leaders at Okta and Palo Alto Networks use us to convert 80% of booth meetings into qualified pipeline, compared to 30% before, by automating badge scans directly to CRM and pre-qualifying attendees against your ICP. Worth a look at how we pre-load target accounts for your reps?
 
-`channel: email` · `offset: T-14d` · `type: email_cold` · `cta: make_offer` · `words: 81` · `quality: 5.0/5 (top-tier)`
+`channel: email` · `offset: T-14d` · `type: email_cold` · `cta: make_offer` · `words: 92` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -116,9 +116,9 @@ _Subject:_ `rsa conference meetings`
 
 _Subject:_ (none)
 
-> Noticed RSA Conference is coming up for {{company}}, {{first_name}}. How are you ensuring reps connect with named accounts instead of general booth traffic? Palo Alto Networks and Zscaler use us to book 3x more pre-show ICP meetings. Open to comparing notes?
+> {{first_name}}, with RSA Conference 2026 approaching for {{company}}, how are you ensuring your booth scans activate effectively before they go cold past the 72-hour mark? Companies like Okta are activating 85% of their event leads in 48 hours, up from 20%. Worth a peek?
 
-`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 41` · `quality: 1.5/5 (rewrite)` · `validation: rules_violated`
+`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 44` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -126,19 +126,19 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> Looks like you're at RSA today, {{first_name}}. How are you ensuring your booth leads at {{company}} move from scan to SDR follow-up before they go cold? Open to comparing notes at Moscone?
+> {{first_name}}, at RSA today, how are you ensuring booth scans turn into pipeline for {{company}}? CrowdStrike gets 80% of scans to meetings in 48 hours, not 15% before. Worth a look?
 
-`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 32` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 31` · `quality: 5.0/5 (top-tier)`
 
 ---
 
 ### Touch 5: T+2d · email_followup
 
-_Subject:_ `rsa conference leads`
+_Subject:_ `rsa leads`
 
-> noticed the RSA Conference wrapped up, {{first_name}}, which usually means a flood of booth scans for {{company}} that can go cold quickly. how are you making sure the right leads from RSA turn into actual pipeline? CyberGuard and SecureFlow are using us to convert 3x more event scans into pipeline compared to traditional follow-up, by automating lead qualification and rep assignment directly from booth scans. worth a look?
+> {{first_name}}, noticed the focus on AI in Cybersecurity at {{event_name}} often means a surge of new leads, but how are you ensuring that high volume translates into qualified pipeline before they go cold for {{company}}? CrowdStrike and Palo Alto Networks use us to convert 75% of their event scans to qualified meetings in 3 days, compared to 10-15 days before. This involves a real-time sync between badge scans and your CRM. Worth a look?
 
-`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 68` · `quality: 5.0/5 (top-tier)`
+`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 74` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -146,8 +146,8 @@ _Subject:_ `rsa conference leads`
 
 _Subject:_ (none)
 
-> noticed you were at {{event_name}}, {{first_name}}, which often brings up the challenge of quickly converting those booth conversations into pipeline for {{company}}. how are you ensuring those valuable event interactions don't go cold before reps can follow up effectively? VMware and Palo Alto Networks use us to convert 75% of event scans into qualified meetings within 5 days (vs 20% before) by automating follow-up and CRM sync from the booth. worth a look at how that works?
+> noticed you were at RSA Conference last week, {{first_name}}. How are you ensuring those event leads don't go cold for {{company}} before your reps can engage them? Okta and CrowdStrike use us to get 85% of their event leads into SDR cadences within 48 hours, compared to 15% before, by automating the lead-to-CRM flow and intelligent rep assignment. Worth a look?
 
-`channel: linkedin` · `offset: T+7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 77` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T+7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 61` · `quality: 5.0/5 (top-tier)`
 
 ---
