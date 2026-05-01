@@ -70,9 +70,18 @@ export type OutreachTouch = {
     subjectWordCount: number;
     allLowercase: boolean;
     bodyWordCount: number;
+    bodyCharCount: number;
+    bodySentenceCount: number;
     bannedWordsFound: string[];
     youVsWeRatio: number;
+    hasIlluminationQuestion: boolean;
+    hasLeadingQuestion: boolean;
+    hasEmDash: boolean;
+    hasExclamation: boolean;
+    hasEmoji: boolean;
+    specificityHits: number;
   };
+  validation_errors?: ValidationError[];
   quality_flag?: 'rules_violated';
 };
 

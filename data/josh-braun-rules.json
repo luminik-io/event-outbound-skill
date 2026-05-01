@@ -1,0 +1,121 @@
+{
+  "_source": "data/josh-braun-frameworks.md (Encoding plan §2)",
+  "_about": "Josh Braun-specific machine-readable rules. Layered on top of cold-email-benchmarks.json (the cross-source baseline). Channel-specific length tables, JB-only banned phrases, the leading-question regex, and the illumination-question heuristic.",
+  "channel_length_rules": {
+    "cold_email_first_touch": {
+      "min_words": 50,
+      "max_words": 100,
+      "min_sent": 3,
+      "max_sent": 5,
+      "_source": "Cold_Email_Messages:561-563 (\"literally four to five sentences\")"
+    },
+    "cold_email_followup_2": {
+      "min_words": 40,
+      "max_words": 90,
+      "min_sent": 3,
+      "max_sent": 4,
+      "_source": "Cold_Email_Messages:826-840"
+    },
+    "cold_email_followup_3plus": {
+      "min_words": 25,
+      "max_words": 60,
+      "min_sent": 2,
+      "max_sent": 3,
+      "_source": "Pattern interrupts: lumpy mail, video, embedded graphic"
+    },
+    "linkedin_connection_request": {
+      "max_chars": 200,
+      "max_words": 35,
+      "min_words": 18,
+      "min_sent": 1,
+      "max_sent": 2,
+      "_source": "LinkedIn free-tier 200-char ceiling; JB DM example is 32 words / 200 chars"
+    },
+    "linkedin_dm_post_connect": {
+      "min_words": 50,
+      "max_words": 120,
+      "min_sent": 3,
+      "max_sent": 5,
+      "_source": "JB cadence; LinkedIn 1300-char ceiling allows more but JB stays short"
+    },
+    "linkedin_day_of_nudge": {
+      "min_words": 30,
+      "max_words": 60,
+      "min_sent": 2,
+      "max_sent": 3,
+      "_source": "JB lean-back CTA principle (Cold_Email_Messages:614-672)"
+    },
+    "post_event_followup": {
+      "min_words": 40,
+      "max_words": 90,
+      "min_sent": 2,
+      "max_sent": 4,
+      "_source": "Post-event \"It was great meeting at X\" pattern"
+    }
+  },
+  "median_sentence_length_max": 12,
+  "_median_sentence_length_source": "LinkedIn-CSV stats: median sentence = 6 words; 78% of sentences under 10. Soft cap at 12.",
+  "additional_banned_phrases": [
+    "would you be interested",
+    "if I could",
+    "wouldn't you agree",
+    "we're the best",
+    "we're the only",
+    "industry-leading",
+    "world-class",
+    "best-in-class",
+    "cutting-edge",
+    "robust",
+    "scalable",
+    "seamless",
+    "drive results",
+    "move the needle",
+    "next-gen",
+    "mission-critical",
+    "paradigm shift",
+    "book a call",
+    "schedule a meeting",
+    "calendar link",
+    "15 minutes",
+    "30 minutes",
+    "quick demo",
+    "happy to send",
+    "happy to share",
+    "happy to chat",
+    "award-winning"
+  ],
+  "_additional_banned_phrases_source": "JB CSV phrase-frequency analysis (data/josh-braun-frameworks.md:380-401). Counts in 1998-post corpus: best-in-class 0, world-class 0, cutting-edge 0, industry-leading 0, robust 0, scalable 0, drive results 0, game-changer 0. JB ridicules \"if I could 10x your revenue\" + \"would you be interested\" (4T:47-62).",
+  "leading_question_pattern": {
+    "regex": "\\b(if I could|wouldn'?t you|don'?t you think|would you be interested|would you be open to a (?:15|30)|would you agree)\\b",
+    "flags": "i",
+    "fail": true,
+    "_source": "4T:55-62. The moon-and-stars + leading-question family."
+  },
+  "illumination_question_required": {
+    "applies_to": [
+      "cold_email_first_touch",
+      "email_cold",
+      "linkedin_dm_post_connect"
+    ],
+    "regex": "\\b(how|what|why)\\s+(are|do|is|can|could|would|should|did)\\s+(you|your)\\b",
+    "flags": "i",
+    "min_count": 1,
+    "_source": "4T:84-100. Every cold-email-first-touch and post-connect DM must have at least one neutral how/what/why-are-you question."
+  },
+  "specific_pass_phrases": {
+    "lean_back_ctas": [
+      "worth a look",
+      "worth a peek",
+      "worth a skim",
+      "worth a read",
+      "worth an exchange",
+      "worth a conversation",
+      "open to learning more",
+      "open to comparing notes",
+      "or tabled",
+      "or table for now",
+      "or ignore"
+    ],
+    "_source": "JB approved closers (4T transcript + Cold_Email_Messages:646-672)."
+  }
+}

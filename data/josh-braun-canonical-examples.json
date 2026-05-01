@@ -1,0 +1,189 @@
+{
+  "_source": "data/josh-braun-frameworks.md sections \"Canonical should pass examples\" + \"Canonical should fail examples\". JB's voice is preserved verbatim (ASCII-only: em-dashes converted to commas/periods per workspace policy).",
+  "pass_examples": [
+    {
+      "id": "warmbox_cold_first_touch",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "cold emails in spam?",
+      "body": "noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises your inbox reputation. open to a look?",
+      "source": "4T_framework_cold_email_Josh_Braun.txt:175-240",
+      "annotation": "Canonical 4T cold email. Word count 60. Sentences 4. Pronouns: you/your=4, we/our=1. Trigger (hiring SDRs) -> Think (deliverability question) -> Third-party (Google/Salesforce + 94% vs 12%) -> Talk (open to a look)."
+    },
+    {
+      "id": "captivateiq_cold_first_touch",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "end of month",
+      "body": "Steve, end of the month and lots of commissions to pay. curious how are you dealing with the labor-intensive error-prone process of hard pasting Excel pages into Google Sheets running commissions? Gong is using CaptivateIQ to run monthly commissions in 5 minutes instead of 5 hours. no rebuilding individual Google Sheets, manual entry, or customizing reports. worth the conversation?",
+      "source": "How_to_construct_an_effective_cold_email_Josh_Braun.txt",
+      "annotation": "Situation trigger (end-of-month commissions, true regardless of profile). Multi-line illumination question with a specific painful current process. Third-party Gong + 5 minutes vs 5 hours contrast. Lean-back CTA."
+    },
+    {
+      "id": "titanx_cold_first_touch",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "more at bats",
+      "body": "Pete, looks like you have 9 SDRs cold calling Directors of Benefits and CHROs. how are you giving your reps more at bats? SDRs using TitanX have 6-8 conversations every 50 dials, compared to 1-2 before. we identify the people most likely to answer. no long-term contracts or new tech to implement. open to learning more?",
+      "source": "LinkedIn-CSV:Sheet1 (JB's own LinkedIn 4T post)",
+      "annotation": "JB's literal teaching example. 70 words. Specific trigger (9 SDRs / Benefits / CHROs). Illumination question (\"more at bats\" is JB's exact phrase). 6-8 vs 1-2 contrast pivot."
+    },
+    {
+      "id": "truebill_cold_first_touch",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "subscriptions",
+      "body": "looks like you just cut the cord, which suggests you're subscribed to Netflix, Hulu, and YouTube Premium. how do you know you're not overpaying for subscriptions you forgot about? built an app being used by over 3,000 cord-cutters that shows all your subscriptions in one place and lets you cancel the ones you don't want with a click. typically saves $23/month. worth a look?",
+      "source": "Josh_Braun_Cold_Email_Messages.txt:539-577",
+      "annotation": "67 words. \"Looks like\" trigger opener (44 hits in JB CSV). Specific dollar amount. Lean-back CTA."
+    },
+    {
+      "id": "solopreneur_tax_cold_first_touch",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "boca taxes",
+      "body": "Josh, it looks like you're self-employed in Boca Florida. if you make over 75K a year, you're probably overpaying taxes even if you have an accountant. it involves some tweaks to the tax laws that are only available to solopreneurs that most general accountants aren't aware of. worth an exchange?",
+      "source": "Josh_Braun_Cold_Email_Messages.txt:339-366",
+      "annotation": "Real cold email JB received and praised. 53 words. Inline objection-handler (\"even if you have an accountant\"). \"Worth an exchange?\" closer."
+    },
+    {
+      "id": "podcast_editing_li_connect",
+      "channel": "linkedin",
+      "touch_type": "linkedin_connection_request",
+      "subject": "",
+      "body": "Josh, looks like your podcast episodes are under five minutes. do you ever do long-form interviews? if so, any conditions you'd consider hiring an editor?",
+      "source": "LinkedIn-CSV:Sheet1",
+      "annotation": "JB gold-standard DM. 26 words / 158 chars. Compresses 4T into 3 sentences. JB gloss: \"No filler. No agenda. A gentle knock. They noticed something. Asked a question with humble curiosity. And left space for reflection.\""
+    },
+    {
+      "id": "fintech_li_connect",
+      "channel": "linkedin",
+      "touch_type": "linkedin_connection_request",
+      "subject": "",
+      "body": "Avi, saw you're hiring 4 AEs for the SOC2 compliance vertical. curious how you're getting them ramped on the new pricing model. open to comparing notes?",
+      "source": "synthesis-doc:linkedin-pass-2",
+      "annotation": "27 words / ~165 chars. Trigger (hiring AEs) + neutral question + lean-back CTA."
+    },
+    {
+      "id": "truebill_li_dm_post_connect",
+      "channel": "linkedin",
+      "touch_type": "linkedin_dm_post_connect",
+      "subject": "",
+      "body": "Thanks for connecting, Pete. saw on your profile you just moved off cable. probably means you're juggling Netflix, Hulu, YouTube Premium, maybe Spotify too. quick question, how do you know you're not paying for subscriptions you forgot about? we built an app used by 3,000+ cord-cutters that shows everything in one place and cancels with a click. typically catches $23/month in forgotten subs. worth a peek?",
+      "source": "synthesis-doc:linkedin-dm-pass-1",
+      "annotation": "70 words. Adapts Truebill 4T pattern to post-connect DM."
+    },
+    {
+      "id": "rsa_li_day_of_nudge",
+      "channel": "linkedin",
+      "touch_type": "linkedin_day_of_nudge",
+      "subject": "",
+      "body": "Pete, running our identity-verification roundtable today at 4pm at the Marriott bar (a block from Moscone West). 8 CISOs already RSVP'd, room for 2 more. low-pressure, no slides, just a conversation. swing by?",
+      "source": "synthesis-doc:linkedin-day-of-pass-1",
+      "annotation": "40 words. Concrete time + place. \"low-pressure\" used as descriptive adjective (allowed) not defensive opener."
+    },
+    {
+      "id": "blackhat_post_event_followup",
+      "channel": "email",
+      "touch_type": "post_event_followup",
+      "subject": "mfa rollout",
+      "body": "Pete, appreciated your take on phishing-resistant MFA at the Friday breakfast. you mentioned the rollout to your help desk was the friction point. how are you keeping the help desk from defaulting back to SMS resets? we've seen Auth0 + a 30-second runbook get adoption from 40% to 92%. worth comparing notes?",
+      "source": "synthesis-doc:post-event-pass-1",
+      "annotation": "56 words. Post-event hook + illumination question + 3rd-party validation + soft CTA."
+    }
+  ],
+  "fail_examples": [
+    {
+      "id": "moon_and_stars",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "10x your pipeline",
+      "body": "Hi Pete, hope this finds you well! If I could 10x your outbound pipeline in the next 90 days, would you be interested? We're the industry-leading platform that's revolutionizing the way modern revenue teams unlock their growth potential. Happy to share a quick 15-min demo at your convenience!",
+      "source": "synthesis-doc:fail-1",
+      "expected_failures": [
+        "subject_buzzword_10x",
+        "hope this finds you well",
+        "leading_question_if_I_could",
+        "leading_question_would_you_be_interested",
+        "self_praise_industry-leading",
+        "buzzword_revolutionizing",
+        "buzzword_unlock",
+        "buzzword_growth_potential",
+        "happy_to_share",
+        "15_minutes_meeting_ask",
+        "exclamation_marks"
+      ],
+      "annotation": "8+ separate violations. The canonical anti-example."
+    },
+    {
+      "id": "irrelevant_trigger",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "florida state",
+      "body": "Hey Josh, noticed you went to Florida State University. how are you ensuring cold emails don't land in spam? Warmbox helps with deliverability. want to meet?",
+      "source": "synthesis-doc:fail-2 (4T:199-204)",
+      "expected_failures": ["trigger_think_incoherence", "premature_meeting_ask"],
+      "annotation": "Trigger and Think have nothing to do with each other (S1). LLM-judge eval, not regex."
+    },
+    {
+      "id": "multi_problem_mash",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "outbound",
+      "body": "looks like you're hiring SDRs. how are you ensuring deliverability, dialer connect rates, LinkedIn reply rates, AE handoff quality, and rep ramp time? Warmbox does inbox warm-up, Orum does parallel dial, Apollo does prospecting, Gong does coaching, and we tie it all together. interested?",
+      "source": "synthesis-doc:fail-3 (Cold_Email_Messages:758-773)",
+      "expected_failures": ["multiple_problems_in_one_email"],
+      "annotation": "Five problems crammed in (H19). LLM-judge eval."
+    },
+    {
+      "id": "pitchy_cta",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "deliverability",
+      "body": "looks like your team is doubling. how are you ensuring cold emails land in inboxes? Warmbox helps Google and Salesforce hit 94% inbox placement. Can we book 30 minutes on your calendar this week?",
+      "source": "synthesis-doc:fail-4",
+      "expected_failures": ["book_a_call", "30_minutes", "calendar"],
+      "annotation": "CTA is needy / direct meeting ask (H9, S6). Banned phrases catch this."
+    },
+    {
+      "id": "leading_question_yesno",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "sdrs",
+      "body": "looks like you're hiring SDRs. would you agree that getting cold emails into the inbox is critical to your team's success? Warmbox solves it. interested?",
+      "source": "synthesis-doc:fail-5",
+      "expected_failures": ["leading_question_would_you_agree"],
+      "annotation": "Leading question (\"would you agree\"), value-prop framing instead of neutral problem framing (S2)."
+    },
+    {
+      "id": "gated_asset",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "deliverability checklist",
+      "body": "looks like you're hiring SDRs. we built a deliverability checklist used by 200+ teams. Want me to send it over? Happy to share if useful.",
+      "source": "synthesis-doc:fail-6",
+      "expected_failures": ["want_me_to_send", "happy_to_share"],
+      "annotation": "Gating language (H17). Attach or link, never gate."
+    },
+    {
+      "id": "defensive_opener",
+      "channel": "email",
+      "touch_type": "email_cold",
+      "subject": "sdrs",
+      "body": "Not a pitch, no strings attached, just thought you might find this useful. looks like you're hiring SDRs. how are you ensuring cold emails don't land in spam?",
+      "source": "synthesis-doc:fail-7",
+      "expected_failures": ["not_a_pitch", "no_strings"],
+      "annotation": "Defensive throat-clearing (H18). Telegraphs \"I am about to pitch you.\""
+    },
+    {
+      "id": "li_connect_bloat",
+      "channel": "linkedin",
+      "touch_type": "linkedin_connection_request",
+      "subject": "",
+      "body": "Hi Pete, my name is Anna and I'm a sales development representative at Warmbox. We help cold-email teams achieve 94% inbox placement, dramatically improving their pipeline conversion. We've worked with Google, Salesforce, and over 200 other companies in the SaaS vertical. I'd love to connect and discuss how we might be able to help your team. Looking forward to hearing back!",
+      "source": "synthesis-doc:fail-8",
+      "expected_failures": ["over_200_chars", "self_introduction", "looking_forward_to_hearing", "exclamation"],
+      "annotation": "Way over 200 chars (~370). Self-introduction. Pitch-shaped."
+    }
+  ]
+}
