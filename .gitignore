@@ -7,6 +7,8 @@ marketing/
 plans/
 scripts/*
 !scripts/verify-install.sh
+!scripts/run-example.ts
+!scripts/scan-deliverables.ts
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log

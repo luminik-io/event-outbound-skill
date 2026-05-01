@@ -42,7 +42,12 @@
     "want me to send", "want me to drop", "want me to meet",
     "no strings", "peer channel", "not a pitch", "no pitch",
     "yours to keep", "if it's of interest", "looking forward to hearing",
-    "no pressure", "hope this", "hope you"
+    "no pressure", "hope this", "hope you",
+    "we're the best", "we're the only", "industry-leading", "world-class",
+    "cutting-edge", "award-winning", "drive results", "move the needle",
+    "next-gen", "mission-critical", "paradigm shift", "robust", "scalable",
+    "seamless", "book a call", "schedule a meeting", "calendar link",
+    "15 minutes", "30 minutes", "quick demo"
   ],
   "exclamation_marks_banned": true,
   "emoji_banned": true,

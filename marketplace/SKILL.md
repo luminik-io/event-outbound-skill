@@ -66,13 +66,8 @@ This skill adheres to the following internal validation criteria:
 *   **Description Quality:** Uses third person, includes specific trigger phrases, and lists concrete scenarios.
 *   **Content Quality:** Body uses imperative/infinitive form, is focused and lean (within 1,500-2,000 words), and points to `src/types/index.ts` for detailed type definitions.
 *   **Progressive Disclosure:** Core concepts are in `SKILL.md`, with detailed type definitions in `src/types/index.ts`.
-*   **Testing:** The skill's agents are covered by unit and integration tests. The final demo sequence in `examples/saastr-annual-2026/` serves as an end-to-end validation.
+*   **Testing:** The skill's agents are covered by unit and integration tests. The worked sequences in `examples/rsa-conference-2026/` and `examples/money2020-europe-2026/` serve as end-to-end validation.
 
 ## Credits
 
-**Teachers and sources we learned from**:
-
-- **[Josh Braun](https://joshbraun.com)**, whose public writing on permission-based cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
-- **Gong's "Ultimate Cold Email Data Report"**: 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
-
-This plugin does not redistribute any proprietary content. It encodes general craft principles from publicly-taught material and published research into validation rules that run at generation time.
+Full credits, sources, and acknowledgments are in the repository [README](https://github.com/luminik-io/event-outbound-skill#credits). The plugin does not redistribute any proprietary content; it encodes general craft principles from publicly-taught material and published research into validation rules that run at generation time.

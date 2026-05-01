@@ -19,10 +19,10 @@ Use whichever account owns the plugin. For Luminik, sign in with `prasad@luminik
 event-outbound
 ```
 
-### Short description (<= 100 chars, 96 here)
+### Short description (<= 100 chars)
 
 ```
-Multi-channel outbound sequences for B2B events. Josh-Braun-grounded, Apollo-ready, validated.
+Multi-channel outbound sequences for B2B events. Permission-based, Apollo-ready, validated.
 ```
 
 ### Long description (280 words)
@@ -45,20 +45,19 @@ no exclamation marks, no emoji, no banned gating phrases ("want me to send",
 Failed touches are regenerated up to three times with temperature jitter.
 Anything still failing is flagged rules_violated for human review.
 
-Grounded in 20k+ personalised touches across 50+ B2B events that sourced
-$6M+ in pipeline across fintech (identity verification), cybersecurity, and
-B2B SaaS. The validator rules are distilled from Josh Braun's public
-permission-based outbound writing and Gong's 85M-email "Ultimate Cold Email
-Data Report" co-authored with 30 Minutes to President's Club and Outbound
-Squad.
+Grounded in 20,000+ personalised touches across 50+ B2B events that sourced
+$6M+ in pipeline across fintech (identity verification) and cybersecurity.
+The validator rules are distilled from public research on permission-based
+cold outbound and Gong's 85M-email "Ultimate Cold Email Data Report"
+co-authored with 30 Minutes to President's Club and Outbound Squad.
 
 Primary audience: AEs, SDRs, and event marketers running pre-event meeting
 motions, dinner and side-event invites, booth-visit campaigns, and post-event
 follow-ups. Secondary: founders doing their own outbound.
 
-Two full example runs ship in the repo: Money20/20 Europe 2026 (fintech ICP,
-two personas) and SaaStr Annual 2026 (SaaS ICP, two personas). Both are
-hand-verified 24/24 on Josh Braun's permission-based criteria.
+Worked examples ship in the repo: RSA Conference 2026 (cybersecurity ICP,
+two personas) and Money20/20 Europe 2026 (fintech ICP, two personas). Both
+are hand-verified against the full validator stack across every touch.
 ```
 
 ### Category
@@ -130,7 +129,7 @@ Matches both `.claude-plugin/plugin.json` and the marketplace entry.
 ### Tags / keywords
 
 ```
-josh-braun, cold-outbound, apollo, b2b-events, sequencer, gtm, sdr, ae,
+cold-outbound, permission-based, apollo, b2b-events, sequencer, gtm, sdr, ae,
 event-marketing, cold-email, linkedin, trade-shows, conferences,
 sales-enablement, field-marketing, demand-generation
 ```
@@ -152,7 +151,7 @@ Jane Doe, VP Growth, AcmeCo.
 ### Screenshots / demo
 
 - Cover image: `marketplace/cover-1200x630.png` (the validator-checklist composition).
-- Full example output: `examples/money2020-europe-2026/final_sequence.md` and `examples/saastr-annual-2026/final_sequence.md` in the public repo.
+- Full example output: `examples/rsa-conference-2026/final_sequence.md` and `examples/money2020-europe-2026/final_sequence.md` in the public repo.
 
 ## Pre-submit checklist (confirm before hitting submit)
 

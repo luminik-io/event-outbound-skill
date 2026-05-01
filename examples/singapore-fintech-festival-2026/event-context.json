@@ -1,0 +1,34 @@
+{
+  "name": "Singapore Fintech Festival 2026",
+  "dates": "11-13 November 2026",
+  "location": "Singapore Expo, Singapore",
+  "agendaTitles": [
+    "Identity Verification at Cross-Border Scale",
+    "AI-Powered Fraud and Synthetic Identity Defense",
+    "Real-Time Payments and APP Fraud Liability",
+    "Stablecoins, CBDCs, and the Compliance Stack",
+    "RegTech: From Reactive to Predictive Compliance",
+    "Open Finance and Consent Frameworks in APAC",
+    "KYC at Onboarding: Friction vs. Approval Rate",
+    "Sanctions Screening at Velocity"
+  ],
+  "speakers": [
+    "Ravi Menon (former Managing Director, Monetary Authority of Singapore)",
+    "Sopnendu Mohanty (Chief FinTech Officer, MAS)",
+    "Janet Young (Group Head of Channels and Digital, UOB)",
+    "Jessica Tan (Co-CEO, Ping An Group)",
+    "Tan Su Shan (Group Head of Institutional Banking, DBS)"
+  ],
+  "exhibitorList": [
+    "Microblink",
+    "Onfido",
+    "Jumio",
+    "Sumsub",
+    "Persona",
+    "Alloy",
+    "ComplyAdvantage",
+    "Trulioo",
+    "Socure",
+    "Sardine"
+  ]
+}
