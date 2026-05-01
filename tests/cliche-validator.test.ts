@@ -81,6 +81,34 @@ describe('findLlmCliches: lazy_generalization_openers (new in May 2026)', () => 
     const result = findLlmCliches(text, blocklist);
     expect(result.hardBans.lazy_generalization_openers).toBeUndefined();
   });
+
+  it('flags templated funding-stage aggregation: "Three Series B fintechs we worked with..."', () => {
+    const text =
+      "Three Series B fintechs we worked with cut their false-positive bar 35% without dropping approval rates.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('flags "Two Series A SaaS we partnered with"', () => {
+    const text =
+      "Two Series A SaaS we partnered with hit 6x meeting velocity inside a quarter.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('flags "Series C cybersecurity" as templated proof', () => {
+    const text =
+      "A Series C cybersecurity team we helped raised post-event reply rates from 5% to 25%.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('passes a named-customer third-party validation (the right shape)', () => {
+    const text =
+      "Stripe and Plaid lifted post-event reply rates from 5% to 25% inside 21 days using the same approach.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeUndefined();
+  });
 });
 
 describe('findLlmCliches: cold_email_overused (existing)', () => {
