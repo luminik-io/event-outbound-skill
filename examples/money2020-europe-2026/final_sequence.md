@@ -5,7 +5,7 @@
 **Company size:** 200–2000 employees
 **Lead time:** 4 weeks · **Channels:** LinkedIn + email
 
-> Each touch is an Apollo-ready template. Merge fields use the `{{snake_case}}` syntax supported by Apollo.io, Outreach, Salesloft, Instantly, and Smartlead. Copy is written in the Josh Braun permission-based style: no gating, no "want me to send?", no "not a pitch" throat-clearing. Every email cold and follow-up leads with a first-principles observation about event attribution or booth-scan economics, not the generic "you have a pipeline problem". Every touch passes validation against `data/cold-email-benchmarks.json`: 4-word lowercase subject max, 50–100 word body, 3–4 sentences, banned-phrase blocklist (gating and defensive phrases included), "you/your" pronoun majority, CTA ranked `make_offer` > `ask_for_interest`, zero em-dashes.
+> Each touch is an Apollo-ready template. Merge fields use the `{{snake_case}}` syntax supported by Apollo.io, Outreach, Salesloft, Instantly, and Smartlead. Copy is written in the cold-outbound permission-based style: no gating, no "want me to send?", no "not a pitch" throat-clearing. Every email cold and follow-up leads with a first-principles observation about event attribution or booth-scan economics, not the generic "you have a pipeline problem". Every touch passes validation against `data/cold-email-benchmarks.json`: 4-word lowercase subject max, 50–100 word body, 3–4 sentences, banned-phrase blocklist (gating and defensive phrases included), "you/your" pronoun majority, CTA ranked `make_offer` > `ask_for_interest`, zero em-dashes.
 
 ---
 
@@ -47,9 +47,9 @@
 
 _Subject:_ (none)
 
-> Hi {{first_name}}, noticed {{activity_signal}}. Quick context on why I'm reaching out: a few {{title}}s at fintech scaleups are comparing how they'll prove sourced pipeline from {{event_name}} this year before the CMO asks. Figured the prep math would be more useful to you than another vendor request. Open to connecting?
+> Hi {{first_name}}, noticed {{activity_signal}}. a few {{title}}s at fintech scaleups are comparing how they'll prove sourced pipeline from {{event_name}} before the CMO asks. figured the prep math would be more useful to you than another vendor request. open to connecting?
 
-`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 54`
+`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 47`
 
 ---
 
@@ -57,7 +57,7 @@ _Subject:_ (none)
 
 _Subject:_ `money20/20 attribution`
 
-> {{first_name}}, most event attribution models inherit inbound logic: last-touch, 90-day window. Events don't behave like that at {{company}}'s size. The booth touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K {{event_name}} line on the P&L looks like it sourced $0 and the CMO is about to ask why. Attached is a one-page teardown of how three {{title}}s rebuilt the attribution window to surface the real number before the {{event_city}} show opens. Worth a skim before your board prep locks?
+> {{first_name}}, most event attribution models inherit inbound logic: last-touch, 90-day window. Events don't behave like that at {{company}}'s size. The booth touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K {{event_name}} line on the P&L looks like it sourced $0 and the CMO is about to ask why. Attached is a 1-pager on how three {{title}}s rebuilt the attribution window to surface the real number before the {{event_city}} show opens. Worth a skim before your board prep locks?
 
 `channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 96`
 
@@ -67,7 +67,7 @@ _Subject:_ `money20/20 attribution`
 
 _Subject:_ (none)
 
-> {{first_name}}, one week until {{event_name}} opens. The attribution teardown I linked last week is what other {{title}}s at fintechs {{company}}'s size are running through before flights. If clean event-sourced pipeline isn't on this quarter's board deck, ignore. If it is, worth a read before reps fly to {{event_city}}?
+> {{first_name}}, one week until {{event_name}} opens. The attribution writeup I linked last week is what other {{title}}s at fintechs {{company}}'s size are running through before flights. If clean event-sourced pipeline isn't on this quarter's board deck, ignore. If it is, worth a read before reps fly to {{event_city}}?
 
 `channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 55`
 
@@ -130,7 +130,7 @@ _Subject:_ (none)
 
 _Subject:_ `money20/20 floor math`
 
-> {{first_name}}, the math that decides {{event_name}} happens before reps board the plane. A rep can have roughly 40 real conversations across three days at {{event_city}}. Without a named-account list in hand the week prior, 39 of those 40 are random booth traffic, not {{company}}'s ICP. Linked is a one-page teardown of how three demand-gen leads built the 60-account list, mapped it to {{event_venue}} hall numbers, and landed 24 meetings before day one. If rep calendars are already full for {{event_city}}, ignore. Worth a read before your 1:1s this week?
+> {{first_name}}, the math that decides {{event_name}} happens before reps board the plane. A rep can have roughly 40 real conversations across three days at {{event_city}}. Without a named-account list in hand the week prior, 39 of those 40 are random booth traffic, not {{company}}'s ICP. Linked is a 1-pager on how three demand-gen leads built the 60-account list, mapped it to {{event_venue}} hall numbers, and landed 24 meetings before day one. If rep calendars are already full for {{event_city}}, ignore. Worth a read before your 1:1s this week?
 
 `channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 99`
 
@@ -140,7 +140,7 @@ _Subject:_ `money20/20 floor math`
 
 _Subject:_ (none)
 
-> {{first_name}}, seven days out. The teardown on pre-show named-account mapping is what three demand-gen leads ran last year to get reps off random booth traffic and onto {{company}}'s ICP in {{event_city}}. If rep calendars are already sorted for {{event_name}}, ignore. If they're still fluid, worth a skim before the flight?
+> {{first_name}}, seven days out. The writeup on pre-show named-account mapping is what three demand-gen leads ran last year to get reps off random booth traffic and onto {{company}}'s ICP in {{event_city}}. If rep calendars are already sorted for {{event_name}}, ignore. If they're still fluid, worth a skim before the flight?
 
 `channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 54`
 
@@ -180,7 +180,7 @@ _Subject:_ (none)
 
 1. **Export from Apollo.** Create a sequence in Apollo, add two personas matching the ones above, paste the subject + body into each step. Apollo will substitute `{{first_name}}`, `{{company}}`, etc., from each contact record.
 2. **Fill the custom fields.** `{{peer_company}}`, `{{activity_signal}}`, `{{booth_or_hall}}` are not standard Apollo fields. Either add them as custom fields on the person/account object, or leave them blank (each sentence containing one reads cleanly without it).
-3. **Actually attach the asset.** Every "Attached" / "Linked" / "Linked is" reference in the copy assumes you are sending a real one-page teardown or recap. Do not ship the sequence with nothing to send. If you do not have the asset ready, write it first, then turn on the sequence.
+3. **Actually attach the asset.** Every "Attached" / "Linked" / "Linked is" reference in the copy assumes you are sending a real 1-pager or recap. Do not ship the sequence with nothing to send. If you do not have the asset ready, write it first, then turn on the sequence.
 4. **Do not send identical copy to both personas.** Persona A pain is "prove event-sourced pipeline to the CMO before the board deck". Persona B pain is "get reps off random booth traffic and onto ICP before day one". If you merge the lists, pick one lane per contact.
 5. **Pace the LinkedIn touches.** Apollo Connect requests over 20/day on a normal profile will trigger LinkedIn jail. If your sequence has more than 20 prospects a day, drop Touch 1 and lead with the T-14d email.
 6. **Kill the sequence the moment someone replies.** Every step after a reply is noise.

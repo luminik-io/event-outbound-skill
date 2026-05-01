@@ -5,7 +5,7 @@
 **Company size:** 50–2000 employees (Series A through late growth)
 **Lead time:** 4 weeks · **Channels:** LinkedIn + email
 
-> Each touch is an Apollo-ready template using the `{{snake_case}}` merge-field syntax supported by Apollo.io, Outreach, Salesloft, Instantly, and Smartlead. Copy is written in the Josh Braun permission-based style: no gating, no "want me to send?", no "not a pitch" defensive throat-clearing. Every email cold and follow-up leads with a first-principles observation about event lead scoring or rep-prep economics, not the generic "you have a pipeline problem" framing. Every touch passes validation against `data/cold-email-benchmarks.json`: 4-word lowercase subject max, 50–100 word body, 3–4 sentences, banned-phrase blocklist (gating and defensive phrases included), "you/your" pronoun majority, CTA ranked `make_offer` > `ask_for_interest`, zero em-dashes.
+> Each touch is an Apollo-ready template using the `{{snake_case}}` merge-field syntax supported by Apollo.io, Outreach, Salesloft, Instantly, and Smartlead. Copy is written in the cold-outbound permission-based style: no gating, no "want me to send?", no "not a pitch" defensive throat-clearing. Every email cold and follow-up leads with a first-principles observation about event lead scoring or rep-prep economics, not the generic "you have a pipeline problem" framing. Every touch passes validation against `data/cold-email-benchmarks.json`: 4-word lowercase subject max, 50–100 word body, 3–4 sentences, banned-phrase blocklist (gating and defensive phrases included), "you/your" pronoun majority, CTA ranked `make_offer` > `ask_for_interest`, zero em-dashes.
 
 ---
 
@@ -56,7 +56,7 @@ _Subject:_ (none)
 
 _Subject:_ `saastr lead scoring`
 
-> {{first_name}}, here's why the CRO doesn't believe {{company}}'s {{event_name}} number: most SaaS teams score an event lead on day 1 against a generic MQL rubric, and the score never updates. Q4 forecast opens, the CRO sees event MQLs converting at 4%, cuts the budget, and the accounts that actually would have converted get deprioritized because day-1 scoring flagged them as low intent. Linked is a one-page teardown of how three {{title}}s rebuilt that scoring loop before {{event_city}} last year. If it's already rebuilt at {{company}}, ignore. Worth a skim before board prep?
+> {{first_name}}, here's why the CRO doesn't believe {{company}}'s {{event_name}} number: most SaaS teams score an event lead on day 1 against a generic MQL rubric, and the score never updates. Q4 forecast opens, the CRO sees event MQLs converting at 4%, cuts the budget, and the accounts that actually would have converted get deprioritized because day-1 scoring flagged them as low intent. Linked is a 1-pager on how three {{title}}s rebuilt that scoring loop before {{event_city}} last year. If it's already rebuilt at {{company}}, ignore. Worth a skim before board prep?
 
 `channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 99`
 
@@ -66,7 +66,7 @@ _Subject:_ `saastr lead scoring`
 
 _Subject:_ (none)
 
-> {{first_name}}, one week out from {{event_name}}. The teardown I linked on rebuilding event-lead scoring is what three {{title}}s at SaaS companies {{company}}'s size are running through before flights. If the CRO already counts {{company}}'s event pipeline, ignore. If the conversion still sits below inbound, worth a read before reps land in {{event_city}}?
+> {{first_name}}, one week out from {{event_name}}. The writeup I linked on rebuilding event-lead scoring is what three {{title}}s at SaaS companies {{company}}'s size are running through before flights. If the CRO already counts {{company}}'s event pipeline, ignore. If the conversion still sits below inbound, worth a read before reps land in {{event_city}}?
 
 `channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 55`
 
@@ -129,7 +129,7 @@ _Subject:_ (none)
 
 _Subject:_ `saastr 72 hour sprint`
 
-> {{first_name}}, standard rep-prep playbooks assume a five-day enablement week. {{event_name}} is a 72-hour sprint across a 15,000-person floor. A rep can't internalize 60 named accounts, 10 competitor talking points, and session logistics in a Thursday huddle, so half the {{company}} target list gets forgotten by Tuesday afternoon and never surfaces in the post-show debrief. Linked is a one-page teardown of how three demand-gen leads compressed prep into a pre-flight card reps actually used in {{event_city}}. If that's already solved at {{company}}, ignore. Worth a skim before 1:1s this week?
+> {{first_name}}, standard rep-prep playbooks assume a five-day enablement week. {{event_name}} is a 72-hour sprint across a 15,000-person floor. A rep can't internalize 60 named accounts, 10 competitor talking points, and session logistics in a Thursday huddle, so half the {{company}} target list gets forgotten by Tuesday afternoon and never surfaces in the post-show debrief. Linked is a 1-pager on how three demand-gen leads compressed prep into a pre-flight card reps actually used in {{event_city}}. If that's already solved at {{company}}, ignore. Worth a skim before 1:1s this week?
 
 `channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 99`
 
@@ -139,7 +139,7 @@ _Subject:_ `saastr 72 hour sprint`
 
 _Subject:_ (none)
 
-> {{first_name}}, seven days until {{event_name}}. The pre-flight card teardown is what three demand-gen leads used to keep reps on {{company}}'s ICP through Tuesday at {{event_city}} rather than forgetting half the list. If prep is already locked for {{event_name}}, ignore. If 1:1s still feel fluid, worth a read before the flight?
+> {{first_name}}, seven days until {{event_name}}. The pre-flight card writeup is what three demand-gen leads used to keep reps on {{company}}'s ICP through Tuesday at {{event_city}} rather than forgetting half the list. If prep is already locked for {{event_name}}, ignore. If 1:1s still feel fluid, worth a read before the flight?
 
 `channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 54`
 
@@ -179,7 +179,7 @@ _Subject:_ (none)
 
 1. **Export from Apollo.** Create a sequence, add two personas matching the ones above, paste subject + body into each step. Apollo substitutes `{{first_name}}`, `{{company}}`, etc., from each contact record automatically.
 2. **Fill the custom fields.** `{{peer_company}}`, `{{activity_signal}}`, `{{session_name}}` are not standard Apollo fields. Either add them as custom fields on the person/account object, or leave them blank. Each sentence containing a custom field reads cleanly without it.
-3. **Actually attach the asset.** Every "Linked" / "Attached" reference in the copy assumes a real one-page teardown or recap is attached. Do not ship the sequence without the asset. Write it first, then turn on the sequence.
+3. **Actually attach the asset.** Every "Linked" / "Attached" reference in the copy assumes a real 1-pager or recap is attached. Do not ship the sequence without the asset. Write it first, then turn on the sequence.
 4. **Do not send identical copy to both personas.** Persona A pain is "the CRO doesn't believe the event pipeline number". Persona B pain is "reps forget half the list by Tuesday". If you merge the lists, pick one lane per contact.
 5. **Pace the LinkedIn touches.** Apollo Connect requests over 20/day on a normal profile will trigger LinkedIn jail. If your sequence has more than 20 prospects a day, drop Touch 1 and lead with the T-14d email.
 6. **Kill the sequence the moment someone replies.** Every step after a reply is noise.

@@ -1,0 +1,333 @@
+{
+  "sequencesByPersona": {
+    "vp_marketing": {
+      "personaId": "vp_marketing",
+      "touches": [
+        {
+          "send_at_offset_days": -28,
+          "channel": "linkedin",
+          "touch_type": "linkedin_connect",
+          "subject": "",
+          "body": "Looks like {{company}} is preparing for RSA Conference 2026. Your peers often struggle with proving pipeline directly from events.",
+          "word_count": 19,
+          "cta_type": "none",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 19,
+            "bodyCharCount": 130,
+            "bodySentenceCount": 2,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 5
+          }
+        },
+        {
+          "send_at_offset_days": -14,
+          "channel": "email",
+          "touch_type": "email_cold",
+          "subject": "rsa pipeline attribution",
+          "body": "looks like {{company}} will be at RSA, which suggests {{first_name}}, you're likely thinking about how to prove pipeline impact from the event. how are you ensuring the $250K RSA budget line shows up as pipeline sourced, not just influenced, in your board deck? Okta and Palo Alto Networks are using us to attribute 60% more pipeline directly to events like RSA, compared to their old last-touch models. it involves mapping early-stage event interactions to specific buying committee members, even if they didn't scan. open to comparing notes on how?",
+          "word_count": 89,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 89,
+            "bodyCharCount": 550,
+            "bodySentenceCount": 5,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 21
+          }
+        },
+        {
+          "send_at_offset_days": -7,
+          "channel": "linkedin",
+          "touch_type": "linkedin_nudge",
+          "subject": "",
+          "body": "Noticing RSA Conference is next week, {{first_name}}. How are you ensuring your event efforts at {{company}} turn booth scans into trackable pipeline, not just contacts? Okta and Crowdstrike use us to attribute 60% more closed-won deals to their events. Worth an exchange?",
+          "word_count": 42,
+          "cta_type": "ask_for_interest",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 42,
+            "bodyCharCount": 272,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 7
+          },
+          "validation_errors": [
+            {
+              "rule": "bodySentenceCount",
+              "message": "Body has 4 sentences; expected max 3 for linkedin_day_of_nudge."
+            }
+          ],
+          "quality_flag": "rules_violated"
+        },
+        {
+          "send_at_offset_days": 0,
+          "channel": "linkedin",
+          "touch_type": "linkedin_day_of",
+          "subject": "",
+          "body": "Noticed {{company}} is at RSA Conference this week, {{first_name}}; how are you tracking post-event pipeline beyond last-touch attribution? Okta and CrowdStrike use us to directly attribute 65% more pipeline from events like this, compared to 10% before. It connects every booth interaction directly to your CRM. Open to comparing notes?",
+          "word_count": 50,
+          "cta_type": "ask_for_interest",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 50,
+            "bodyCharCount": 337,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 14
+          },
+          "validation_errors": [
+            {
+              "rule": "bodySentenceCount",
+              "message": "Body has 4 sentences; expected max 3 for linkedin_day_of_nudge."
+            }
+          ],
+          "quality_flag": "rules_violated"
+        },
+        {
+          "send_at_offset_days": 2,
+          "channel": "email",
+          "touch_type": "email_followup",
+          "subject": "rsa event pipeline",
+          "body": "noticed the RSA Conference agenda included sessions on AI in cybersecurity, which suggests {{company}} is exploring new ways to measure event impact. how are you tracking the actual pipeline sourced from events like RSA, especially with long sales cycles and opaque buying committees? CrowdStrike and Palo Alto Networks are using us to attribute 70% of their event-influenced pipeline, compared to 20% before, by connecting event interactions to full buying committees in their CRM. worth a look at how {{company}} could do this, {{first_name}}?",
+          "word_count": 83,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 83,
+            "bodyCharCount": 545,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 11
+          }
+        },
+        {
+          "send_at_offset_days": 7,
+          "channel": "linkedin",
+          "touch_type": "linkedin_followup",
+          "subject": "",
+          "body": "noticed a few VPs like {{first_name}} at RSA discussing how tough it is to attribute pipeline back to specific event touches. how are you ensuring your team at {{company}} can attribute pipeline beyond first or last touch, especially after a show like RSA? companies like Palo Alto Networks and CrowdStrike use us to show 3x faster pipeline attribution from events by mapping buyer committee engagement. worth a look at how other VPs of Marketing are solving this?",
+          "word_count": 77,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 77,
+            "bodyCharCount": 464,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 9
+          }
+        }
+      ],
+      "leadTimeWeeks": 4,
+      "channels": [
+        "email",
+        "linkedin"
+      ]
+    },
+    "demand_gen_lead": {
+      "personaId": "demand_gen_lead",
+      "touches": [
+        {
+          "send_at_offset_days": -28,
+          "channel": "linkedin",
+          "touch_type": "linkedin_connect",
+          "subject": "",
+          "body": "Hi {{first_name}}, noticed you're likely planning for RSA Conference 2026 at {{company}}. Connecting with other demand gen leaders focused on maximizing event ROI.",
+          "word_count": 23,
+          "cta_type": "none",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 23,
+            "bodyCharCount": 163,
+            "bodySentenceCount": 2,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 3
+          }
+        },
+        {
+          "send_at_offset_days": -14,
+          "channel": "email",
+          "touch_type": "email_cold",
+          "subject": "rsa conference meetings",
+          "body": "noticed {{company}} is heading to RSA Conference soon, which suggests you're probably focused on filling rep calendars with target accounts. how are you making sure your reps secure enough meetings with target accounts before day one of RSA? Cisco and Palo Alto Networks are using us to book 3x more target account meetings for their reps at events like RSA compared to random booth traffic before. it involves identifying high-intent accounts and automating outreach to secure those meetings. worth a look?",
+          "word_count": 81,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 81,
+            "bodyCharCount": 507,
+            "bodySentenceCount": 5,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 17
+          }
+        },
+        {
+          "send_at_offset_days": -7,
+          "channel": "linkedin",
+          "touch_type": "linkedin_nudge",
+          "subject": "",
+          "body": "Noticed RSA Conference is coming up for {{company}}, {{first_name}}. How are you ensuring reps connect with named accounts instead of general booth traffic? Palo Alto Networks and Zscaler use us to book 3x more pre-show ICP meetings. Open to comparing notes?",
+          "word_count": 41,
+          "cta_type": "ask_for_interest",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 41,
+            "bodyCharCount": 258,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 10
+          },
+          "validation_errors": [
+            {
+              "rule": "bodySentenceCount",
+              "message": "Body has 4 sentences; expected max 3 for linkedin_day_of_nudge."
+            }
+          ],
+          "quality_flag": "rules_violated"
+        },
+        {
+          "send_at_offset_days": 0,
+          "channel": "linkedin",
+          "touch_type": "linkedin_day_of",
+          "subject": "",
+          "body": "Looks like you're at RSA today, {{first_name}}. How are you ensuring your booth leads at {{company}} move from scan to SDR follow-up before they go cold? Open to comparing notes at Moscone?",
+          "word_count": 32,
+          "cta_type": "ask_for_interest",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 32,
+            "bodyCharCount": 189,
+            "bodySentenceCount": 3,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 8
+          }
+        },
+        {
+          "send_at_offset_days": 2,
+          "channel": "email",
+          "touch_type": "email_followup",
+          "subject": "rsa conference leads",
+          "body": "noticed the RSA Conference wrapped up, {{first_name}}, which usually means a flood of booth scans for {{company}} that can go cold quickly. how are you making sure the right leads from RSA turn into actual pipeline? CyberGuard and SecureFlow are using us to convert 3x more event scans into pipeline compared to traditional follow-up, by automating lead qualification and rep assignment directly from booth scans. worth a look?",
+          "word_count": 68,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 68,
+            "bodyCharCount": 427,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 7
+          }
+        },
+        {
+          "send_at_offset_days": 7,
+          "channel": "linkedin",
+          "touch_type": "linkedin_followup",
+          "subject": "",
+          "body": "noticed you were at {{event_name}}, {{first_name}}, which often brings up the challenge of quickly converting those booth conversations into pipeline for {{company}}. how are you ensuring those valuable event interactions don't go cold before reps can follow up effectively? VMware and Palo Alto Networks use us to convert 75% of event scans into qualified meetings within 5 days (vs 20% before) by automating follow-up and CRM sync from the booth. worth a look at how that works?",
+          "word_count": 77,
+          "cta_type": "make_offer",
+          "checks": {
+            "subjectWordCount": 0,
+            "allLowercase": true,
+            "bodyWordCount": 77,
+            "bodyCharCount": 480,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasLeadingQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "hasEmoji": false,
+            "specificityHits": 14
+          }
+        }
+      ],
+      "leadTimeWeeks": 4,
+      "channels": [
+        "email",
+        "linkedin"
+      ]
+    }
+  }
+}
