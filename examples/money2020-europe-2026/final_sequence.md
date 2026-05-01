@@ -47,9 +47,9 @@
 
 _Subject:_ (none)
 
-> Hi {{first_name}}, noticed {{activity_signal}}. Quick context on why I'm reaching out: a few {{title}}s at fintech scaleups are comparing how they'll prove sourced pipeline from {{event_name}} this year before the CMO asks. Figured the prep math would be more useful to you than another vendor request. Open to connecting?
+> Hi {{first_name}}, noticed {{activity_signal}}. a few {{title}}s at fintech scaleups are comparing how they'll prove sourced pipeline from {{event_name}} before the CMO asks. figured the prep math would be more useful to you than another vendor request. open to connecting?
 
-`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 54`
+`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 47`
 
 ---
 

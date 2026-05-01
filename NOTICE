@@ -1,0 +1,45 @@
+event-outbound-skill
+Copyright 2026 DataRavel Inc. (Luminik)
+
+Licensed under the MIT License (see LICENSE).
+
+This product encodes general craft principles from publicly-taught material
+and published research into validation rules that run at generation time.
+None of the source material is redistributed; only validators, prompts, and
+worked examples in our own voice ship in this repo.
+
+ATTRIBUTION
+
+Josh Braun (https://joshbraun.com)
+  Public writing on permission-based cold outbound. The 4T framework
+  (Trigger -> Think -> Third-party -> Talk?), illumination-question shape,
+  lean-back CTA preference, and the "you" > "we" pronoun discipline reflected
+  in `data/josh-braun-frameworks.md` and `data/josh-braun-rules.json` are
+  derived from his openly-published teaching. Canonical pass/fail examples
+  in `data/josh-braun-canonical-examples.json` cite the original lessons in
+  their `source` fields.
+
+Gong + 30 Minutes to President's Club + Outbound Squad
+  "Ultimate Cold Email Data Report" (85M emails analysed, publicly published).
+  The benchmark numbers we validate against, including subject-length impact,
+  CTA-type reply-rate deltas, and word-count sweet spots, are sourced from
+  this report and recorded in `data/cold-email-benchmarks.json` and
+  `data/cold-email-data-report-stats.md` with citations.
+
+LLM-cliche blocklist
+  The 8-category blocklist in `data/llm-cliche-blocklist.md` is compiled from
+  public GPT-detection research (Stanford CRFM, GPTZero linguistic markers,
+  community-tracked GPT-overused-vocabulary lists), the published Lavender
+  Live transcript, the Gong/30MPC 85M-email report, and Luminik's own
+  workspace voice rules. None of this content is JB-specific; it is a
+  defensive layer against the broader "LLM-shaped copy" pattern.
+
+Luminik (https://luminik.io)
+  Publisher and maintainer. Validators, agent code, prompts, scoring layer,
+  worked example fixtures, and synthesis docs in this repo are original work
+  by Luminik (DataRavel Inc., Oslo).
+
+If you reuse the validators, prompts, or canonical examples in derivative
+work, attribution back to Luminik and the upstream teachers above is
+appreciated but not legally required (MIT). The teachers above are not
+affiliated with Luminik and have not endorsed this project.

@@ -50,7 +50,73 @@ export type JoshBraunRules = {
     min_count: number;
   };
   specific_pass_phrases?: { lean_back_ctas?: string[] };
+  llm_cliche_blocklist?: {
+    performative_empathy?: string[];
+    generic_compliments?: string[];
+    sales_speak_openers?: string[];
+    manufactured_intimacy?: string[];
+    marketing_buzzwords?: string[];
+    llm_transition_tics?: string[];
+    gpt_vocabulary?: string[];
+    hedge_softener_warnings?: string[];
+  };
 };
+
+export type LlmClicheCategory =
+  | 'performative_empathy'
+  | 'generic_compliments'
+  | 'sales_speak_openers'
+  | 'manufactured_intimacy'
+  | 'marketing_buzzwords'
+  | 'llm_transition_tics'
+  | 'gpt_vocabulary'
+  | 'hedge_softener_warnings';
+
+const HARD_BAN_CATEGORIES: LlmClicheCategory[] = [
+  'performative_empathy',
+  'generic_compliments',
+  'sales_speak_openers',
+  'manufactured_intimacy',
+  'marketing_buzzwords',
+  'llm_transition_tics',
+  'gpt_vocabulary',
+];
+
+const SOFT_WARNING_CATEGORIES: LlmClicheCategory[] = ['hedge_softener_warnings'];
+
+/**
+ * Scan text for LLM-cliche phrases. Returns a per-category map of phrases
+ * that fired, separated into hard-ban (operator must rewrite) and soft-warning
+ * (operator can review). Phrases match case-insensitively as substrings; the
+ * caller is responsible for word-boundary tightening if needed.
+ */
+export function findLlmCliches(
+  text: string,
+  blocklist: NonNullable<JoshBraunRules['llm_cliche_blocklist']> | undefined,
+): {
+  hardBans: { [K in LlmClicheCategory]?: string[] };
+  softWarnings: { [K in LlmClicheCategory]?: string[] };
+} {
+  const out: {
+    hardBans: { [K in LlmClicheCategory]?: string[] };
+    softWarnings: { [K in LlmClicheCategory]?: string[] };
+  } = { hardBans: {}, softWarnings: {} };
+  if (!blocklist) return out;
+  const lower = text.toLowerCase();
+  for (const cat of HARD_BAN_CATEGORIES) {
+    const phrases = blocklist[cat];
+    if (!phrases) continue;
+    const hits = phrases.filter((p) => lower.includes(p.toLowerCase()));
+    if (hits.length > 0) out.hardBans[cat] = hits;
+  }
+  for (const cat of SOFT_WARNING_CATEGORIES) {
+    const phrases = blocklist[cat];
+    if (!phrases) continue;
+    const hits = phrases.filter((p) => lower.includes(p.toLowerCase()));
+    if (hits.length > 0) out.softWarnings[cat] = hits;
+  }
+  return out;
+}
 
 const DATA_DIR = path.join(process.cwd(), 'data');
 

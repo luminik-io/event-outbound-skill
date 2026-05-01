@@ -69,7 +69,7 @@
       "channel": "linkedin",
       "touch_type": "linkedin_dm_post_connect",
       "subject": "",
-      "body": "Thanks for connecting, Pete. saw on your profile you just moved off cable. probably means you're juggling Netflix, Hulu, YouTube Premium, maybe Spotify too. quick question, how do you know you're not paying for subscriptions you forgot about? we built an app used by 3,000+ cord-cutters that shows everything in one place and cancels with a click. typically catches $23/month in forgotten subs. worth a peek?",
+      "body": "Thanks for connecting, Pete. saw on your profile you just moved off cable. probably means you're juggling Netflix, Hulu, YouTube Premium, maybe Spotify too. how do you know you're not paying for subscriptions you forgot about? we built an app used by 3,000+ cord-cutters that shows everything in one place and cancels with a click. typically catches $23/month in forgotten subs. worth a peek?",
       "source": "synthesis-doc:linkedin-dm-pass-1",
       "annotation": "70 words. Adapts Truebill 4T pattern to post-connect DM."
     },

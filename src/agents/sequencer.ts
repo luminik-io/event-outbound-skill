@@ -21,6 +21,7 @@ import {
   getColdOutboundPatterns,
   getColdOutboundFrameworks,
   getJoshBraunRules,
+  findLlmCliches,
   ColdEmailBenchmarks,
   JoshBraunRules,
   ChannelLengthRule,
@@ -244,6 +245,26 @@ function validateTouch(
       offendingValue: bannedFound.join(', '),
     });
   }
+
+  // ---- LLM-cliche blocklist ----------------------------------------------
+  // Catches phrases that mark text as LLM-generated even when the JB and
+  // CEB lists pass: performative empathy openers ("stuck with me"),
+  // GPT-overused vocab ("delve"), LLM transition tics ("Moreover,"), etc.
+  // Hard-ban categories trigger validation errors with a per-category tag
+  // so the operator can see which family fired. Soft-warning categories
+  // (currently just `hedge_softener_warnings`) get persisted in checks
+  // but don't fail validation.
+  const cliches = findLlmCliches(combined, jbRules.llm_cliche_blocklist);
+  for (const [cat, hits] of Object.entries(cliches.hardBans)) {
+    if (hits && hits.length > 0) {
+      errors.push({
+        rule: `llmCliche:${cat}`,
+        message: `LLM-cliche (${cat}) phrases present: ${hits.join(', ')}.`,
+        offendingValue: hits.join(', '),
+      });
+    }
+  }
+  // Track soft warnings on the checks object below; they don't fail this loop.
 
   const subjectBuzzwords = findBannedPhrases(
     touch.subject,
