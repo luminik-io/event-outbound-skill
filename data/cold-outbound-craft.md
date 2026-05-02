@@ -1,8 +1,8 @@
 # the cold-outbound canon frameworks (canonical reference)
 
-> Source: the cold-outbound canon's public materials at `/Users/batman/Downloads/cold-outbound-archive/`. This document is the structured encoding of his frameworks for use by the event-outbound skill prompt + validators + evals.
+> Source: publicly-taught material from the cold-outbound community (course transcripts, podcast episodes, public LinkedIn posts, the Lavender Live transcript, the Gong / 30MPC / Outbound Squad 85M-email "Ultimate Cold Email Data Report"). This document is the structured encoding of those frameworks for use by the event-outbound skill prompt + validators + evals.
 >
-> Sources cited inline use the format `(source: <filename>:<line-range>)` for transcripts and `(source: JTBD-pdf:<page>)` for the PDF. CSV-derived findings cite `(source: LinkedIn-CSV:<sheet>:<row>)` where useful.
+> Inline citations use the format `(source: <transcript-or-doc>:<line-range>)` and `(source: 85M-email-report:<section>)` where useful. No proprietary or paywalled material is redistributed.
 
 ---
 

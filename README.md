@@ -1,14 +1,39 @@
-# Event Outbound
+<div align="center">
 
-A Claude Code plugin that turns a B2B event into a full pre-event-to-post-event outbound sequence per ICP persona. Validated at generation time against ten cliche categories, channel-specific length rules, and permission-based CTA patterns.
+<a href="https://www.luminik.io"><img src="https://www.luminik.io/luminik-logo.svg" alt="Luminik" height="56" /></a>
+
+# event-outbound
+
+Pre-event outbound sequences for B2B trade shows, conferences, and industry events. <br/>
+Validated at generation time. Email + LinkedIn. Free, MIT, open source.
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-1e1e1e.svg)](https://docs.claude.com/en/docs/claude-code/plugins)
+[![Tests](https://img.shields.io/badge/tests-37%20pass-2ea043.svg)](#run-the-tests)
+[![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
+
+[**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
+
+<img src="marketplace/cover-1200x630.png" alt="event-outbound: Josh-Braun-grounded outbound sequences for B2B events" width="900" />
+
+</div>
+
+---
 
 > **Built on 20,000+ personalised touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
+The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona — pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, body 50–100 words, no buzzwords, illumination question on first touch, lean-back permission-based CTA. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+
+## Install
+
+From any Claude Code session:
+
 ```bash
-# From any Claude Code session
 /plugin marketplace add luminik-io/claude-plugins
 /plugin install event-outbound@luminik-plugins
 ```
+
+That's it. The skill registers itself, and any prompt mentioning a B2B event, attendee outreach, or pre-event sequencing routes to it.
 
 ## Who this is for
 
@@ -27,14 +52,13 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | Layer | What it checks |
 |---|---|
 | **Subject** | All lowercase, ≤ 4 words, no colons, no digits, no buzzwords |
-| **Body length** | Channel-specific: cold email 50–100 words, LinkedIn connect ≤ 200 chars, day-of nudge 30–60 words, post-event 40–90 words |
+| **Body length** | Channel-specific: cold email 50–100 words / 3–5 sentences, LinkedIn connect 18–35 words ≤ 200 chars, day-of nudge 30–60 words, post-event 40–90 words |
 | **Structure** | 4T pattern: Trigger → Think (illumination question) → Third-party validation → Talk? (lean-back CTA) |
 | **Pronoun ratio** | "you/your" must outnumber "we/our" |
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
-| **Cliche blocklist** | Ten categories, ~190 phrases. See *Validation rules* below |
-
-Touches that fail validation are regenerated up to three times with temperature jitter. Anything still failing ships with `quality_flag: 'rules_violated'` so your pipeline can route it for human review instead of silently shipping bad copy.
+| **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
+| **Specificity** | Every touch must reference a concrete event/persona signal — no population-shape generalizations |
 
 ## What it does
 
@@ -71,9 +95,11 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 
 ## Worked examples
 
-- `examples/rsa-conference-2026/` — cybersecurity ICP, two personas (VP Security + Lead SecurityOps Engineer), 12 touches across email + LinkedIn.
-- `examples/money2020-europe-2026/` — fintech ICP, two personas (VP Marketing + Demand Gen Lead), 12 touches.
-- `examples/singapore-fintech-festival-2026/` — fintech IDV ICP fixtures (run locally to generate sequences).
+| Example | ICP | Personas | Lead time | Status |
+|---|---|---|---|---|
+| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity | VP Security + Lead SecurityOps Engineer | 4 weeks | Pre-rendered, avg 4.54/5 |
+| [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech | VP Marketing + Demand Gen Lead | 4 weeks | Pre-rendered |
+| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | — | Run locally with a Gemini API key |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
@@ -82,8 +108,8 @@ Every shipped sequence is hand-verified against the full validator stack: zero h
 From inside a Claude Code session, after installing the plugin:
 
 ```
-Create an outbound sequence for RSA Conference 2026 targeting VP Security at Series B fintechs.
-4 week lead time, email plus LinkedIn.
+Create an outbound sequence for RSA Conference 2026 targeting VP Security
+at Series B fintechs. 4 week lead time, email plus LinkedIn.
 ```
 
 The skill picks up the request, asks for any missing input fields (sending identity, lead time, channels), and returns a full `SequencerOutput` plus a rendered markdown preview ready to paste into your sequencer.
@@ -108,6 +134,14 @@ To run the full validator scan against every shipped artefact:
 ```bash
 npx tsx scripts/scan-deliverables.ts
 ```
+
+### Run the tests
+
+```bash
+npm test -- --run
+```
+
+37 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
 
 ## Parameters
 
@@ -139,26 +173,26 @@ Each `OutreachTouch` carries a `checks` block so you can see exactly why it pass
 
 ## Validation rules
 
-The cliche blocklist in `data/llm-cliche-blocklist.md` defines ten categories. Nine are hard-banned in skill output; one is soft-warned for human review.
+The cliche blocklist in [`data/cold-outbound-rules.json`](data/cold-outbound-rules.json) defines ten categories totalling 195 phrases. Nine are hard-banned in skill output; one is soft-warned for human review.
 
 <!-- scan:disable -->
-| Category | Representative examples |
-|---|---|
-| `performative_empathy` | "stuck with me", "really resonated", "got me thinking" |
-| `generic_compliments` | "amazing work", "love what you're doing", "curious to hear your thoughts" |
-| `sales_speak_openers` | "hope this finds you well", "circling back", "touching base", "just checking in" |
-| `manufactured_intimacy` | "in case it's helpful", "no pressure at all", "if it's of interest" |
-| `marketing_buzzwords` | "leverage", "unlock", "transform", "seamless", "synergy", "drive growth" |
-| `cold_email_overused` | "teardown" (as 1-pager), "playbook" (as marketing word), "blueprint", "north star", "table stakes", "low-hanging fruit", "double-click on", "do you have bandwidth" |
-| `lazy_generalization_openers` | "Most teams...", "Most fintechs...", "Most VPs I talk to...", "Almost nobody...", "Nobody is...", "Everyone is...", "In our experience..." |
-| `llm_transition_tics` | "Moreover,", "Furthermore,", "Additionally,", "It is worth noting that" |
-| `gpt_vocabulary` | "delve", "tapestry", "navigate the landscape", "in today's fast-paced world" |
-| `hedge_softener_warnings` | "I think", "perhaps", "it seems" (soft-warning, not auto-rejected) |
+| Category | Phrases | Representative examples |
+|---|---:|---|
+| `performative_empathy` | 11 | "stuck with me", "really resonated", "got me thinking" |
+| `generic_compliments` | 7 | "amazing work", "love what you're doing", "curious to hear your thoughts" |
+| `sales_speak_openers` | 21 | "hope this finds you well", "circling back", "touching base", "just checking in" |
+| `manufactured_intimacy` | 8 | "in case it's helpful", "no pressure at all", "if it's of interest" |
+| `marketing_buzzwords` | 32 | "leverage", "unlock", "transform", "seamless", "synergy", "drive growth" |
+| `cold_email_overused` | 8 | "teardown" (as 1-pager), "playbook" (as marketing word), "blueprint", "north star", "table stakes", "low-hanging fruit", "double-click on", "do you have bandwidth" |
+| `lazy_generalization_openers` | 51 | "Most teams...", "Most fintechs...", "Most VPs I talk to...", "Almost nobody...", "Nobody is...", "Everyone is...", "In our experience..." |
+| `llm_transition_tics` | 20 | "Moreover,", "Furthermore,", "Additionally,", "It is worth noting that" |
+| `gpt_vocabulary` | 29 | "delve", "tapestry", "navigate the landscape", "in today's fast-paced world" |
+| `hedge_softener_warnings` | 8 | "I think", "perhaps", "it seems" (soft-warning, not auto-rejected) |
 <!-- scan:enable -->
 
-Sources cited inline in `data/llm-cliche-blocklist.md`: Stanford CRFM evaluations of GPT-detected vocabulary, GPTZero linguistic markers, the Lavender Live transcript, the Gong / 30MPC / Outbound Squad 85M-email "Ultimate Cold Email Data Report", and the workspace voice canon.
+Sources cited inline in [`data/llm-cliche-blocklist.md`](data/llm-cliche-blocklist.md): Stanford CRFM evaluations of GPT-detected vocabulary, GPTZero linguistic markers, the Lavender Live transcript, the Gong / 30MPC / Outbound Squad 85M-email "Ultimate Cold Email Data Report", and the workspace voice canon.
 
-## Why use this over (alternatives)
+## Why use this over alternatives
 
 | You're considering... | Where it falls short for event outbound |
 |---|---|
@@ -167,19 +201,42 @@ Sources cited inline in `data/llm-cliche-blocklist.md`: Stanford CRFM evaluation
 | **Hand-writing each sequence** | The hand-written sequence is the bar this skill is calibrated against. The skill exists so you can run that bar across 10 personas in one afternoon instead of one persona per week. |
 | **A general-purpose copywriter or AE training course** | Buys you craft, not throughput. This skill encodes the craft into validation rules and applies them to every touch automatically. |
 
+## Project layout
+
+```
+.
+├── src/                    Sequencer agent, validators, timeline, types
+├── data/                   Validator inputs: cliche blocklist, channel rules,
+│                           cold-email benchmarks, craft canon
+├── examples/               Worked examples (RSA, Money20/20, Singapore Fintech)
+├── tests/                  Vitest unit + integration tests
+├── evals/                  End-to-end output evaluations
+├── scripts/                Run-example, scan-deliverables, install verification
+├── marketplace/            Plugin manifest, cover image, INSTALL.md, SKILL.md
+└── .claude-plugin/         Claude Code plugin descriptor
+```
+
 ## License
 
-MIT. See `LICENSE`.
+MIT. See [`LICENSE`](LICENSE).
 
 ## Credits
 
-**Teachers and sources we learned from**:
+**Teachers and sources we learned from:**
 
 - **[Josh Braun](https://joshbraun.com)**, whose public writing on permission-based cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
-- **Gong's "Ultimate Cold Email Data Report"**: 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
+- **Gong's "Ultimate Cold Email Data Report"**, 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
+- **Stanford CRFM** and **GPTZero** for public research on GPT-detected vocabulary and linguistic markers, which seeded the LLM-cliche blocklist.
+- **The Lavender Live transcript**, for one of the few public corpora of in-the-moment cold-email rewrites by working SDR managers.
 
 This plugin does not redistribute any proprietary content. It encodes general craft principles from publicly-taught material and published research into validation rules that run at generation time.
 
 ---
 
-Luminik is a product of DataRavel Inc. (Newark, DE). More at [luminik.io](https://www.luminik.io).
+<div align="center">
+
+**[Visit the skill page on luminik.io →](https://www.luminik.io/tools/event-outbound/)**
+
+Luminik is a product of [DataRavel Inc.](https://www.luminik.io) (Newark, DE).
+
+</div>
