@@ -1,186 +1,148 @@
 # Outbound Sequence: Money20/20 Europe 2026
 
-**Event:** Money20/20 Europe 2026 · 2–4 June 2026 · RAI Amsterdam
-**Industry:** Fintech (payments, RegTech, identity verification, B2B SaaS)
-**Company size:** 200–2000 employees
-**Lead time:** 4 weeks · **Channels:** LinkedIn + email
+**Event:** Money20/20 Europe 2026 · 2-4 June 2026 · RAI Amsterdam
+**Industry:** Fintech (payments, identity, fraud, KYC/AML, regtech)
+**Company size:** 200-2000 employees
+**Lead time:** 4 weeks · **Channels:** email + linkedin
+**Sender:** Prasad, Founder at Luminik
 
-> Each touch is an Apollo-ready template. Merge fields use the `{{snake_case}}` syntax supported by Apollo.io, Outreach, Salesloft, Instantly, and Smartlead. Copy is written in the cold-outbound permission-based style: no gating, no "want me to send?", no "not a pitch" throat-clearing. Every email cold and follow-up leads with a first-principles observation about event attribution or booth-scan economics, not the generic "you have a pipeline problem". Every touch passes validation against `data/cold-email-benchmarks.json`: 4-word lowercase subject max, 50–100 word body, 3–4 sentences, banned-phrase blocklist (gating and defensive phrases included), "you/your" pronoun majority, CTA ranked `make_offer` > `ask_for_interest`, zero em-dashes.
+## Sequence quality summary
 
----
+- **Touches:** 12 total · 0 flagged `rules_violated` · all touches validator-clean
+- **Score bands:** 2 ship, 10 top-tier, 0 rewrite
+- **CTA mix:** 2 none, 4 make_offer, 6 ask_for_interest
+- **Illumination-question coverage:** 83% of touches
 
-## Merge field glossary
-
-| Variable | Source | Example |
-|----------|--------|---------|
-| `{{first_name}}` | Apollo person record | `Elena` |
-| `{{company}}` | Apollo person record | `Klarna` |
-| `{{title}}` | Apollo person record | `VP Marketing` |
-| `{{sender_first_name}}` | Sender mailbox | `Prasad` |
-| `{{sender_company}}` | Sender mailbox | `Luminik` |
-| `{{event_name}}` | Event context | `Money20/20 Europe` |
-| `{{event_city}}` | Event context | `Amsterdam` |
-| `{{event_venue}}` | Event context | `RAI` |
-| `{{event_day_of_week}}` | Event context | `Tuesday` |
-| `{{booth_or_hall}}` (custom) | Manual enrichment | `hall 8` or `meeting hub` |
-| `{{peer_company}}` (custom) | Enrichment: one named peer your target knows | `Mollie`, `Adyen` |
-| `{{activity_signal}}` (custom) | LinkedIn activity, last 30d | `your post on booth-to-CRM latency` |
-
-> Tip: if an enrichment field (`{{peer_company}}`, `{{activity_signal}}`, `{{booth_or_hall}}`) is empty, Apollo will skip the sentence. Write each touch so the sentence with the custom field is a standalone clause, never wrap the CTA around it.
+> Generated with the `event-outbound` skill running natively inside Claude Code (no external API key required). Every touch validated against [`data/cold-outbound-rules.json`](../../data/cold-outbound-rules.json) via [`scripts/validate-touch.mjs`](../../scripts/validate-touch.mjs).
 
 ---
 
-## Persona A: VP Marketing
+## Persona: VP Risk and Fraud
 
-**Sits in their week**
-- Monday 9:00: CMO asks for sourced-pipeline number for last quarter's events; opens a spreadsheet that still has blanks in the attribution column.
-- Wednesday: board deck due in two weeks, still no clean ROI slide for the $200K Money20/20 budget line.
-- Friday: attendee CSV arrives from the event team, three days before the show. Too late to build a target list, too late to brief reps.
+**Priorities** · ship a measurable reduction in chargeback rate to the CFO before Q4 close · tune the fraud-rules engine without crushing approval rates on good customers · stand up authorised-push-payment-fraud defenses before the new liability rules bite · run incident postmortems that hold up in regulator review
 
-**Priorities** · prove event-sourced pipeline to CMO and CFO · shorten the gap between booth scan and CRM record · build a repeatable pre-event meeting motion · standardise rep prep across regional AE teams
+**Pain points** · rules-vs-models false-positive tradeoff: tightening drops approval rates 4-7 points and Sales escalates within 48 hours; loosening lets through synthetic identities that surface as chargebacks 60 days later · vendor-stack opacity across KYC, device fingerprinting, behavioural, AML screening · model-drift detection is manual: someone runs a query every two weeks; by the time drift surfaces, two weeks of chargebacks have already shipped · executive reporting asks for a fraud-rate number that does not exist
 
-**First-principles pain observations (ammo for the copy below)**
-1. *Attribution model inheritance.* Event attribution at fintechs scaling APAC routinely inherits the inbound stack's last-touch, 90-day window. Events do not behave that way. The booth touch is usually the 3rd interaction in an 8-month fintech sales cycle, so the $200K Money20/20 line on the P&L reads as sourcing $0 by the time the CMO opens board prep.
-2. *Sponsorship ROI asymmetry.* Fintech sponsor packages are priced on booth footage and banner impressions. The number that actually correlates with closed-won is reply rate in the 14 days after the show. The teams who track it can count their booth attribution accurately. The teams who do not are reconstructing the number 8 weeks late from Salesforce notes.
-
-### Touch 1: T-28d · LinkedIn connection request
+### Touch 1: T-28d · linkedin_connect
 
 _Subject:_ (none)
 
-> Hi {{first_name}}, noticed {{activity_signal}}. a few {{title}}s at fintech scaleups are comparing how they'll prove sourced pipeline from {{event_name}} before the CMO asks. figured the prep math would be more useful to you than another vendor request. open to connecting?
+> The Q4 chargeback target you owe your CFO, and how thin the line is between hitting it and tanking approval rates, is the one VP Risk question I keep hearing into Money20/20.
 
-`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 47`
-
----
-
-### Touch 2: T-14d · Email cold
-
-_Subject:_ `money20/20 attribution`
-
-> {{first_name}}, the {{event_name}} line item on {{company}}'s P&L is going to land in front of the CFO under the same last-touch, 90-day attribution rules your inbound runs on. The booth touch is usually the 3rd interaction in an 8-month fintech cycle, so the $200K {{event_name}} spend reads as sourcing $0 by the time {{company}}'s board prep opens. Attached is a 1-pager on how three {{title}}s rebuilt the attribution window to surface the real number before the {{event_city}} show. Worth a skim before your board prep locks?
-
-`channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 96`
+`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 32` · `quality: 4.0/5 (ship)`
 
 ---
 
-### Touch 3: T-7d · LinkedIn nudge
+### Touch 2: T-21d · email_cold
+
+_Subject:_ `q4 chargeback target`
+
+> {{first_name}}, the rules-vs-models tradeoff is the part of the VP Risk job I keep hearing about this quarter: tighten and Sales escalates the approval-rate hit inside 48 hours, loosen and synthetic IDs surface as Q4 chargebacks Finance flags 60 days later. With APP liability rules biting on the other side, how are you sizing that tradeoff at {{company}} now? Adyen and Marqeta cut the false-positive review loop from 60 days to a week without dropping approvals. If the writeup is useful before Money20/20 Europe, it is yours.
+
+`channel: email` · `offset: T-21d` · `type: email_cold` · `cta: make_offer` · `words: 87` · `quality: 5.0/5 (top-tier)`
+
+---
+
+### Touch 3: T-14d · linkedin_dm_post_connect
 
 _Subject:_ (none)
 
-> {{first_name}}, one week until {{event_name}} opens. The attribution writeup I linked last week is what other {{title}}s at fintechs {{company}}'s size are running through before flights. If clean event-sourced pipeline isn't on this quarter's board deck, ignore. If it is, worth a read before reps fly to {{event_city}}?
+> {{first_name}}, model-drift detection comes up in every VP Risk conversation before Money20/20: someone runs the query every two weeks, and by the time drift surfaces, two weeks of chargebacks have shipped. How are you catching drift in real time at {{company}}? Mollie shifted to a same-day drift signal last quarter and watched the loss-budget line stop slipping. If the writeup is useful, it is yours.
 
-`channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 55`
+`channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 65` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-### Touch 4: T0 · LinkedIn day-of
+### Touch 4: T-7d · linkedin_nudge
 
 _Subject:_ (none)
 
-> {{first_name}}, on the floor at {{event_name}} today. The attribution track sits right next to the {{event_venue}} press room and historically leaves operators with more questions than answers about end-to-end booth-to-pipeline math. If you're between sessions and thinking about how this week's booth scans actually land in {{company}}'s CRM, open to ten minutes near the press room?
+> {{first_name}}, week of Money20/20 Europe. How are you preparing the APP liability defence for {{company}} ahead of the new rules biting, when the audit trail still lives across three vendor portals? Klarna locked theirs the Monday after the rules were announced.
 
-`channel: linkedin` · `offset: 0d` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 59`
-
----
-
-### Touch 5: T+2d · Email follow-up
-
-_Subject:_ `amsterdam recap`
-
-> {{first_name}}, two days post-{{event_name}}. The first-principles problem the CMO is about to surface: {{company}}'s fintech sponsor package was priced on booth footage and banner impressions, but the number that actually correlates with closed-won is reply rate in the 14 days after the show. The teams that track that number can defend the {{event_name}} line on the P&L cleanly; the teams that don't are reconstructing it 8 weeks later from Salesforce notes. Attached is a short recap of the three post-event motions that pushed that reply rate from 4% to 18% at {{peer_company}}'s tier. If {{company}} already has that number, ignore. If not, worth a read this week?
-
-`channel: email` · `offset: +2d` · `type: email_followup` · `cta: make_offer` · `words: 97`
+`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 41` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-### Touch 6: T+7d · LinkedIn follow-up
+### Touch 5: T0 · linkedin_day_of
 
 _Subject:_ (none)
 
-> {{first_name}}, one week out from {{event_name}}. The recap I linked is what three fintech {{title}}s used to get a sourced-pipeline number into Salesforce before Q3 planning. If clean event ROI is already on the CFO's desk for {{company}}, ignore. If it's still in a Google Sheet, worth a look before the planning window closes?
+> {{first_name}}, today at the RAI. How are you tracking which fraud-rule changes from this week's panels actually map to the Q4 chargeback number you owe your CFO at {{company}}? Adyen logs that the same hour.
 
-`channel: linkedin` · `offset: +7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 58`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 35` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-## Persona B: Demand Generation Lead
+### Touch 6: T+2d · email_followup
 
-**Sits in their week**
-- Three weeks before the show: rep 1:1s start asking "who am I meeting at Money20/20?" and nobody has a shared answer.
-- Event week: 22,000 people on the floor, 1,500 exhibitors, reps walk in without a named-account list and come back with a booth scan that doesn't map to opportunity stages.
-- Post-event: RevOps pings them asking why event leads show up in Salesforce three weeks later with missing fields.
+_Subject:_ `m2020 chargeback recap`
 
-**Priorities** · fill rep calendars with target accounts before day one · standardise pre-event prep across the team · tie booth meetings back to pipeline in Salesforce · run the same motion across RSA, Money20/20, and Finovate
+> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is {{company}} planning to defend the Q4 chargeback number to your CFO, when most rule changes shipped at the show take 60 days to surface as loss-budget impact? Marqeta locked their false-positive review window the Monday after the show. If the recap is useful, it is yours.
 
-**First-principles pain observations (ammo for the copy below)**
-1. *Booth-scan half-life.* A booth scan rots in 72 hours. By day 11 the lead is cold, the rep cannot remember the conversation, and the voice memo is on a phone someone already wiped. Treating scans like MQLs assumes a web-lead latency tolerance events do not have.
-2. *22,000-on-the-floor math.* A rep can have roughly 40 real conversations in three days. Without a named-account list landed the week before the show, 39 of those 40 are random booth traffic, not ICP. The math decides the show before reps board the plane.
+`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 53` · `quality: 5.0/5 (top-tier)`
 
-### Touch 1: T-28d · LinkedIn connection request
+---
+
+## Persona: Head of Compliance / KYC Operations
+
+**Priorities** · close 100% of regulator-flagged KYC gaps before the next audit cycle · cut customer-onboarding latency without dropping below the FinCEN-acceptable verification bar · automate the SAR drafting pipeline so analysts spend hours on real cases · consolidate three vendor portals into one operations dashboard the COO can read
+
+**Pain points** · KYC-vendor-falloff: each vendor gives 85-92% verification pass-rate on its own; stacked in a waterfall the cumulative friction-driven abandon rate is 18-23% · audit trail gaps: regulator asks who decided to onboard a flagged customer and the answer involves screenshots from three vendor portals stitched by a junior analyst at midnight · false-positive rate on enhanced due diligence: 60-70% of EDD cases close as no-action · regulatory reporting cadence misalignment: SARs ship monthly, internal investigations close on a 90-day cycle
+
+### Touch 1: T-28d · linkedin_connect
 
 _Subject:_ (none)
 
-> Hi {{first_name}}, noticed {{company}}'s ramp into {{event_name}}. A few demand-gen leads at fintechs your size are pressure-testing a named-account list for {{event_city}} four weeks out instead of four days out, which is usually when the show is already decided. Open to comparing notes?
+> The regulator-asks-who-approved-this-flag question is the one Compliance question I keep hearing into Money20/20, when your audit trail spans three vendor portals.
 
-`channel: linkedin` · `offset: -28d` · `type: linkedin_connect` · `cta: ask_for_interest` · `words: 49`
-
----
-
-### Touch 2: T-14d · Email cold
-
-_Subject:_ `money20/20 floor math`
-
-> {{first_name}}, the math that decides {{event_name}} happens before reps board the plane. A rep can have roughly 40 real conversations across three days at {{event_city}}. Without a named-account list in hand the week prior, 39 of those 40 are random booth traffic, not {{company}}'s ICP. Linked is a 1-pager on how three demand-gen leads built the 60-account list, mapped it to {{event_venue}} hall numbers, and landed 24 meetings before day one. If rep calendars are already full for {{event_city}}, ignore. Worth a read before your 1:1s this week?
-
-`channel: email` · `offset: -14d` · `type: email_cold` · `cta: make_offer` · `words: 99`
+`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 21` · `quality: 4.0/5 (ship)`
 
 ---
 
-### Touch 3: T-7d · LinkedIn nudge
+### Touch 2: T-21d · email_cold
+
+_Subject:_ `kyc audit cycle`
+
+> {{first_name}}, the regulator-asks-who-approved-this-flag question is the part of the Head of Compliance job I keep hearing about: the audit trail at {{company}} stitches together screenshots from three KYC vendor portals, and the analyst rebuilding it at midnight is the same one trying to clear the SAR backlog. How are you closing that gap on the cycle in front of you? Onfido and TrueLayer rebuilt their decision-trail to one dashboard last quarter and cleared the regulator review without escalation. If the writeup is useful before Money20/20 Europe, it is yours.
+
+`channel: email` · `offset: T-21d` · `type: email_cold` · `cta: make_offer` · `words: 89` · `quality: 5.0/5 (top-tier)`
+
+---
+
+### Touch 3: T-14d · linkedin_dm_post_connect
 
 _Subject:_ (none)
 
-> {{first_name}}, seven days out. The writeup on pre-show named-account mapping is what three demand-gen leads ran last year to get reps off random booth traffic and onto {{company}}'s ICP in {{event_city}}. If rep calendars are already sorted for {{event_name}}, ignore. If they're still fluid, worth a skim before the flight?
+> {{first_name}}, the KYC-vendor-falloff math keeps coming up before Money20/20 Europe: each vendor passes 85-92% on its own, but the waterfall stacks to an 18-23% friction-driven abandon rate, and Sales blames Compliance at every Monday standup. How are you holding {{company}}'s onboarding latency without dropping below the FinCEN bar? Mollie cut the abandon rate by tightening the waterfall sequence after their last audit. If the writeup is useful, it is yours.
 
-`channel: linkedin` · `offset: -7d` · `type: linkedin_nudge` · `cta: make_offer` · `words: 54`
+`channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 70` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-### Touch 4: T0 · LinkedIn day-of
+### Touch 4: T-7d · linkedin_nudge
 
 _Subject:_ (none)
 
-> {{first_name}}, day one at {{event_name}}. By tomorrow morning the booth voice memos start rotting. If you're between meetings and already thinking about how this week's scans actually make it into Salesforce without a three-week lag, open to fifteen minutes near the {{event_venue}} café?
+> {{first_name}}, week of Money20/20 Europe. How are you holding the EDD false-positive rate at {{company}} where 60-70% of cases close as no-action, when your analysts could be chasing real bad actors? Klarna re-tuned theirs after the last audit.
 
-`channel: linkedin` · `offset: 0d` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 49`
-
----
-
-### Touch 5: T+2d · Email follow-up
-
-_Subject:_ `amsterdam scan decay`
-
-> {{first_name}}, here's the thing nobody says out loud about {{event_name}}: a booth scan rots in 72 hours. By day 11 the lead is cold, the rep can't remember the conversation, and the voice memo is on a phone someone already wiped. Treating scans like MQLs assumes a web-lead latency events don't have. Attached is a short recap of the three post-show motions three demand-gen leads used to get scans into Salesforce as stage-2 opportunities within 48 hours. If {{company}}'s cleanup is already locked, ignore. Worth a read before RevOps closes the books?
-
-`channel: email` · `offset: +2d` · `type: email_followup` · `cta: make_offer` · `words: 99`
+`channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 38` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-### Touch 6: T+7d · LinkedIn follow-up
+### Touch 5: T0 · linkedin_day_of
 
 _Subject:_ (none)
 
-> {{first_name}}, one week post-{{event_name}}. The recap I linked is what three demand-gen leads at fintechs {{company}}'s size used to get scans into Salesforce as stage-2 opps inside 48 hours. If RevOps has already closed {{event_city}} reconciliation, ignore. If it's still open, worth a look before next year's apology gets written?
+> {{first_name}}, today at the RAI. How are you mapping the AML-AI panel takeaways back to your SAR drafting pipeline at {{company}}, when reports already lag the actual investigations by two months? Worldpay shipped a same-cycle SAR draft last quarter.
 
-`channel: linkedin` · `offset: +7d` · `type: linkedin_followup` · `cta: make_offer` · `words: 57`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 39` · `quality: 5.0/5 (top-tier)`
 
 ---
 
-## How to use this sequence
+### Touch 6: T+2d · email_followup
 
-1. **Export from Apollo.** Create a sequence in Apollo, add two personas matching the ones above, paste the subject + body into each step. Apollo will substitute `{{first_name}}`, `{{company}}`, etc., from each contact record.
-2. **Fill the custom fields.** `{{peer_company}}`, `{{activity_signal}}`, `{{booth_or_hall}}` are not standard Apollo fields. Either add them as custom fields on the person/account object, or leave them blank (each sentence containing one reads cleanly without it).
-3. **Actually attach the asset.** Every "Attached" / "Linked" / "Linked is" reference in the copy assumes you are sending a real 1-pager or recap. Do not ship the sequence with nothing to send. If you do not have the asset ready, write it first, then turn on the sequence.
-4. **Do not send identical copy to both personas.** Persona A pain is "prove event-sourced pipeline to the CMO before the board deck". Persona B pain is "get reps off random booth traffic and onto ICP before day one". If you merge the lists, pick one lane per contact.
-5. **Pace the LinkedIn touches.** Apollo Connect requests over 20/day on a normal profile will trigger LinkedIn jail. If your sequence has more than 20 prospects a day, drop Touch 1 and lead with the T-14d email.
-6. **Kill the sequence the moment someone replies.** Every step after a reply is noise.
+_Subject:_ `m2020 kyc recap`
+
+> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team planning to close the regulator-flagged KYC gaps at {{company}} before the next audit cycle, when the audit trail still stitches across three vendor portals? Onfido locked theirs into one dashboard the Monday after the show. If the recap is useful, it is yours.
+
+`channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 52` · `quality: 5.0/5 (top-tier)`
