@@ -22,7 +22,7 @@ Validated at generation time. Email + LinkedIn. Free, MIT, open source.
 
 > **Built on 20,000+ personalised touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona — pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, body 50–100 words, no buzzwords, illumination question on first touch, lean-back permission-based CTA. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, body 50–100 words, no buzzwords, illumination question on first touch, lean-back permission-based CTA. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
 ## Install
 
@@ -58,15 +58,15 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
-| **Specificity** | Every touch must reference a concrete event/persona signal — no population-shape generalizations |
+| **Specificity** | Every touch must reference a concrete event/persona signal, no population-shape generalizations |
 
 ## What it does
 
 You hand the skill three things:
 
-1. **Event** — name, dates, agenda, speakers, exhibitor list.
-2. **ICP** — industry, size range, and one or more buyer personas with concrete priorities and pain points (vague aspirations like "build the brand" or "scale the team" fail the specificity check).
-3. **Sequence params** — lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), sending identity.
+1. **Event**, name, dates, agenda, speakers, exhibitor list.
+2. **ICP**, industry, size range, and one or more buyer personas with concrete priorities and pain points (vague aspirations like "build the brand" or "scale the team" fail the specificity check).
+3. **Sequence params**, lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), sending identity.
 
 It returns a full sequence per persona. Six to twelve touches on a four-week lead time, distributed across email and LinkedIn, covering pre-event, day-of, and post-event.
 
@@ -97,9 +97,9 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 
 | Example | ICP | Personas | Lead time | Status |
 |---|---|---|---|---|
-| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity | VP Security + Lead SecurityOps Engineer | 4 weeks | Pre-rendered, avg 4.54/5 |
-| [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech | VP Marketing + Demand Gen Lead | 4 weeks | Pre-rendered |
-| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | — | Run locally with a Gemini API key |
+| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity | VP Security + Lead SecurityOps Engineer | 4 weeks | Pre-rendered, validator-clean |
+| [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech | VP Marketing + Demand Gen Lead | 4 weeks | Pre-rendered, validator-clean |
+| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | , | Regenerate inside Claude Code with no API key |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
@@ -108,8 +108,8 @@ Every shipped sequence is hand-verified against the full validator stack: zero h
 From inside a Claude Code session, after installing the plugin:
 
 ```
-Create an outbound sequence for RSA Conference 2026 targeting VP Security
-at Series B fintechs. 4 week lead time, email plus LinkedIn.
+Create an outbound sequence for RSA Conference 2026 targeting Directors of Security Engineering at mid-market SaaS.
+4 week lead time, email plus LinkedIn.
 ```
 
 The skill picks up the request, asks for any missing input fields (sending identity, lead time, channels), and returns a full `SequencerOutput` plus a rendered markdown preview ready to paste into your sequencer.
@@ -119,14 +119,17 @@ The skill picks up the request, asks for any missing input fields (sending ident
 ```bash
 git clone https://github.com/luminik-io/event-outbound-skill.git
 cd event-outbound-skill
-npm install && npm run build
+npm install
 claude --plugin-dir $(pwd)
 ```
 
-To generate a worked example end-to-end (requires a Gemini API key):
+That's it. The skill runs inside Claude Code with no extra API keys. Claude reads the rules from `data/`, generates each touch, validates it via `node scripts/validate-touch.mjs`, and revises on failure.
+
+To validate a single hand-written touch against the rule set:
 
 ```bash
-GEMINI_API_KEY=... npx tsx scripts/run-example.ts examples/rsa-conference-2026
+echo '{"subject":"...","body":"...","channel":"email","touch_type":"cold_email_first_touch"}' \
+  | node scripts/validate-touch.mjs --stdin
 ```
 
 To run the full validator scan against every shipped artefact:
@@ -141,7 +144,11 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-37 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
+49 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
+
+### Headless / batch generation (optional)
+
+If you want to generate sequences outside Claude Code (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM. There is no required cloud API for using the skill inside Claude Code.
 
 ## Parameters
 

@@ -46,6 +46,11 @@ const ALLOWLIST_BY_FILENAME = new Set([
   'ruleService.ts',
   'cold-outbound-evals.eval.ts',
   'scan-deliverables.ts',
+  'validate-touch.mjs',
+  // SKILL.md documents the rule set Claude must follow, so it cites
+  // banned phrases as anti-examples. The validator that gates those phrases
+  // out of generated touches lives in scripts/validate-touch.mjs.
+  'SKILL.md',
 ]);
 
 // Top-level dirs to scan for deliverable artefacts.

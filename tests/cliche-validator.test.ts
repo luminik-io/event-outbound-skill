@@ -81,6 +81,34 @@ describe('findLlmCliches: lazy_generalization_openers (new in May 2026)', () => 
     const result = findLlmCliches(text, blocklist);
     expect(result.hardBans.lazy_generalization_openers).toBeUndefined();
   });
+
+  it('flags templated funding-stage aggregation: "Three Series B fintechs we worked with..."', () => {
+    const text =
+      "Three Series B fintechs we worked with cut their false-positive bar 35% without dropping approval rates.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('flags "Two Series A SaaS we partnered with"', () => {
+    const text =
+      "Two Series A SaaS we partnered with hit 6x meeting velocity inside a quarter.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('flags "Series C cybersecurity" as templated proof', () => {
+    const text =
+      "A Series C cybersecurity team we helped raised post-event reply rates from 5% to 25%.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeDefined();
+  });
+
+  it('passes a named-customer third-party validation (the right shape)', () => {
+    const text =
+      "Stripe and Plaid lifted post-event reply rates from 5% to 25% inside 21 days using the same approach.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.lazy_generalization_openers).toBeUndefined();
+  });
 });
 
 describe('findLlmCliches: cold_email_overused (existing)', () => {
@@ -140,5 +168,75 @@ describe('findLlmCliches: existing categories still fire (regression coverage)',
     const text = 'Let us delve into the post-event attribution problem.';
     const result = findLlmCliches(text, blocklist);
     expect(result.hardBans.gpt_vocabulary).toBeDefined();
+  });
+});
+
+describe('findLlmCliches: floor / vendor-shopper framing (new in May 2026)', () => {
+  it('flags "Walking the floor" booth-canvasser opener', () => {
+    const text =
+      "Walking the floor last year I counted 14 vendors all pitching the same rule-engine story.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('flags "vendors all pitching the same"', () => {
+    const text =
+      'The exhibitor list this year has 47 fraud-platform vendors all pitching the same demo.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('flags "five vendors who" reciprocity-list framing', () => {
+    const text =
+      'I have a short list of the five vendors who showed up at last year RSA with real numbers.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('passes copy that grounds in the persona priority instead of the floor', () => {
+    const text =
+      'how are you keeping rule sets from going stale faster than the threat actor ROE evolves?';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeUndefined();
+  });
+});
+
+describe('additional_banned_phrases: anti-flex selling tics (new in May 2026)', () => {
+  it('catches "no deck" as a soulless-selling tell', () => {
+    expect(rules.additional_banned_phrases).toContain('no deck');
+  });
+
+  it('catches "no calendar invite" as a sales-coded reassurance', () => {
+    expect(rules.additional_banned_phrases).toContain('no calendar invite');
+  });
+
+  it("catches \"reply yes and i'll send\" as a manufactured-friction CTA", () => {
+    expect(rules.additional_banned_phrases).toContain("reply yes and i'll send");
+  });
+
+  it('catches "no commitment" as a permission-theatre tell', () => {
+    expect(rules.additional_banned_phrases).toContain('no commitment');
+  });
+});
+
+describe('additional_banned_phrases: forced-personalization + slang tells (new in May 2026)', () => {
+  it('catches "caught my eye" as a fabricated-signal tell', () => {
+    expect(rules.additional_banned_phrases).toContain('caught my eye');
+  });
+
+  it('catches "caught my attention" as the same fabricated-signal tell', () => {
+    expect(rules.additional_banned_phrases).toContain('caught my attention');
+  });
+
+  it('catches "wall-to-wall" as faux-casual slang', () => {
+    expect(rules.additional_banned_phrases).toContain('wall-to-wall');
+  });
+
+  it('catches "no worries" as a sales-coded soft-out', () => {
+    expect(rules.additional_banned_phrases).toContain('no worries');
+  });
+
+  it('catches "fire drill" as office-slang theatre', () => {
+    expect(rules.additional_banned_phrases).toContain('fire drill');
   });
 });

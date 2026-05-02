@@ -32,20 +32,19 @@ claude --plugin-dir $(pwd)
 
 Inside the session, `/plugin list` will show `event-outbound` loaded from your local path.
 
-To run the bundled live example end-to-end (requires a Gemini API key):
+To regenerate any of the bundled examples end-to-end, just ask Claude in the same session:
 
-```bash
-export GEMINI_API_KEY=...
-node scripts/generate-live-demo.mjs
+```
+Regenerate examples/money2020-usa-2026-fraud using the event-outbound skill.
 ```
 
-This regenerates `examples/money2020-europe-2026/final_sequence.md` from scratch against the real LLM. A successful run takes 2 to 4 minutes and finishes with `0 flagged rules_violated`.
+Claude reads the persona, drafts each touch, validates it via `node scripts/validate-touch.mjs`, and revises on failure. A typical 2-persona / 12-touch sequence finishes in 1-2 minutes with 0 `rules_violated` touches if the inputs are good.
 
 ## Requirements
 
 - Claude Code CLI 2.1 or later
-- Node.js 20+ (for local development only; the published skill runs inside Claude Code)
-- A Gemini API key (free tier is sufficient for small runs; paid tier recommended for agencies running dozens of events per quarter). Set as `GEMINI_API_KEY`.
+- Node.js 20+ (only used by the skill's validator CLI; no global tooling required)
+- No API keys. The skill runs entirely inside the Claude Code session you're already in.
 
 ## Verifying the install
 
