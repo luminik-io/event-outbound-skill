@@ -170,3 +170,51 @@ describe('findLlmCliches: existing categories still fire (regression coverage)',
     expect(result.hardBans.gpt_vocabulary).toBeDefined();
   });
 });
+
+describe('findLlmCliches: floor / vendor-shopper framing (new in May 2026)', () => {
+  it('flags "Walking the floor" booth-canvasser opener', () => {
+    const text =
+      "Walking the floor last year I counted 14 vendors all pitching the same rule-engine story.";
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('flags "vendors all pitching the same"', () => {
+    const text =
+      'The exhibitor list this year has 47 fraud-platform vendors all pitching the same demo.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('flags "five vendors who" reciprocity-list framing', () => {
+    const text =
+      'I have a short list of the five vendors who showed up at last year RSA with real numbers.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeDefined();
+  });
+
+  it('passes copy that grounds in the persona priority instead of the floor', () => {
+    const text =
+      'how are you keeping rule sets from going stale faster than the threat actor ROE evolves?';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.cold_email_overused).toBeUndefined();
+  });
+});
+
+describe('additional_banned_phrases: anti-flex selling tics (new in May 2026)', () => {
+  it('catches "no deck" as a soulless-selling tell', () => {
+    expect(rules.additional_banned_phrases).toContain('no deck');
+  });
+
+  it('catches "no calendar invite" as a sales-coded reassurance', () => {
+    expect(rules.additional_banned_phrases).toContain('no calendar invite');
+  });
+
+  it("catches \"reply yes and i'll send\" as a manufactured-friction CTA", () => {
+    expect(rules.additional_banned_phrases).toContain("reply yes and i'll send");
+  });
+
+  it('catches "no commitment" as a permission-theatre tell', () => {
+    expect(rules.additional_banned_phrases).toContain('no commitment');
+  });
+});
