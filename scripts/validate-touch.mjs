@@ -258,6 +258,30 @@ if (benchmarks.pronoun_ratio?.majority_you_your) {
   }
 }
 
+// Sentence-start capitalization in body. Bodies use proper grammar:
+// the first letter of each sentence is uppercase. Subjects stay lowercase
+// (per the canon's subject-line convention; not checked here).
+const trimmed = body.trim();
+if (trimmed.length > 0) {
+  const firstChar = trimmed[0];
+  // Allow merge fields ({{first_name}}) and quoted opens; otherwise require uppercase.
+  if (/^[a-z]/.test(firstChar)) {
+    errors.push({
+      rule: 'sentenceCapitalization',
+      message: `Body starts with a lowercase letter ("${firstChar}"). Bodies use proper grammar: capitalize the first letter of each sentence.`,
+    });
+  }
+  // Each ". <letter>" must be ". <Letter>" or ". <merge-field>".
+  const lowerStarts = trimmed.match(/[.!?]\s+[a-z]/g) || [];
+  if (lowerStarts.length > 0) {
+    errors.push({
+      rule: 'sentenceCapitalization',
+      message: `Body has ${lowerStarts.length} sentence(s) that start with a lowercase letter (after a period). Capitalize the first letter of every sentence.`,
+      offendingValue: lowerStarts.join(' / '),
+    });
+  }
+}
+
 // Exclamation, emoji, em-dash
 if (benchmarks.exclamation_marks_banned !== false && /[!]/.test(combined)) {
   errors.push({ rule: 'exclamationMark', message: 'No exclamation marks allowed.' });

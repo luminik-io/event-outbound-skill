@@ -218,3 +218,25 @@ describe('additional_banned_phrases: anti-flex selling tics (new in May 2026)', 
     expect(rules.additional_banned_phrases).toContain('no commitment');
   });
 });
+
+describe('additional_banned_phrases: forced-personalization + slang tells (new in May 2026)', () => {
+  it('catches "caught my eye" as a fabricated-signal tell', () => {
+    expect(rules.additional_banned_phrases).toContain('caught my eye');
+  });
+
+  it('catches "caught my attention" as the same fabricated-signal tell', () => {
+    expect(rules.additional_banned_phrases).toContain('caught my attention');
+  });
+
+  it('catches "wall-to-wall" as faux-casual slang', () => {
+    expect(rules.additional_banned_phrases).toContain('wall-to-wall');
+  });
+
+  it('catches "no worries" as a sales-coded soft-out', () => {
+    expect(rules.additional_banned_phrases).toContain('no worries');
+  });
+
+  it('catches "fire drill" as office-slang theatre', () => {
+    expect(rules.additional_banned_phrases).toContain('fire drill');
+  });
+});

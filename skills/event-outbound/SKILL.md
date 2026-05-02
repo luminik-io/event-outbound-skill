@@ -43,6 +43,20 @@ After all touches generate, write the final output as `final_sequence.md` (human
 
 The full system prompt with worked pass/fail examples lives in `data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
+## Voice (read this before drafting anything)
+
+The bar is **authentic, honest, empathetic, no theatrics**. Not slang. Not coolness-signalling. Not corporate-sales-speak either. Write as a real person who has worked the job and is genuinely curious whether the recipient is dealing with the same thing.
+
+Concrete rules that follow from that:
+
+- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the part of the VP Risk job I hear about most before Money20/20 is..."). The situation is honest; the fake signal isn't.
+- **Poke the bear via pain illumination + cost of inaction, not theatrics.** Name the specific tradeoff the persona is managing this quarter, then quietly draw the line to what happens if it goes unaddressed (Q4 board deck, regulator audit, CFO QBR). No drama. No "this is wild." No "honestly?". Just the operational reality the persona is already living.
+- **Empathy over swagger.** When the persona is dealing with a hard tradeoff, name it honestly. "Tightening the rules drops approval rates 4-7 points and Sales escalates inside 48 hours" is honest empathy. "Most VPs walk in already knowing the pitch" is performative.
+- **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
+- **Bodies use proper grammar.** Capitalize the first letter of every sentence. Use full punctuation. The "all-lowercase" convention applies only to subject lines (per the cold-email-subject canon). Body copy is not a Slack message.
+- **Don't force the event into the body opener.** The event is the *occasion* for outreach; it doesn't have to be the *subject*. Many of the strongest touches anchor on a persona-priority or pain in the body and only invoke the event at the CTA when both parties will be there ("worth a quick coffee at the show?"). Forcing "before RSA" / "at Money20/20" into every sentence reads like a sequence template.
+- **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
+
 ## The 4T framework
 
 Every cold email and post-event email follows this shape. LinkedIn DMs follow it loosely. LinkedIn connection requests compress it to 2 sentences (Trigger + Talk).
