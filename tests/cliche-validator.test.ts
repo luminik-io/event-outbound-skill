@@ -239,4 +239,12 @@ describe('additional_banned_phrases: forced-personalization + slang tells (new i
   it('catches "fire drill" as office-slang theatre', () => {
     expect(rules.additional_banned_phrases).toContain('fire drill');
   });
+
+  it('catches "comparing notes" as an over-deployed cold-email close', () => {
+    expect(rules.additional_banned_phrases).toContain('comparing notes');
+  });
+
+  it('catches "compare notes" as the same over-deployed close', () => {
+    expect(rules.additional_banned_phrases).toContain('compare notes');
+  });
 });

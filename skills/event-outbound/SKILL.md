@@ -55,6 +55,11 @@ Concrete rules that follow from that:
 - **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
 - **Bodies use proper grammar.** Capitalize the first letter of every sentence. Use full punctuation. The "all-lowercase" convention applies only to subject lines (per the cold-email-subject canon). Body copy is not a Slack message.
 - **Don't force the event into the body opener.** The event is the *occasion* for outreach; it doesn't have to be the *subject*. Many of the strongest touches anchor on a persona-priority or pain in the body and only invoke the event at the CTA when both parties will be there ("worth a quick coffee at the show?"). Forcing "before RSA" / "at Money20/20" into every sentence reads like a sequence template.
+- **Use human shorthand for proof references.** Stiff: "Adyen and Marqeta wrote up a same-week false-positive cohort review that compresses the loop. There is a write-up if useful." Better, the way someone would actually say it: "Attached a one-pager from our work with Adyen and Marqeta on this. What do you think, is the false-positive review on your roadmap this quarter?" Shorthand reads as a peer talking, not a vendor reading from a script. Patterns that work:
+  - `"Attached a one-pager from our work with [A] and [B] on [topic]."`
+  - `"Sending the writeup we did for [A] last quarter, scan it if useful."`
+  - `"[A] and [B] hit [number]; happy to share how, if it's worth the read."`
+- **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Stronger when grounded: `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} right now, or queued for Q3?"`. Banned because every cold-email guide overuses it: `"comparing notes"`, `"compare notes"`, `"swap notes"`.
 - **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
 
 ## The 4T framework
@@ -64,7 +69,7 @@ Every cold email and post-event email follows this shape. LinkedIn DMs follow it
 1. **Trigger**, why this person, why now? A specific observation or situation. Patterns: `"noticed [observable thing] which suggests [deduction]"`, `"saw you're [doing X] at [event]"`. If you have no signal, use a situation trigger sized to the role (e.g. "end of Q3 and the CFO is locking the FY27 plan"). **Never open with a population claim** ("Most teams…", "Most VPs…", "In our experience…", "Many fintechs…"). Auto-rejected.
 2. **Think**, the **illumination question**. A neutral how/what/why-are-you question that shines a light on a problem the persona owns. Not a leading question. Auto-rejected: `"if I could…"`, `"would you be interested?"`, `"wouldn't you agree?"`, `"don't you think?"`. Required for cold emails and post-connect DMs.
 3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references when possible; if not, frame as "we wrote up the workflow used by two payments teams" rather than fabricating named customers. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
-4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved closers: `"Worth a look?"`, `"Worth a skim?"`, `"Open to comparing notes?"`. Banned: `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`.
+4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth a look?"`, `"Worth a skim?"`, `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} this quarter?"`. Banned: `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
 
 ## Channel-specific length rules (hard)
 
