@@ -1,0 +1,52 @@
+{
+  "industry": "Cybersecurity (identity verification, fraud, IAM, threat detection)",
+  "sizeRange": "200-2000 employees",
+  "personas": [
+    {
+      "personaId": "vp_marketing",
+      "role": "VP Marketing",
+      "seniority": "VP",
+      "priorities": [
+        "prove event-sourced pipeline to CMO and CFO",
+        "build a board-deck-ready attribution slide for the $250K RSA budget line",
+        "shorten the gap between booth scan and CRM record",
+        "standardise rep prep across regional AE teams before flights"
+      ],
+      "painPoints": [
+        "attribution model inheritance: event attribution at cyber companies typically inherits the inbound stack's last-touch, 90-day window. The booth touch in cyber is the 3rd interaction in a 9-month CISO sales cycle, so the $250K RSA line on the P&L reads as sourcing $0",
+        "sponsorship ROI asymmetry: cyber sponsor packages priced on booth footage and stage time, but the number that correlates with closed-won is reply rate in the 21 days post-show. The teams that track it can defend their booth attribution at the next QBR; the teams that do not are reconstructing the number 8 weeks later from Salesforce notes",
+        "CISO buying-committee opacity: the attendee list shows VP Sec / Director InfoSec / SecOps lead, but the actual signer is a CISO who didn't attend. Pre-event sequencing without committee mapping is theatre",
+        "post-show attribution fade: by week 4 post-RSA, every vendor in the buyer's stack is claiming credit; the rep who actually moved the deal can't prove it"
+      ],
+      "exampleTitles": [
+        "VP of Marketing",
+        "VP Demand Generation",
+        "Director of Field Marketing",
+        "Head of Marketing Operations"
+      ]
+    },
+    {
+      "personaId": "demand_gen_lead",
+      "role": "Demand Generation Lead",
+      "seniority": "Director",
+      "priorities": [
+        "fill rep calendars with target accounts before day one of the show",
+        "tie booth meetings back to opportunity stages in Salesforce/HubSpot",
+        "run the same pre-event motion across RSA, Black Hat, and re:Invent",
+        "kill the spreadsheet step between booth scan and SDR follow-up"
+      ],
+      "painPoints": [
+        "booth-scan half-life: a scan rots in 72 hours. By day 11 the lead is cold, the rep cannot remember the conversation, and the voice memo is on a phone someone already wiped",
+        "45,000-on-the-floor math: a rep can have roughly 35 real conversations across three Moscone days. Without a named-account list landed the week before the show, 34 of those 35 are random booth traffic, not ICP",
+        "tooling-stack tax: pre-event prep lives in a Notion doc, the attendee list lives in a CSV, the badge-scan output is in the show vendor's portal, the CRM is in Salesforce. Reps swivel-chair between four tools per attendee",
+        "attribution stage-mismatch: SDR books a booth meeting that maps to a 'Stage 1' opp, but Salesforce only credits the meeting if the AE later disposition-codes it; half the meetings disappear from event ROI by Q3"
+      ],
+      "exampleTitles": [
+        "Demand Generation Lead",
+        "Field Marketing Manager",
+        "Marketing Operations Manager",
+        "Director Revenue Operations"
+      ]
+    }
+  ]
+}

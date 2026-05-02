@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Event Viewer</title>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const root = document.getElementById('root');
+            if (root) {
+                setTimeout(() => {
+                    root.innerHTML = `
+                        <h1>Innovation Summit 2024</h1>
+                        <p><strong>Dates:</strong> November 15-17, 2024</p>
+                        <p><strong>Location:</strong> Online Event</p>
+                        <p>Explore the latest in innovation and technology.</p>
+
+                        <h2>Speakers</h2>
+                        <ul>
+                            <li>Dr. Emily White - AI Ethics Expert</li>
+                            <li>Mr. David Green - Future Tech Strategist</li>
+                        </ul>
+
+                        <h2>Agenda Highlights</h2>
+                        <ul>
+                            <li>Opening Keynote: The Innovative Edge</li>
+                            <li>Panel: Sustainable Technologies</li>
+                        </ul>
+
+                        <h2>Exhibiting Companies</h2>
+                        <ul>
+                            <li>Innovate Solutions</li>
+                            <li>Future Systems Inc.</li>
+                        </ul>
+                    `;
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

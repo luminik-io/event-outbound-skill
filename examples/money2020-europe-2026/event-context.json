@@ -1,0 +1,29 @@
+{
+  "name": "Money20/20 Europe 2026",
+  "dates": "2-4 June 2026",
+  "location": "RAI Amsterdam",
+  "agendaTitles": [
+    "Authorised-Push-Payment Fraud and the New Liability Rules",
+    "Identity in Open Banking: KYC at the Wallet Layer",
+    "Fraud Models vs Rules: the Approval-Rate Tradeoff",
+    "Cross-Border Payments and Real-Time Settlement",
+    "AI in AML: From Alerts to Investigations"
+  ],
+  "speakers": [
+    "Mark Carney (UN Special Envoy on Climate)",
+    "Dilip Asbe (CEO, NPCI)",
+    "Charlotte Hogg (CEO, Visa Europe)"
+  ],
+  "exhibitorList": [
+    "Adyen",
+    "Marqeta",
+    "Mollie",
+    "Plaid",
+    "Worldpay",
+    "TrueLayer",
+    "Onfido",
+    "Stripe",
+    "Wise",
+    "Klarna"
+  ]
+}

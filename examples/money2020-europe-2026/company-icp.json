@@ -1,0 +1,52 @@
+{
+  "industry": "Fintech (payments, identity, fraud, KYC/AML, regtech)",
+  "sizeRange": "200-2000 employees",
+  "personas": [
+    {
+      "personaId": "vp_risk_fraud",
+      "role": "VP Risk and Fraud",
+      "seniority": "VP",
+      "priorities": [
+        "ship a measurable reduction in chargeback rate to the CFO before Q4 close",
+        "tune the fraud-rules engine without crushing approval rates on good customers",
+        "stand up authorised-push-payment-fraud defenses before the new liability rules bite",
+        "run incident postmortems that hold up in regulator review"
+      ],
+      "painPoints": [
+        "rules-vs-models false-positive tradeoff: tightening drops approval rates 4-7 points and Sales escalates within 48 hours; loosening lets through synthetic identities that surface as chargebacks 60 days later",
+        "vendor-stack opacity: KYC, device fingerprinting, behavioural, AML screening across five vendors with three different rule-engine syntaxes",
+        "model-drift detection is manual: someone runs a query every two weeks; by the time drift surfaces, two weeks of chargebacks have already shipped",
+        "executive reporting asks for a fraud-rate number that does not exist: declines? chargebacks? attempt-rate? loss as percent of GMV?"
+      ],
+      "exampleTitles": [
+        "VP Risk",
+        "VP Fraud",
+        "Head of Trust and Safety",
+        "Director Risk Operations"
+      ]
+    },
+    {
+      "personaId": "head_of_compliance_kyc",
+      "role": "Head of Compliance / KYC Operations",
+      "seniority": "Director",
+      "priorities": [
+        "close 100% of regulator-flagged KYC gaps before the next audit cycle",
+        "cut customer-onboarding latency without dropping below the FinCEN-acceptable verification bar",
+        "automate the SAR drafting pipeline so analysts spend hours on real cases",
+        "consolidate three vendor portals into one operations dashboard the COO can read"
+      ],
+      "painPoints": [
+        "KYC-vendor-falloff: each vendor gives 85-92% verification pass-rate on its own; stacked in a waterfall the cumulative friction-driven abandon rate is 18-23%, and Sales blames Compliance every Monday",
+        "audit trail gaps: regulator asks who decided to onboard a flagged customer and the answer involves screenshots from three vendor portals stitched by a junior analyst at midnight",
+        "false-positive rate on enhanced due diligence: 60-70% of EDD cases close as no-action, so analyst hours go to confirming legitimate customers instead of chasing real bad actors",
+        "regulatory reporting cadence misalignment: SARs ship monthly per FinCEN cadence, but internal investigations close on a 90-day cycle, so reports lag the actual cases by two months"
+      ],
+      "exampleTitles": [
+        "Head of Compliance",
+        "Director KYC Operations",
+        "Director BSA/AML",
+        "VP Regulatory Operations"
+      ]
+    }
+  ]
+}

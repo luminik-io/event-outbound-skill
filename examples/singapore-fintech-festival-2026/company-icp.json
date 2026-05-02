@@ -1,0 +1,42 @@
+{
+  "industry": "Fintech (identity verification, KYC, fraud)",
+  "sizeRange": "200-2000 employees, Series B through late growth",
+  "geography": "APAC headquartered or APAC expansion stage; serving cross-border payments and digital banks",
+  "icpNotes": "Mid-market identity-verification platforms scaling APAC coverage. Microblink-shaped buyer: doc verification + biometric + risk signals, sold to neobanks, payment processors, and digital wallets. RFP cycles compressed to 60 days. The buying committee is VP Risk + Head of KYC Operations + Chief Compliance Officer.",
+  "personas": [
+    {
+      "personaId": "vp-risk",
+      "role": "VP of Risk and Compliance",
+      "seniority": "VP",
+      "priorities": [
+        "ship a measurable reduction in onboarding friction without raising fraud loss before the next board cycle",
+        "stand up sanctions and PEP screening that holds up under MAS, BNM, and BI examination at the same time",
+        "tune the synthetic-identity model so approval rates do not drop on legitimate first-time-banked customers across APAC",
+        "give the CFO a single number for fraud-loss-as-percent-of-GMV that survives the audit committee"
+      ],
+      "painPoints": [
+        "vendor-stack opacity: doc verification, device fingerprinting, behavioral biometrics, AML screening, network signals, five vendors with three rule-engine syntaxes, the team cannot answer 'why did this transaction get blocked' inside any single tool",
+        "model-drift detection is manual: someone runs a query every two weeks. By the time drift surfaces, two weeks of approvals have already shipped and the chargeback-loss budget is bleeding",
+        "false-positive cost is invisible to the C-suite: a 4-point drop in approval rate looks fine on a slide, but it is the exact 4 points where Series A neobanks are bleeding to a competitor that approves first try",
+        "regulatory parallax: MAS Notice 626 wants one thing on biometric storage, GDPR another, the new PSR consent framework a third. The compliance team is reconciling the three by hand on a Confluence page"
+      ]
+    },
+    {
+      "personaId": "head-kyc-ops",
+      "role": "Head of KYC Operations",
+      "seniority": "Director / Head",
+      "priorities": [
+        "drop median onboarding time below 90 seconds for the 80th-percentile customer without dropping verification quality",
+        "consolidate the doc-verification + biometric + liveness stack into one decisioning layer the team can audit without screen-scraping vendor portals",
+        "push the analyst-review queue under 2 percent of all checks so the ops team can scale without doubling headcount",
+        "publish a clean weekly KYC ops dashboard that the COO can read in under three minutes"
+      ],
+      "painPoints": [
+        "manual review queue half-life: an escalation that sits in queue more than 6 hours is a customer who already abandoned. By Monday morning the team is triaging Friday-night escalations into a backlog that reps cannot recover from",
+        "vendor SLA opacity: each vendor reports decision latency in their own portal, in their own time zone, with their own definition of 'completed'. There is no single number for end-to-end onboarding latency that survives quarterly review",
+        "audit-trail hand-stitching: when a regulator asks 'why did this customer fail KYC on attempt 2 but pass on attempt 4', the ops lead pulls logs from three vendor portals plus internal tooling to reconstruct the timeline. It eats a half-day per inquiry",
+        "training-data echo: the analyst-review labels feed back into the model. Bad labels from rushed review compound across the next four weeks of approvals. Nobody has time to QA the labels"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "event-outbound-skill",
+  "version": "1.0.0",
+  "description": "Claude skill for generating event-driven outbound sequences.",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint . --ext .ts",
+    "scan": "tsx scripts/scan-deliverables.ts",
+    "verify": "npm run build && npm run test -- --run && npm run scan"
+  },
+  "keywords": [],
+  "author": "Luminik (DataRavel Inc.)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jsdom": "^28.0.1",
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
+    "@ai-sdk/provider": "^3.0.8",
+    "@ai-sdk/provider-utils": "^4.0.23",
+    "@mozilla/readability": "^0.6.0",
+    "ai": "^6.0.168",
+    "cheerio": "^1.0.0-rc.12",
+    "jsdom": "^24.0.0",
+    "zod": "^4.3.6"
+  },
+  "overrides": {
+    "vite": "^6.4.2",
+    "esbuild": "^0.25.0",
+    "minimatch": "^9.0.7"
+  }
+}

@@ -1,0 +1,1 @@
+Software Engineer at TechSolutions. I build scalable backend systems using Node.js and AWS. Always looking for new challenges and learning opportunities. My interests include distributed systems and cloud architecture. Proficient in TypeScript, Docker, Kubernetes, and various database technologies. Committed to clean code and robust solutions.

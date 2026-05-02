@@ -1,0 +1,30 @@
+{
+  "name": "RSA Conference 2026",
+  "dates": "April 27 - May 1, 2026",
+  "location": "Moscone Center, San Francisco",
+  "agendaTitles": [
+    "AI in Cybersecurity: Friend or Foe",
+    "Identity Threat Detection and Response (ITDR)",
+    "Zero Trust Architecture: Beyond the Buzzword",
+    "Supply Chain Security and Third-Party Risk",
+    "Cloud Security and Container Workload Protection"
+  ],
+  "speakers": [
+    "Jen Easterly (Director, CISA)",
+    "Bruce Schneier (Security Technologist)",
+    "Kevin Mandia (CEO, Mandiant)",
+    "Wendy Nather (Head of Advisory CISOs, Cisco)"
+  ],
+  "exhibitorList": [
+    "CrowdStrike",
+    "Palo Alto Networks",
+    "Okta",
+    "Wiz",
+    "SentinelOne",
+    "Snyk",
+    "Cloudflare",
+    "1Password",
+    "Abnormal Security",
+    "Lacework"
+  ]
+}
