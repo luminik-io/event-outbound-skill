@@ -1,4 +1,5 @@
 {
+  "_about": "ICP for the *recipient* of the outbound (the buyer Daniel at Truelink is targeting), not the sender. Truelink is a fictional fraud-scoring / KYC API; its buyers are VPs of Risk and Heads of Compliance at payments fintechs and neobanks.",
   "industry": "Fintech (payments, identity, fraud, KYC/AML, regtech)",
   "sizeRange": "200-2000 employees",
   "personas": [

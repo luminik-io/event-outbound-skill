@@ -5,8 +5,9 @@
     "linkedin"
   ],
   "sendingIdentity": {
-    "name": "Prasad",
-    "title": "Founder",
-    "company": "Luminik"
-  }
+    "name": "Daniel",
+    "title": "Account Executive",
+    "company": "Truelink"
+  },
+  "_about": "Worked example. Daniel is the AE at Truelink, a fictional fraud-scoring / KYC API used here as an illustrative sender. He targets VPs of Risk and Heads of Compliance at payments fintechs and neobanks attending Money20/20 Europe 2026. Replace name / title / company with your own at send time."
 }
