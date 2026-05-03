@@ -112,7 +112,12 @@
     "all hands on deck",
     "comparing notes",
     "compare notes",
-    "swap notes"
+    "swap notes",
+    "comparing playbooks",
+    "compare playbooks",
+    "swap playbooks",
+    "swapping how",
+    "swap how"
   ],
   "_additional_banned_phrases_source": "the corpus phrase-frequency analysis (data/cold-outbound-craft.md:380-401). Counts in 1998-post corpus: best-in-class 0, world-class 0, cutting-edge 0, industry-leading 0, robust 0, scalable 0, drive results 0, game-changer 0. the canon ridicules \"if I could 10x your revenue\" + \"would you be interested\" (4T:47-62).",
   "leading_question_pattern": {

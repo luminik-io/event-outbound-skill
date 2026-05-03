@@ -5,16 +5,16 @@
 # event-outbound
 
 Pre-event outbound sequences for B2B trade shows, conferences, and industry events. <br/>
-Validated at generation time. Email + LinkedIn. Free, MIT, open source.
+Email + LinkedIn. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-1e1e1e.svg)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![Tests](https://img.shields.io/badge/tests-37%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-56%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
 
-<img src="marketplace/cover-1200x630.png" alt="event-outbound: Josh-Braun-grounded outbound sequences for B2B events" width="900" />
+<img src="marketplace/cover-1200x630.png" alt="event-outbound: validated outbound sequences for B2B events" width="900" />
 
 </div>
 
@@ -97,9 +97,9 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 
 | Example | ICP | Personas | Lead time | Status |
 |---|---|---|---|---|
-| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity | VP Security + Lead SecurityOps Engineer | 4 weeks | Pre-rendered, validator-clean |
-| [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech | VP Marketing + Demand Gen Lead | 4 weeks | Pre-rendered, validator-clean |
-| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | , | Regenerate inside Claude Code with no API key |
+| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
+| [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
+| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude Code with no API key |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 

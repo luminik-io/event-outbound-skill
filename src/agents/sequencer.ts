@@ -59,7 +59,9 @@ function countWords(s: string): number {
 }
 
 function countSentences(s: string): number {
-  const matches = s.match(/[.!?]+/g);
+  // Skip `.` followed by a digit (e.g. "1.4%") so decimal numbers do not
+  // inflate sentence counts. Mirrors scripts/validate-touch.mjs.
+  const matches = s.match(/[.!?]+(?!\d)/g);
   return matches ? matches.length : 0;
 }
 

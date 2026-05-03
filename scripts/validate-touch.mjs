@@ -112,7 +112,11 @@ const countWords = (s) =>
     .split(/\s+/)
     .filter((w) => w.length > 0).length;
 const countSentences = (s) => {
-  const m = String(s || '').match(/[.!?]+/g);
+  // Match a sentence terminator [.!?] only when it is NOT inside a number
+  // (e.g. "1.4%" should not count as two sentences). The negative lookahead
+  // skips `.` immediately followed by a digit. Multiple terminators in a row
+  // ("?!") count as one. Leading/trailing whitespace handled by the caller.
+  const m = String(s || '').match(/[.!?]+(?!\d)/g);
   return m ? m.length : 0;
 };
 const findHits = (text, list) => {
