@@ -242,4 +242,4 @@ A "soft warning" surfaces in the touch's `checks.softWarnings` array but doesn't
 
 - New cliches surface as cold-email vocabulary mutates. Add them to this file as encountered.
 - When a touch passes hard validation but reads as machine-generated, the conversational-tone LLM eval should flag it; capture the offending phrase here for the next regex update.
-- The Money20/20 USA fraud dog-food run on 2026-05-01 produced touches that passed hard validators but used "stuck with me" in the persona narrative — that's how this file got created. Keep iterating.
+- The Money20/20 USA fraud example produced touches that passed hard validators but used "stuck with me" in the persona narrative. Keep adding phrases here when a validated touch still reads machine-generated.

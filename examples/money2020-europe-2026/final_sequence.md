@@ -29,7 +29,7 @@
 
 _Subject:_ (none)
 
-> The Q4 chargeback target you owe your CFO, and how thin the line is between hitting it and tanking approval rates, is the VP Risk question I keep hearing into m2020.
+> The Q4 chargeback target and the approval-rate tradeoff behind it are close to work I am doing with fintech risk leaders going to Money20/20.
 
 `channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 31` · `quality: 4.0/5 (ship)`
 
@@ -49,7 +49,7 @@ _Subject:_ `q4 chargeback target`
 
 _Subject:_ (none)
 
-> {{first_name}}, model-drift detection comes up in every VP Risk conversation before Money20/20. Someone runs the query every two weeks, and by the time drift surfaces, two weeks of chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? A peer payments team shifted to a same-day drift signal last quarter and cut drift-attributable chargebacks 38%. Hosting four risk leads at a Tuesday roundtable on this, hold a seat?
+> {{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and two weeks of chargebacks have already shipped by the time drift surfaces. How are you catching drift in real time at {{company}} before next year's loss-budget locks? A peer payments team shifted to a same-day drift signal last quarter and cut drift-attributable chargebacks 38%. I am hosting four risk leads Tuesday afternoon on this. Worth a seat?
 
 `channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 77` · `quality: 5.0/5 (top-tier)`
 
@@ -59,7 +59,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, week of Money20/20. How are you preparing the APP liability defence for {{company}} ahead of the new rules biting, when your audit trail still spans three vendor portals? A peer team locked theirs the Monday after the rules dropped and cleared the first regulator review at 100%, want the one-pager?
+> {{first_name}}, APP liability prep gets harder when the audit trail still spans three vendor portals. How are you preparing the defence for {{company}} ahead of the new rules biting? A peer team locked theirs the Monday after the rules dropped and cleared the first regulator review at 100%. I attached the one-page audit trail review.
 
 `channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 51` · `quality: 5.0/5 (top-tier)`
 
@@ -69,7 +69,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, today at the RAI. How are you tracking which fraud-rule changes from this week's panels actually map to the Q4 chargeback number you owe your CFO at {{company}}? Free for ten minutes by the speaker lounge at three?
+> {{first_name}}, the RAI fraud-rule panels map back to the Q4 chargeback number you owe your CFO at {{company}}. How are you deciding which panel takeaways become rule changes and which stay as notes? I am near the speaker lounge at three if coffee is useful.
 
 `channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 39` · `quality: 5.0/5 (top-tier)`
 
@@ -77,9 +77,9 @@ _Subject:_ (none)
 
 ### Touch 6: T+2d · email_followup
 
-_Subject:_ `m2020 board prep`
+_Subject:_ `chargeback recap`
 
-> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team planning to defend the Q4 chargeback line for {{company}} to your CFO, when most rule changes shipped at the show take 60 days to surface as loss-budget impact? A peer payments team locked their false-positive review window the Monday after the show and held the chargeback line at 0.6% through Q4. Worth twenty minutes before your next board prep?
+> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team defending the Q4 chargeback line for {{company}} to the CFO, when rule changes shipped this month may take 60 days to surface as loss impact? A peer payments team locked their false-positive review window the Monday after the show and held the chargeback line at 0.6% through Q4. I attached the review sheet.
 
 `channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 68` · `quality: 5.0/5 (top-tier)`
 
@@ -95,7 +95,7 @@ _Subject:_ `m2020 board prep`
 
 _Subject:_ (none)
 
-> The regulator-asks-who-approved-this-flag question is the Compliance question I keep hearing into Money20/20, when your audit trail spans three vendor portals.
+> The regulator question about who approved a flagged customer is close to work I am doing with Compliance leaders going to Money20/20.
 
 `channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 20` · `quality: 4.0/5 (ship)`
 
@@ -105,7 +105,7 @@ _Subject:_ (none)
 
 _Subject:_ `kyc audit cycle`
 
-> {{first_name}}, the regulator-asks-who-approved-this-flag question is the part of the Head of Compliance job I keep hearing about. The audit trail at {{company}} stitches together screenshots from three KYC vendor portals, and the analyst rebuilding it at midnight is the same one trying to clear the SAR backlog. How are you closing that gap on the audit cycle in front of you? Two peer fintechs (similar regulated cohort) rebuilt theirs to one decision-trail dashboard last quarter and cleared the regulator review at 100% with zero escalations. Worth fifteen minutes to walk through the dashboard before m2020?
+> {{first_name}}, when a regulator asks who approved a flagged customer, the hard part is rebuilding the audit trail without pulling screenshots from three KYC portals. How are you closing that gap at {{company}} on the audit cycle in front of you? Two peer fintechs rebuilt theirs into one decision-trail dashboard last quarter and cleared the regulator review at 100% with zero escalations. I attached the dashboard outline. Worth a conversation at Money20/20?
 
 `channel: email` · `offset: T-21d` · `type: email_cold` · `cta: make_offer` · `words: 95` · `quality: 5.0/5 (top-tier)`
 
@@ -115,7 +115,7 @@ _Subject:_ `kyc audit cycle`
 
 _Subject:_ (none)
 
-> {{first_name}}, the KYC-vendor-falloff math keeps coming up before Money20/20. Each vendor passes 85-92% on its own, but the waterfall stacks to an 18-23% friction-driven abandon rate, and Sales blames Compliance every Monday. How are you holding {{company}}'s onboarding latency without dropping below the FinCEN bar? A peer fintech tightened theirs after the last audit and cut friction-abandon from 21% to 9% in one quarter. Want me to walk your COO through how before your next audit cycle opens?
+> {{first_name}}, KYC waterfall math gets painful when each vendor passes 85-92% on its own but the full flow creates 18-23% friction abandon. How are you holding {{company}}'s onboarding latency without dropping below the FinCEN bar? A peer fintech tightened theirs after the last audit and cut friction-abandon from 21% to 9% in one quarter. I attached the COO version of the review.
 
 `channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 78` · `quality: 5.0/5 (top-tier)`
 
@@ -125,7 +125,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, week of Money20/20. How are you holding the EDD false-positive rate at {{company}}, when 60-70% of cases close as no-action and your analysts could be chasing real bad actors? A peer fintech re-tuned theirs after the last audit and cut EDD false-positives from 64% to 31%, want the one-page on what they cut?
+> {{first_name}}, EDD false positives get expensive when 60-70% of cases close as no-action and analysts could be chasing real bad actors. How are you holding that rate at {{company}} this quarter? I attached the one-page review a peer fintech used to cut EDD false positives from 64% to 31%.
 
 `channel: linkedin` · `offset: T-7d` · `type: linkedin_nudge` · `cta: ask_for_interest` · `words: 54` · `quality: 5.0/5 (top-tier)`
 
@@ -135,7 +135,7 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, today at the RAI. How are you mapping the AML-AI panel takeaways back to your SAR-drafting pipeline at {{company}}, when reports already lag the actual investigations by two months? A peer fintech shipped a same-cycle SAR draft last quarter, free for fifteen minutes after the next session?
+> {{first_name}}, the AML-AI panel at the RAI maps directly to SAR drafting lag when reports trail investigations by two months. How are you deciding what should change in {{company}}'s pipeline after the session? I am near the next hall if coffee is useful.
 
 `channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 48` · `quality: 5.0/5 (top-tier)`
 
@@ -143,8 +143,8 @@ _Subject:_ (none)
 
 ### Touch 6: T+2d · email_followup
 
-_Subject:_ `m2020 audit recap`
+_Subject:_ `kyc audit recap`
 
-> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team planning to close the regulator-flagged KYC gaps at {{company}} before the next audit cycle, when the audit trail still stitches across three vendor portals? A peer fintech locked theirs into one dashboard the Monday after the show and cleared their next two audit reviews at 100%. Worth thirty minutes with your COO before the cycle opens?
+> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team planning to close the regulator-flagged KYC gaps at {{company}}, when the audit trail still stitches across three vendor portals? A peer fintech locked theirs into one dashboard after the show and cleared the next two audit reviews at 100%. I attached the audit-trail diagram.
 
 `channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 65` · `quality: 5.0/5 (top-tier)`

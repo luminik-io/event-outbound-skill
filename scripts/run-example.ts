@@ -2,10 +2,10 @@
 // run generateSequence(), write final_sequence.md.
 //
 // Usage (from repo root):
-//   GEMINI_API_KEY=... npx tsx scripts/run-example.ts examples/rsa-conference-2026
+//   npx tsx scripts/run-example.ts examples/black-hat-usa-2026
 //
-// If sequencer-output.json already exists in the example dir, the LLM step is
-// skipped and only the markdown rendering re-runs (saves ~5 min). Pass
+// If sequencer-output.json already exists in the example dir, the generator
+// step is skipped and only the markdown rendering re-runs. Pass
 // `--rerun` to force regeneration. Pass `--explain` to expand per-touch
 // validation details (banned phrases caught, cliche categories tripped, full
 // `checks` object) inline below each touch.
@@ -14,7 +14,6 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { generateSequence } from '../src/agents/sequencer.js';
 import type {
   EventContext,
   CompanyICP,
@@ -243,14 +242,9 @@ async function main() {
     out = await readJson<SequencerOutput>(exampleDir, 'sequencer-output.json');
   } else {
     console.error(
-      `Generating ${companyIcp.personas.length} persona sequences for ${eventContext.name} ...`,
+      `No cached ${jsonPath} found. Claude Code runs this skill with the active Claude session and the local validator. For headless runs, call generateSequence() from your own script and inject a TouchGenerator.`,
     );
-    const start = Date.now();
-    out = await generateSequence(eventContext, companyIcp, sequenceParams);
-    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
-    console.error(`Generation complete in ${elapsed}s.`);
-    await writeFile(jsonPath, JSON.stringify(out, null, 2), 'utf-8');
-    console.error(`Wrote ${jsonPath}`);
+    process.exit(1);
   }
 
   const stats = computeStats(out);

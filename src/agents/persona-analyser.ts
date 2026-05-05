@@ -1,8 +1,7 @@
 // TODO: real impl. This is a fixture stub — it returns a hardcoded persona
-// regardless of input, matching the fixture expectations exercised in
-// tests/agents/persona-analyser.test.ts (which mocks @ai-sdk/google). A real
-// implementation should call Gemini via generateObject with a Zod schema,
-// grounded in the profile text. See README for the intended contract.
+// regardless of input, matching the fixture expectations exercised in tests.
+// A production implementation should use the active Claude session in the
+// installed skill, or an explicitly injected model adapter in headless code.
 import { AttendeePersona } from '../types/index.js';
 import { createHash } from 'crypto';
 

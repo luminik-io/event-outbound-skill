@@ -7,7 +7,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, beforeAll } from 'vitest';
 
-import { findLlmCliches, type ColdOutboundRules } from '../src/lib/ruleService.js';
+import {
+  findForcedEventPhrasing,
+  findEventFirstPreviewPhrasing,
+  findLlmCliches,
+  findPermissionToSendPhrasing,
+  findSellerFirstPreviewPhrasing,
+  type ColdOutboundRules,
+} from '../src/lib/ruleService.js';
 
 let rules: ColdOutboundRules;
 let blocklist: NonNullable<ColdOutboundRules['llm_cliche_blocklist']>;
@@ -145,6 +152,42 @@ describe('findLlmCliches: cold_email_overused (existing)', () => {
   });
 });
 
+describe('preview-line validator: first 18 words (new in May 2026)', () => {
+  it('catches seller-first preview copy with "I"', () => {
+    const hits = findSellerFirstPreviewPhrasing(
+      '{{first_name}}, I saw you are headed to Black Hat and wanted to share a worksheet.',
+    );
+    expect(hits).toContain('i');
+  });
+
+  it('catches seller-first preview copy with "we"', () => {
+    const hits = findSellerFirstPreviewPhrasing(
+      "{{first_name}}, we're helping security teams prepare for the next audit cycle.",
+    );
+    expect(hits).toContain('we');
+  });
+
+  it('catches event-first preview copy', () => {
+    const hits = findEventFirstPreviewPhrasing(
+      '{{first_name}}, Black Hat is coming up and I wanted to connect on detection rules.',
+      'Black Hat USA 2026',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('passes buyer-responsibility-first preview copy with a natural event CTA later', () => {
+    const sellerHits = findSellerFirstPreviewPhrasing(
+      '{{first_name}}, rule ownership gets messy when the original writer moves teams and tier-1 keeps closing the same detection. Worth coffee at Black Hat?',
+    );
+    const eventHits = findEventFirstPreviewPhrasing(
+      '{{first_name}}, rule ownership gets messy when the original writer moves teams and tier-1 keeps closing the same detection. Worth coffee at Black Hat?',
+      'Black Hat USA 2026',
+    );
+    expect(sellerHits).toEqual([]);
+    expect(eventHits).toEqual([]);
+  });
+});
+
 describe('findLlmCliches: existing categories still fire (regression coverage)', () => {
   it('flags "stuck with me" under performative_empathy', () => {
     const text = 'Pete, your post about cold email stuck with me. how are you screening for spam?';
@@ -219,6 +262,66 @@ describe('additional_banned_phrases: anti-flex selling tics (new in May 2026)', 
   });
 });
 
+describe('permission-to-send and direct-asset CTA validator', () => {
+  it('catches "should I send" permission CTAs', () => {
+    const hits = findPermissionToSendPhrasing('I wrote the checklist. Should I send it before the show?');
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches "can I send" permission CTAs', () => {
+    const hits = findPermissionToSendPhrasing('Can I send the worksheet to your team?');
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches "want me to walk" permission CTAs', () => {
+    const hits = findPermissionToSendPhrasing('Want me to walk your COO through the map?');
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches gated asset phrasing like "want the one-pager"', () => {
+    const hits = findPermissionToSendPhrasing('A peer team cut alert volume 41%, want the one-pager?');
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('passes direct asset delivery with a real question', () => {
+    const hits = findPermissionToSendPhrasing(
+      'I attached the one-page worksheet we use for that review. Is this useful for {{company}} this quarter?',
+    );
+    expect(hits).toEqual([]);
+  });
+});
+
+describe('forced event phrasing validator', () => {
+  it('catches "keeps coming up before RSA"', () => {
+    const hits = findForcedEventPhrasing(
+      'The alert-fatigue blast radius keeps coming up before RSA.',
+      'RSA Conference 2026',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches "week of Money20/20"', () => {
+    const hits = findForcedEventPhrasing(
+      '{{first_name}}, week of Money20/20. How are you holding false positives?',
+      'Money20/20 Europe 2026',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches vague shorthand like m2020', () => {
+    const hits = findForcedEventPhrasing('Worth a conversation before m2020?', 'Money20/20 Europe 2026');
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('passes a natural event CTA after buyer context', () => {
+    const hits = findForcedEventPhrasing(
+      'How are you deciding who owns the answer at {{company}}? I attached the worksheet. Worth talking through over coffee at RSA?',
+      'RSA Conference 2026',
+    );
+    expect(hits).toEqual([]);
+  });
+});
+
 describe('additional_banned_phrases: forced-personalization + slang tells (new in May 2026)', () => {
   it('catches "caught my eye" as a fabricated-signal tell', () => {
     expect(rules.additional_banned_phrases).toContain('caught my eye');
@@ -246,5 +349,17 @@ describe('additional_banned_phrases: forced-personalization + slang tells (new i
 
   it('catches "compare notes" as the same over-deployed close', () => {
     expect(rules.additional_banned_phrases).toContain('compare notes');
+  });
+
+  it('catches "would you be open to" as a leading question', () => {
+    expect(rules.additional_banned_phrases).toContain('would you be open to');
+  });
+
+  it('catches "if I told you" as a moon-and-stars opener', () => {
+    expect(rules.additional_banned_phrases).toContain('if i told you');
+  });
+
+  it('catches "quick intro call" as a meeting-first CTA', () => {
+    expect(rules.additional_banned_phrases).toContain('quick intro call');
   });
 });

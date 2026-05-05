@@ -1,11 +1,11 @@
 ---
 title: Cold-Outbound Distilled Patterns
-attribution: "Internal reference for building the event-outbound skill. Encodes generic cold-outbound craft principles as pattern shapes. Not for external citation in generated skill output."
+attribution: "Project reference for building the event-outbound skill. Encodes generic cold-outbound craft principles as pattern shapes. Not for citation in generated skill output."
 ---
 
 # Cold-Outbound Distilled Patterns
 
-This document is an internal reference for building the event-outbound skill, distilling recurring pattern shapes used in high-quality B2B cold outbound. The generated skill output never cites this document. All content is abstracted to pattern shapes and descriptions, not verbatim copies.
+This document is a project reference for building the event-outbound skill, distilling recurring pattern shapes used in high-quality B2B cold outbound. The generated skill output never cites this document. All content is abstracted to pattern shapes and descriptions, not verbatim copies.
 
 ## Openers
 
@@ -39,17 +39,17 @@ Nudges are designed to be low-pressure, specific, and build on previous interact
 *   **Value-Add Nudge:** Providing a new piece of relevant information or insight without demanding a response.
 *   **Reference to Shared Context:** Referencing a previous interaction, event, or shared experience to maintain relevance.
 *   **Low-Commitment Question:** Asking a simple, open-ended question that invites a brief response but doesn’t require deep engagement.
-*   **Binary CTA:** Offering a simple yes/no choice to move the conversation forward without high pressure (e.g., "Want me to send you a link...").
+*   **Direct useful next step:** Attach or link the useful thing, then ask one real question about whether it maps to the recipient's work.
 
-## Permission-Based Selling Phrases
+## Buyer-Controlled Selling Phrases
 
-This approach seeks to gain explicit or implicit permission from the prospect to continue the conversation, making them feel in control and respected.
+This approach keeps the prospect in control without adding fake friction. If a useful asset is part of the touch, include it directly instead of asking permission to send it.
 
 ### Example Shapes:
 
 *   **"Not sure if you’ve run into this..."**: Introducing a common problem as a shared observation, inviting the prospect to confirm or deny its relevance to them.
 *   **"You’re probably familiar with..."**: Presupposing some knowledge on the prospect’s part, making the interaction feel less like a pitch and more like a peer conversation.
-*   **"Want me to send you a link to the closest lot?"**: A low-friction offer that provides immediate value without asking for a meeting.
+*   **"I included the closest-lot link below."**: A low-friction offer that provides immediate value without asking for a meeting.
 *   **"First, I wanted to find out if you’re okay with the $, terms, and dates."**: Explicitly asking for alignment on key deal parameters upfront to ensure mutual fit before deeper engagement.
 
 ## What Prompted the Outreach Lines

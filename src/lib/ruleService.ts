@@ -41,6 +41,12 @@ export type ChannelLengthRule = {
 export type ColdOutboundRules = {
   channel_length_rules: { [touchType: string]: ChannelLengthRule };
   median_sentence_length_max: number;
+  preview_line_rules?: {
+    applies_to: string[];
+    word_window: number;
+    event_first_word_window?: number;
+    seller_pronouns_banned?: string[];
+  };
   additional_banned_phrases: string[];
   leading_question_pattern: { regex: string; flags?: string; fail: boolean };
   illumination_question_required: {
@@ -122,6 +128,200 @@ export function findLlmCliches(
     if (hits.length > 0) out.softWarnings[cat] = hits;
   }
   return out;
+}
+
+type PhrasePattern = {
+  regex: RegExp;
+  label: string;
+};
+
+const PERMISSION_TO_SEND_PATTERNS: PhrasePattern[] = [
+  {
+    label: 'permission-to-send question',
+    regex: /\b(?:should|can|may)\s+i\s+(?:send|share|forward|drop|pass|show|walk)\b/i,
+  },
+  {
+    label: 'want-me-to-send question',
+    regex: /\b(?:want|need)\s+(?:me|us)\s+to\s+(?:send|share|forward|drop|pass|show|walk)\b/i,
+  },
+  {
+    label: 'happy-to-send phrase',
+    regex: /\bhappy to\s+(?:send|share|chat|connect|jump|hop|forward|drop|walk)\b/i,
+  },
+  {
+    label: 'gated asset question',
+    regex: /\b(?:want|need)\s+the\s+(?:one[-\s]?pager|one[-\s]?page|write[-\s]?up|map|checklist|worksheet|recap|diagram|note|sheet)\b/i,
+  },
+  {
+    label: 'reply-yes-to-send phrase',
+    regex: /\breply\s+(?:yes|y)\b[^.!?]*(?:send|share|forward|drop)\b/i,
+  },
+  {
+    label: 'say-so-to-send phrase',
+    regex: /\bsay so\b[^.!?]*(?:send|share|forward|drop|come back)\b/i,
+  },
+  {
+    label: 'minutes-as-cta phrase',
+    regex: /\b(?:free for|worth)\s+(?:ten|fifteen|twenty|thirty|\d+)\s+minutes?\b/i,
+  },
+];
+
+function patternHits(text: string, patterns: PhrasePattern[]): string[] {
+  const found = new Set<string>();
+  for (const pattern of patterns) {
+    const match = text.match(pattern.regex);
+    if (match?.[0]) found.add(match[0]);
+  }
+  return Array.from(found);
+}
+
+function previewTokens(text: string, maxWords: number): string[] {
+  const tokens =
+    text
+      .toLowerCase()
+      .match(/\{\{[a-z0-9_]+\}\}|[a-z0-9]+(?:[/-][a-z0-9]+)*(?:'[a-z]+)?/g) ||
+    [];
+  return tokens.slice(0, maxWords);
+}
+
+function normalizePreviewToken(token: string): string {
+  return token
+    .replace(/^i(?:'m|'d|'ll|'ve)?$/, 'i')
+    .replace(/^we(?:'re|'d|'ll|'ve)?$/, 'we');
+}
+
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function eventAliases(eventName?: string): string[] {
+  const lower = (eventName || '').toLowerCase();
+  const aliases = new Set<string>();
+  if (lower.includes('rsa')) {
+    aliases.add('rsa');
+    aliases.add('rsa conference');
+  }
+  if (lower.includes('money20/20') || lower.includes('money2020')) {
+    aliases.add('money20/20');
+    aliases.add('money2020');
+    aliases.add('m20/20');
+    aliases.add('m2020');
+  }
+  if (lower.includes('black hat') || lower.includes('blackhat')) {
+    aliases.add('black hat');
+    aliases.add('blackhat');
+  }
+  const stripped = lower
+    .replace(/\b(20\d{2}|conference|europe|usa|us|global|summit|event)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (stripped.length >= 3) aliases.add(stripped);
+  if (aliases.size === 0) {
+    aliases.add('rsa');
+    aliases.add('money20/20');
+    aliases.add('money2020');
+    aliases.add('m20/20');
+    aliases.add('m2020');
+  }
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+}
+
+/**
+ * Catch asset-gating CTAs. Good copy attaches or links the useful thing and
+ * asks a real question. It does not ask permission to send the thing.
+ */
+export function findPermissionToSendPhrasing(text: string): string[] {
+  return patternHits(text, PERMISSION_TO_SEND_PATTERNS);
+}
+
+/**
+ * Catch event references that read like a template variable was pushed into
+ * the wrong sentence. Natural event asks such as "Worth coffee at RSA?" pass.
+ */
+export function findForcedEventPhrasing(text: string, eventName?: string): string[] {
+  const aliases = eventAliases(eventName).map(escapeRegex).join('|');
+  const patterns: PhrasePattern[] = [
+    {
+      label: 'keeps-coming-up-before-event opener',
+      regex: new RegExp(
+        `\\b(?:keeps?\\s+coming\\s+up|comes\\s+up|keep\\s+hearing|hearing)\\b[^.!?]{0,100}\\b(?:before|into)\\s+(?:${aliases})\\b`,
+        'i',
+      ),
+    },
+    {
+      label: 'week-of-event opener',
+      regex: new RegExp(`\\bweek\\s+of\\s+(?:${aliases})\\b`, 'i'),
+    },
+    {
+      label: 'post-event shorthand opener',
+      regex: new RegExp(
+        `\\b(?:week\\s+one|two\\s+weeks?)\\s+post[-\\s](?:${aliases})\\b`,
+        'i',
+      ),
+    },
+    {
+      label: 'today-at-event opener',
+      regex: new RegExp(`\\btoday\\s+at\\s+(?:${aliases})\\b`, 'i'),
+    },
+    {
+      label: 'forced-before-event question',
+      regex: new RegExp(
+        `\\bhow\\s+(?:are|do|is|can|could|would|should|did)\\s+(?:you|your)\\b[^?]{0,140}\\bbefore\\s+(?:${aliases})\\?`,
+        'i',
+      ),
+    },
+    {
+      label: 'vague event shorthand',
+      regex: /\bm(?:20\/20|2020)\b/i,
+    },
+  ];
+  return patternHits(text, patterns);
+}
+
+/**
+ * The inbox preview is the subject line's partner. If the first ~18 words start
+ * seller-first, the touch has already become a pitch before the buyer reaches
+ * the illumination question.
+ */
+export function findSellerFirstPreviewPhrasing(
+  text: string,
+  wordWindow = 18,
+  bannedPronouns = ['i', 'me', 'my', 'we', 'us', 'our', 'ours'],
+): string[] {
+  const banned = new Set(bannedPronouns.map((p) => p.toLowerCase()));
+  const found = new Set<string>();
+  for (const token of previewTokens(text, wordWindow).map(normalizePreviewToken)) {
+    if (banned.has(token)) found.add(token);
+  }
+  return Array.from(found);
+}
+
+/**
+ * Event-first previews read like a template variable. Buyer responsibility
+ * should create relevance; the event should usually support the ask.
+ */
+export function findEventFirstPreviewPhrasing(
+  text: string,
+  eventName?: string,
+  wordWindow = 12,
+): string[] {
+  const tokens = previewTokens(text, wordWindow);
+  const preview = tokens
+    .filter((t) => !/^\{\{[a-z0-9_]+\}\}$/.test(t))
+    .join(' ')
+    .trim();
+  const aliases = eventAliases(eventName).map(escapeRegex);
+  const found = new Set<string>();
+  for (const alias of aliases) {
+    const direct = new RegExp(`^(?:the\\s+)?${alias}\\b`, 'i');
+    const prep = new RegExp(
+      `^(?:at|before|ahead\\s+of|going\\s+into|during|after|today\\s+at|week\\s+of|the\\s+week\\s+of)\\s+(?:the\\s+)?${alias}\\b`,
+      'i',
+    );
+    const match = preview.match(prep) || preview.match(direct);
+    if (match?.[0]) found.add(match[0]);
+  }
+  return Array.from(found);
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -242,6 +442,13 @@ const FALLBACK_COLD_OUTBOUND_RULES: ColdOutboundRules = {
     'happy to send',
     'happy to share',
     'happy to chat',
+    'should i send',
+    'can i send',
+    'want me to send',
+    'want me to share',
+    'want me to walk',
+    'want the one-pager',
+    'want the one-page',
   ],
   leading_question_pattern: {
     regex: "\\b(if I could|wouldn'?t you|don'?t you think|would you be interested|would you agree)\\b",

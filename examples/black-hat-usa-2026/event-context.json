@@ -1,0 +1,25 @@
+{
+  "name": "Black Hat USA 2026",
+  "dates": "August 1-6, 2026",
+  "location": "Mandalay Bay, Las Vegas",
+  "agendaTitles": [
+    "CISO Summit",
+    "Financial Services Security Summit",
+    "AI Summit",
+    "Black Hat Briefings",
+    "Arsenal open-source tool demos",
+    "Business Hall"
+  ],
+  "exhibitorList": [
+    "CrowdStrike",
+    "Palo Alto Networks",
+    "Okta",
+    "Wiz",
+    "SentinelOne",
+    "Snyk",
+    "Cloudflare",
+    "1Password",
+    "Abnormal Security",
+    "Lacework"
+  ]
+}

@@ -9,7 +9,7 @@ Email + LinkedIn. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-1e1e1e.svg)](https://docs.claude.com/en/docs/claude-code/plugins)
-[![Tests](https://img.shields.io/badge/tests-56%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-73%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -22,7 +22,7 @@ Email + LinkedIn. Free, MIT, open source.
 
 > **Built on 20,000+ personalised touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, body 50–100 words, no buzzwords, illumination question on first touch, lean-back permission-based CTA. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, body 50–100 words, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
 ## Install
 
@@ -52,13 +52,14 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | Layer | What it checks |
 |---|---|
 | **Subject** | All lowercase, ≤ 4 words, no colons, no digits, no buzzwords |
+| **Inbox preview** | First-touch and post-connect DM openers must be buyer-first: no seller pronouns in the first 18 words, no event-first opener |
 | **Body length** | Channel-specific: cold email 50–100 words / 3–5 sentences, LinkedIn connect 18–35 words ≤ 200 chars, day-of nudge 30–60 words, post-event 40–90 words |
-| **Structure** | 4T pattern: Trigger → Think (illumination question) → Third-party validation → Talk? (lean-back CTA) |
+| **Structure** | 4T pattern: Trigger → Think (illumination question) → Third-party validation → Talk? (direct CTA) |
 | **Pronoun ratio** | "you/your" must outnumber "we/our" |
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
-| **Specificity** | Every touch must reference a concrete event/persona signal, no population-shape generalizations |
+| **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations or forced event phrasing |
 
 ## What it does
 
@@ -97,7 +98,7 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 
 | Example | ICP | Personas | Lead time | Status |
 |---|---|---|---|---|
-| [`examples/rsa-conference-2026/`](examples/rsa-conference-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
+| [`examples/black-hat-usa-2026/`](examples/black-hat-usa-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude Code with no API key |
 
@@ -108,7 +109,7 @@ Every shipped sequence is hand-verified against the full validator stack: zero h
 From inside a Claude Code session, after installing the plugin:
 
 ```
-Create an outbound sequence for RSA Conference 2026 targeting Directors of Security Engineering at mid-market SaaS.
+Create an outbound sequence for Black Hat USA 2026 targeting Directors of Security Engineering at mid-market SaaS.
 4 week lead time, email plus LinkedIn.
 ```
 
@@ -144,11 +145,11 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-49 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
+73 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
 
 ### Headless / batch generation (optional)
 
-If you want to generate sequences outside Claude Code (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM. There is no required cloud API for using the skill inside Claude Code.
+If you want to generate sequences outside Claude Code (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. There is no required cloud API for using the skill inside Claude Code, and the repo ships no default external-model dependency.
 
 ## Parameters
 
@@ -215,7 +216,7 @@ Sources cited inline in [`data/llm-cliche-blocklist.md`](data/llm-cliche-blockli
 ├── src/                    Sequencer agent, validators, timeline, types
 ├── data/                   Validator inputs: cliche blocklist, channel rules,
 │                           cold-email benchmarks, craft canon
-├── examples/               Worked examples (RSA, Money20/20, Singapore Fintech)
+├── examples/               Worked examples (Black Hat, Money20/20, Singapore Fintech)
 ├── tests/                  Vitest unit + integration tests
 ├── evals/                  End-to-end output evaluations
 ├── scripts/                Run-example, scan-deliverables, install verification
@@ -231,8 +232,8 @@ MIT. See [`LICENSE`](LICENSE).
 
 **Teachers and sources we learned from:**
 
-- **[Josh Braun](https://joshbraun.com)**, whose public writing on permission-based cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
-- **Gong's "Ultimate Cold Email Data Report"**, 85M emails analysed, co-authored with [30 Minutes to President's Club](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
+- **[Josh Braun](https://joshbraun.com)**, whose public writing on buyer-first cold outbound has been a compass. The validator's tone rules (no pitch-speak, "you" > "we", concrete offers over meeting-asks) echo principles he teaches openly.
+- **Gong's "Ultimate Cold Email Data Report"**, 85M emails analysed, co-authored with [30MPC](https://30mpc.com) and [Outbound Squad](https://outboundsquad.com). The benchmark numbers we validate against (subject length impact, CTA-type reply-rate deltas, word-count sweet spots) come from this publicly-published research.
 - **Stanford CRFM** and **GPTZero** for public research on GPT-detected vocabulary and linguistic markers, which seeded the LLM-cliche blocklist.
 - **The Lavender Live transcript**, for one of the few public corpora of in-the-moment cold-email rewrites by working SDR managers.
 
