@@ -13,7 +13,7 @@
 - **CTA mix:** 2 none, 6 make_offer, 8 ask_for_interest
 - **Illumination-question coverage:** 81% of touches
 
-> Generated with the `event-outbound` skill running natively inside Claude Code (no external API key required). Every touch validated against [`data/cold-outbound-rules.json`](../../data/cold-outbound-rules.json) and [`data/cold-email-benchmarks.json`](../../data/cold-email-benchmarks.json) via [`scripts/validate-touch.mjs`](../../scripts/validate-touch.mjs).
+> Generated with the `event-outbound` skill running natively inside Claude (no external API key required). Every touch validated against [`data/cold-outbound-rules.json`](../../data/cold-outbound-rules.json) and [`data/cold-email-benchmarks.json`](../../data/cold-email-benchmarks.json) via [`scripts/validate-touch.mjs`](../../scripts/validate-touch.mjs).
 
 > Note on the assets and percentages referenced in the body of each touch (the runtime-stack consolidation map, "41% drop in tier-1 alert volume", "breach-readiness from 71 to 84", etc.): these are the *shape* of the proof points a credible sender could attach. Replace with your own real artefacts and numbers at send time.
 

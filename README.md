@@ -4,11 +4,11 @@
 
 # event-outbound
 
-Pre-event outbound sequences for B2B trade shows, conferences, and industry events. <br/>
-Email + LinkedIn. Free, MIT, open source.
+Buyer-first email and LinkedIn outreach for B2B trade shows and conferences. <br/>
+Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
-[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-1e1e1e.svg)](https://docs.claude.com/en/docs/claude-code/plugins)
+[![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
 [![Tests](https://img.shields.io/badge/tests-73%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
@@ -26,6 +26,8 @@ The skill turns three inputs (event, ICP, sender identity) into a full multi-tou
 
 ## Install
 
+### Claude Code
+
 From any Claude Code session:
 
 ```bash
@@ -34,6 +36,12 @@ From any Claude Code session:
 ```
 
 That's it. The skill registers itself, and any prompt mentioning a B2B event, attendee outreach, or pre-event sequencing routes to it.
+
+### Claude Cowork
+
+Install `event-outbound` from Cowork's plugin directory once listed. In Cowork, open **Customize**, choose **Browse plugins**, then install `event-outbound`.
+
+The same plugin package is used for Claude Code and Cowork. The local validator is referenced through `${CLAUDE_PLUGIN_ROOT}`, so it resolves inside the installed plugin directory rather than depending on the current working directory.
 
 ## Who this is for
 
@@ -100,13 +108,13 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 |---|---|---|---|---|
 | [`examples/black-hat-usa-2026/`](examples/black-hat-usa-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
-| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude Code with no API key |
+| [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude with no API key |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
 ## Quickstart
 
-From inside a Claude Code session, after installing the plugin:
+From Claude Code or Cowork, after installing the plugin:
 
 ```
 Create an outbound sequence for Black Hat USA 2026 targeting Directors of Security Engineering at mid-market SaaS.
@@ -124,7 +132,7 @@ npm install
 claude --plugin-dir $(pwd)
 ```
 
-That's it. The skill runs inside Claude Code with no extra API keys. Claude reads the rules from `data/`, generates each touch, validates it via `node scripts/validate-touch.mjs`, and revises on failure.
+That's it. The installed skill runs inside Claude Code and Cowork with no extra API keys. Claude reads the rules from `${CLAUDE_PLUGIN_ROOT}/data/`, generates each touch, validates it via `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"`, and revises on failure.
 
 To validate a single hand-written touch against the rule set:
 
@@ -149,7 +157,7 @@ npm test -- --run
 
 ### Headless / batch generation (optional)
 
-If you want to generate sequences outside Claude Code (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. There is no required cloud API for using the skill inside Claude Code, and the repo ships no default external-model dependency.
+If you want to generate sequences outside Claude (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. There is no required cloud API for using the skill inside Claude Code or Cowork, and the repo ships no default external-model dependency.
 
 ## Parameters
 
@@ -221,7 +229,7 @@ Sources cited inline in [`data/llm-cliche-blocklist.md`](data/llm-cliche-blockli
 ├── evals/                  End-to-end output evaluations
 ├── scripts/                Run-example, scan-deliverables, install verification
 ├── marketplace/            Cover image (1200x630)
-└── .claude-plugin/         Claude Code plugin descriptor
+└── .claude-plugin/         Claude plugin descriptor
 ```
 
 ## License

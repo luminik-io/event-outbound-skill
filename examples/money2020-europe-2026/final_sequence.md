@@ -13,7 +13,7 @@
 - **CTA mix:** 2 none, 4 make_offer, 6 ask_for_interest
 - **Illumination-question coverage:** 83% of touches
 
-> Generated with the `event-outbound` skill running natively inside Claude Code (no external API key required). Every touch validated against [`data/cold-outbound-rules.json`](../../data/cold-outbound-rules.json) via [`scripts/validate-touch.mjs`](../../scripts/validate-touch.mjs).
+> Generated with the `event-outbound` skill running natively inside Claude (no external API key required). Every touch validated against [`data/cold-outbound-rules.json`](../../data/cold-outbound-rules.json) via [`scripts/validate-touch.mjs`](../../scripts/validate-touch.mjs).
 
 > Note on the assets and percentages referenced in the body of each touch (the false-positive review window, "1.4% to 0.6%", "friction-abandon from 21% to 9%", etc.): these are the *shape* of the proof points a credible sender could attach. Replace with your own real artefacts and numbers at send time.
 

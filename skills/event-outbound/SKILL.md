@@ -3,12 +3,12 @@ name: event-outbound
 description: Create validated email and LinkedIn outreach sequences for B2B events, from pre-event to post-event, grounded in buyer priorities and checked by a local validator.
 when_to_use: Use when the user asks to create an outreach sequence for a conference, write cold emails for an event, build a LinkedIn cadence for attendees, invite people to a side event or dinner, or turn an event plus ICP into booked meetings.
 allowed-tools: Bash(node *)
-version: 0.2.0
+version: 0.2.4
 ---
 
 # Event Outbound Skill
 
-This skill turns an event + a target persona into a validated multi-channel outreach sequence. **Claude (the model running this Claude Code session) is the generator.** No external API keys are required. The skill ships a local Node validator CLI that Claude shells out to between drafts.
+This skill turns an event + a target persona into a validated multi-channel outreach sequence. **Claude is the generator.** No external API keys are required. The skill ships a local Node validator CLI that Claude shells out to between drafts.
 
 ## When to use
 
@@ -38,18 +38,18 @@ For each persona, build one outreach sequence with 5-8 touches distributed acros
 Use this validator path. Do not assume the current working directory is the plugin root:
 
 ```bash
-node "${CLAUDE_SKILL_DIR}/../../scripts/validate-touch.mjs"
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 ```
 
 1. **Pick the channel + offset** for this touch from the timeline (see "Timeline" below).
 2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-3. **Validate** by running `node "${CLAUDE_SKILL_DIR}/../../scripts/validate-touch.mjs"` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
 4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 5. **Append** to the sequence; move to the next touch.
 
 After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, average quality, score-band counts, CTA mix, illumination-question coverage.
 
-The full system prompt with worked pass/fail examples lives in `data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
+The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
 ## Voice (read this before drafting anything)
 
@@ -135,7 +135,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 ## Validating a touch from inside this skill
 
 ```bash
-node scripts/validate-touch.mjs --touch <(cat <<'JSON'
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --touch <(cat <<'JSON'
 {
   "subject": "money20/20 chargeback prep",
   "body": "Neha, ...",
@@ -189,4 +189,4 @@ When you're unsure if a draft is good, read it aloud. If you'd be embarrassed se
 
 ## Optional: headless runs
 
-If a user wants to run this skill outside Claude Code (CI, batch generation, scheduled cron), the `src/agents/sequencer.ts` module exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM. There is no required cloud API for using the skill inside Claude Code.
+If a user wants to run this skill outside an installed Claude plugin session (CI, batch generation, scheduled cron), the `src/agents/sequencer.ts` module exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM. There is no required cloud API for using the skill inside Claude Code or Claude Cowork.

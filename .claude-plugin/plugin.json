@@ -1,7 +1,7 @@
 {
   "name": "event-outbound",
-  "description": "Generate multi-channel outbound sequences for AEs, SDRs, and event marketers working B2B trade shows, conferences, and industry events. Takes event context + ICP + target personas and produces email + LinkedIn sequences across a parameterised lead time (1-8 weeks). Built on 20k+ personalised touches across 50+ events that sourced $6M+ in pipeline across fintech (identity verification), cybersecurity, and B2B SaaS. Every touch is validated before it lands: subject under 4 words, channel-aware body length, banned-words blocklist, pronoun ratio favouring the reader, direct CTA, no permission-to-send gating, and no forced event phrasing.",
-  "version": "0.2.3",
+  "description": "Create buyer-first email and LinkedIn outreach for B2B trade shows and conferences. Built from 20K+ outbound touches reviewed across 50+ events. Runs in Claude Code and Claude Cowork with no extra API key.",
+  "version": "0.2.4",
   "author": {
     "name": "Luminik",
     "email": "prasad@luminik.io",
