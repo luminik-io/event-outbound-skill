@@ -686,9 +686,9 @@ signature block, no greeting with "Hey".`;
 }
 
 // ---------------------------------------------------------------------------
-// Generator boundary. Claude Code uses SKILL.md and scripts/validate-touch.mjs
-// directly. The TypeScript API is only for headless callers that inject their
-// own generator.
+// Generator boundary. Installed Claude plugin sessions use SKILL.md and
+// scripts/validate-touch.mjs directly. The TypeScript API is only for headless
+// callers that inject their own generator.
 // ---------------------------------------------------------------------------
 
 export type TouchGenerator = (args: {
@@ -738,7 +738,7 @@ export async function generateSequence(
 
   if (!touchGenerator) {
     throw new Error(
-      'generateSequence() requires an injected TouchGenerator outside Claude Code. The installed skill uses the active Claude session plus the local validator; no external API key is required.',
+      'generateSequence() requires an injected TouchGenerator outside an installed Claude plugin session. The installed skill uses the active Claude session plus the local validator; no external API key is required.',
     );
   }
   const llm = touchGenerator;

@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.4 (2026-05-05)
+
+Cowork support hardening before official plugin-directory submission.
+
+### Changed
+- Validator execution now uses `${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs`, matching Anthropic's plugin-path guidance and avoiding current-working-directory assumptions across Claude Code and Claude Cowork.
+- Skill frontmatter now explicitly allows `Read`, `Write`, and the local Node validator so Claude can load fixtures/playbook context and save the generated sequence files in installed plugin sessions.
+- README and plugin metadata now describe Claude Code + Claude Cowork support consistently.
+
 ## v0.2.0 (2026-05-02)
 
 Public launch release. The skill now runs natively inside Claude Code with no external API keys required.
