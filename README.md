@@ -20,7 +20,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 ---
 
-> **Built on 20,000+ personalised touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
+> **Built on 20,000+ personalized touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
 The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, body 50–100 words, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
