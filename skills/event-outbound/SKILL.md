@@ -2,7 +2,7 @@
 name: event-outbound
 description: Create validated email and LinkedIn outreach sequences for B2B events, from pre-event to post-event, grounded in buyer priorities and checked by a local validator.
 when_to_use: Use when the user asks to create an outreach sequence for a conference, write cold emails for an event, build a LinkedIn cadence for attendees, invite people to a side event or dinner, or turn an event plus ICP into booked meetings.
-allowed-tools: Bash(node *)
+allowed-tools: Read, Write, Bash(node *)
 version: 0.2.4
 ---
 
