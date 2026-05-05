@@ -91,7 +91,7 @@ step "6. Banned phrases in example touches"
 # Only scan the generated sequences. The credits section intentionally mentions
 # "no pitch-speak" when describing the validator; that is a rule description,
 # not a touch violation.
-banned=$(grep -rn -iE "want me to send|want me to drop|\bno pitch\b|not a pitch|peer channel|yours to keep" \
+banned=$(grep -rn -iE "should i send|can i send|want me to (send|share|walk|drop|forward)|want the (one-pager|one page|one-page|writeup|map|checklist|worksheet)|happy to (send|share|chat)|free for (ten|fifteen|twenty|thirty|[0-9]+) minutes|worth (ten|fifteen|twenty|thirty|[0-9]+) minutes|\bno pitch\b|not a pitch|peer channel|yours to keep" \
   examples/*/final_sequence.md 2>/dev/null \
   | grep -vE "banned-phrase|blocklist|no \"not a pitch\"|no gating" \
   || true)

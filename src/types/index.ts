@@ -80,6 +80,10 @@ export type OutreachTouch = {
     hasExclamation: boolean;
     hasEmoji: boolean;
     specificityHits: number;
+    permissionToSendHits?: string[];
+    forcedEventPhrasingHits?: string[];
+    previewSellerHits?: string[];
+    previewEventHits?: string[];
   };
   validation_errors?: ValidationError[];
   quality_flag?: 'rules_violated';

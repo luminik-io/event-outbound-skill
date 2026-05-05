@@ -1,12 +1,14 @@
 ---
 name: event-outbound
-description: Generate validated multi-channel outreach sequences for B2B events (trade shows, conferences, summits). Email + LinkedIn, pre-event through post-event. Built for AEs, SDRs, and event marketers. Grounded in 20k+ personalised touches across 50+ events that sourced $6M+ in pipeline across fintech, cybersecurity, and B2B SaaS. Trigger this skill when the user asks to "create an outreach sequence for a conference", "write cold emails for an event", "build a LinkedIn cadence for attendees", "invite people to a side event or dinner at [conference]", or needs to turn an event + ICP into booked meetings.
+description: Create validated email and LinkedIn outreach sequences for B2B events, from pre-event to post-event, grounded in buyer priorities and checked by a local validator.
+when_to_use: Use when the user asks to create an outreach sequence for a conference, write cold emails for an event, build a LinkedIn cadence for attendees, invite people to a side event or dinner, or turn an event plus ICP into booked meetings.
+allowed-tools: Bash(node *)
 version: 0.2.0
 ---
 
 # Event Outbound Skill
 
-This skill turns an event + a target persona into a validated multi-channel outreach sequence. **Claude (the model running this Claude Code session) is the generator.** No external API keys are required. The skill ships a pure-TypeScript validator and a CLI that Claude shells out to between drafts.
+This skill turns an event + a target persona into a validated multi-channel outreach sequence. **Claude (the model running this Claude Code session) is the generator.** No external API keys are required. The skill ships a local Node validator CLI that Claude shells out to between drafts.
 
 ## When to use
 
@@ -31,11 +33,17 @@ If any of these are missing or vague, ask the user for them before generating. V
 
 ## How Claude executes this skill
 
-For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. Each touch is a separate generation step:
+For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. Each touch is a separate generation step.
+
+Use this validator path. Do not assume the current working directory is the plugin root:
+
+```bash
+node "${CLAUDE_SKILL_DIR}/../../scripts/validate-touch.mjs"
+```
 
 1. **Pick the channel + offset** for this touch from the timeline (see "Timeline" below).
 2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-3. **Validate** by running `node scripts/validate-touch.mjs` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+3. **Validate** by running `node "${CLAUDE_SKILL_DIR}/../../scripts/validate-touch.mjs"` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
 4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 5. **Append** to the sequence; move to the next touch.
 
@@ -49,16 +57,18 @@ The bar is **authentic, honest, empathetic, no theatrics**. Not slang. Not cooln
 
 Concrete rules that follow from that:
 
-- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the part of the VP Risk job I hear about most before Money20/20 is..."). The situation is honest; the fake signal isn't.
+- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the Q4 chargeback target is about to land in the CFO review"). The situation is honest; the fake signal isn't.
 - **Poke the bear via pain illumination + cost of inaction, not theatrics.** Name the specific tradeoff the persona is managing this quarter, then quietly draw the line to what happens if it goes unaddressed (Q4 board deck, regulator audit, CFO QBR). No drama. No "this is wild." No "honestly?". Just the operational reality the persona is already living.
 - **Empathy over swagger.** When the persona is dealing with a hard tradeoff, name it honestly. "Tightening the rules drops approval rates 4-7 points and Sales escalates inside 48 hours" is honest empathy. "Most VPs walk in already knowing the pitch" is performative.
 - **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
 - **Bodies use proper grammar.** Capitalize the first letter of every sentence. Use full punctuation. The "all-lowercase" convention applies only to subject lines (per the cold-email-subject canon). Body copy is not a Slack message.
-- **Don't force the event into the body opener.** The event is the *occasion* for outreach; it doesn't have to be the *subject*. Many of the strongest touches anchor on a persona-priority or pain in the body and only invoke the event at the CTA when both parties will be there ("worth a quick coffee at the show?"). Forcing "before RSA" / "at Money20/20" into every sentence reads like a sequence template.
-- **Use human shorthand for proof references.** Stiff: "Adyen and Marqeta wrote up a same-week false-positive cohort review that compresses the loop. There is a write-up if useful." Better, the way someone would actually say it: "Attached a one-pager from our work with Adyen and Marqeta on this. What do you think, is the false-positive review on your roadmap this quarter?" Shorthand reads as a peer talking, not a vendor reading from a script. Patterns that work:
+- **Protect the first 18 words.** The inbox preview is where the recipient decides whether to keep reading. For cold first touches and post-connect DMs, the opener must be buyer-first: no `I/we/us/our` in the first 18 words, and no event-first opener like `"Black Hat is coming up..."`.
+- **Don't force the event into the body opener.** The event is the *occasion* for outreach; it doesn't have to be the *subject*. The strongest touches anchor on a persona responsibility first, then use the event only when it makes the ask more natural ("Worth a coffee at Black Hat if this is on your audit list?"). Forcing "before RSA" / "week of Money20/20" / "into m2020" into every sentence reads like a sequence template.
+- **Use human shorthand for proof references.** Stiff: "Adyen and Marqeta wrote up a same-week false-positive cohort review that compresses the loop. There is a write-up if useful." Better, the way someone would actually say it: "Attached a one-pager from our work with Adyen and Marqeta on this. Is the false-positive review on your roadmap this quarter?" Shorthand reads as a peer talking, not a vendor reading from a script. Patterns that work:
   - `"Attached a one-pager from our work with [A] and [B] on [topic]."`
-  - `"Sending the writeup we did for [A] last quarter, scan it if useful."`
-  - `"[A] and [B] hit [number]; happy to share how, if it's worth the read."`
+  - `"I attached the writeup from [A]'s review last quarter."`
+  - `"[A] and [B] hit [number]. I attached the short version."`
+- **Do not ask permission to send the useful thing.** If the asset is useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"`
 - **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Stronger when grounded: `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} right now, or queued for Q3?"`. Banned because every cold-email guide overuses it: `"comparing notes"`, `"compare notes"`, `"swap notes"`.
 - **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
 
@@ -108,12 +118,14 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 
 - Subject ≤ 4 lowercase words, no digits in cold-email subjects, no banned subject buzzwords.
 - Body within the channel length rule (above).
+- Cold first touches + post-connect DMs must keep the first 18 words buyer-first: no seller pronouns (`I/me/my/we/us/our`) and no event-first opener.
 - Cold emails + post-connect DMs must contain a `how/what/why-are/do/is-you/your` illumination question.
 - No leading questions: `if I could…`, `would you be interested`, `wouldn't you agree`, `don't you think`.
 - No em-dashes. Use commas, periods, colons, parens.
 - No exclamation marks. No emoji.
 - "you/your" must outnumber "we/our" in the body.
-- No banned phrases, see `additional_banned_phrases` in `data/cold-outbound-rules.json`. Includes `happy to send`, `15 minutes`, `30 minutes`, `calendar link`, `book a call`, `schedule a meeting`, `cutting-edge`, `industry-leading`, `world-class`, etc.
+- No banned phrases, see `additional_banned_phrases` in `data/cold-outbound-rules.json`. Includes `happy to send`, `should I send`, `can I send`, `want me to send`, `want the one-pager`, `15 minutes`, `30 minutes`, `calendar link`, `book a call`, `schedule a meeting`, `cutting-edge`, `industry-leading`, `world-class`, etc.
+- No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, or a question that bolts `"before [event]"` onto the end. Use buyer responsibility as the reason to write and the event as the route to a clear ask.
 - No LLM-cliché phrases, 200+ phrases across 10 categories. See `llm_cliche_blocklist` in the same file. Categories: `performative_empathy`, `generic_compliments`, `sales_speak_openers`, `manufactured_intimacy`, `marketing_buzzwords`, `cold_email_overused`, `lazy_generalization_openers`, `llm_transition_tics`, `gpt_vocabulary`. (`hedge_softener_warnings` is soft, does not fail.)
 - No anti-flex selling tics: `"no deck"`, `"no demo"`, `"no calendar invite"`, `"no follow-up deck"`, `"reply yes and i'll send"`. These read as soulless-selling-with-extra-steps. If you'd write one, just don't include the assurance, write copy that doesn't need it.
 - No floor/booth-shopping framing in cold copy. Don't talk about "47 fraud-platform vendors", "five vendors with real numbers", "which booths can answer X". The recipient cares about the risk they manage, not your vendor census.
@@ -148,8 +160,8 @@ Write two files per run, in a directory named for the event:
 
 Working examples that exercise the full contract:
 
-- `examples/rsa-conference-2026/`, cybersecurity, RSA Conference 2026, VP Marketing + Demand Gen Lead personas.
-- `examples/money2020-usa-2026-fraud/`, fintech, Money20/20 USA 2026, VP Risk and Fraud + Head of Compliance personas.
+- `examples/black-hat-usa-2026/`, cybersecurity, Black Hat USA 2026, Director of Security Engineering + VP Security personas.
+- `examples/money2020-europe-2026/`, fintech, Money20/20 Europe 2026, VP Risk and Fraud + Head of Compliance personas.
 - `examples/singapore-fintech-festival-2026/`, fintech APAC, fixture inputs only (regen target).
 
 ## Voice, the bar

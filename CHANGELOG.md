@@ -5,7 +5,7 @@
 Public launch release. The skill now runs natively inside Claude Code with no external API keys required.
 
 ### Changed
-- **Generator is now Claude itself.** `skills/event-outbound/SKILL.md` is rewritten to drive the full workflow inside a Claude Code session: read inputs, draft each touch following the embedded 4T framework + channel rules, validate via the bundled CLI, revise on failure (up to 3 attempts), score and band, write `final_sequence.md` + `sequencer-output.json`. No `GEMINI_API_KEY`, no model dependency.
+- **Generator is now Claude itself.** `skills/event-outbound/SKILL.md` is rewritten to drive the full workflow inside a Claude Code session: read inputs, draft each touch following the embedded 4T framework + channel rules, validate via the bundled CLI, revise on failure (up to 3 attempts), score and band, write `final_sequence.md` + `sequencer-output.json`. No external model credentials are required for the installed skill.
 - `scripts/validate-touch.mjs` added. Pure-Node validator CLI. Reads a touch JSON from stdin or a file, returns `{isValid, errors, checks}` against the canonical rule set in `data/cold-outbound-rules.json`. Used by SKILL.md between drafts.
 - `src/agents/sequencer.ts` retained for headless / batch use only (CI, scheduled cron). Anyone running outside Claude Code can inject their own `TouchGenerator`.
 
@@ -13,9 +13,10 @@ Public launch release. The skill now runs natively inside Claude Code with no ex
 - Validator hardening:
   - `lazy_generalization_openers`: bans `Most teams`, `Most VPs`, `Almost nobody`, `In our experience`, and the `two/three/four/five Series A/B/C` funding-stage aggregation pattern.
   - `cold_email_overused`: bans floor / vendor-shopper framing, `Walking the floor`, `vendors all pitching`, `fraud-platform vendors`, `five vendors who…`, `short list for our team`. Cold copy stays grounded in the persona's priorities and risks, not booth politics.
+  - `preview_line_rules`: protects the first 18 inbox-preview words on cold first touches and post-connect DMs. Seller-first openers (`I/we/us/our`) and event-first openers are rejected before Claude ships the touch.
   - `additional_banned_phrases`: bans the soulless-non-flex selling tics, `no deck`, `no demo`, `no calendar invite`, `reply yes and i'll send`, `no commitment`, `low-pressure`. If you wouldn't say it on a coffee invite, don't write it.
-- 18 new unit tests in `tests/cliche-validator.test.ts` covering the new categories. 30 cliché tests pass; 49 total tests + evals pass.
-- Two worked example folders: `examples/rsa-conference-2026/` (cybersecurity) and `examples/money2020-usa-2026-fraud/` (fintech). Both regenerated via Claude inside Claude Code to validate the no-API-key path end-to-end.
+- 23 new unit tests in `tests/cliche-validator.test.ts` and `tests/basic.test.ts` covering the new categories, preview-line checks, and CLI subject-number parity. 73 total tests + evals pass.
+- Two worked example folders: `examples/black-hat-usa-2026/` (cybersecurity) and `examples/money2020-europe-2026/` (fintech). Both regenerated via Claude inside Claude Code to validate the no-API-key path end-to-end.
 
 ### Removed
 - The user-facing flow no longer requires any external LLM credentials to run inside Claude Code.

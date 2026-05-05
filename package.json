@@ -27,14 +27,9 @@
     "vitest": "^1.2.1"
   },
   "dependencies": {
-    "@ai-sdk/google": "^3.0.64",
-    "@ai-sdk/provider": "^3.0.8",
-    "@ai-sdk/provider-utils": "^4.0.23",
     "@mozilla/readability": "^0.6.0",
-    "ai": "^6.0.168",
     "cheerio": "^1.0.0-rc.12",
-    "jsdom": "^24.0.0",
-    "zod": "^4.3.6"
+    "jsdom": "^24.0.0"
   },
   "overrides": {
     "vite": "^6.4.2",

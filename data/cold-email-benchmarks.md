@@ -1,6 +1,6 @@
 # Cold Email Benchmarks from Gong / 30MPC / Outbound Squad Report
 
-This document synthesizes key findings from the Gong / 30MPC / Outbound Squad data report on cold email performance. These benchmarks are intended for internal use to guide the event-outbound skill's email generation and validation processes.
+This document synthesizes key findings from the Gong / 30MPC / Outbound Squad data report on cold email performance. These benchmarks guide the event-outbound skill's email generation and validation processes.
 
 ## Subject Line Rules
 - **Max Word Count:** 4 words
@@ -42,4 +42,4 @@ This document synthesizes key findings from the Gong / 30MPC / Outbound Squad da
 
 ---
 
-**Attribution:** This document is an internal reference based on findings from the Gong / 30MPC / Outbound Squad data report. The skill's generated output must never mention these sources by name.
+**Attribution:** This document is a project reference based on findings from the Gong / 30MPC / Outbound Squad data report. The skill's generated output must never mention these sources by name.

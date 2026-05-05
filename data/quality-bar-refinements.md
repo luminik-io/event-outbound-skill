@@ -1,10 +1,10 @@
 # Quality bar refinements
 
-> Source: user direction during the 2026-05-01 dog-fooding session, after the first end-to-end run of the skill on RSA Conference 2026 surfaced the gap between "validator-passing" output and "top 0.1%" output.
+> Source: quality review after an end-to-end example run surfaced the gap between "validator-passing" output and "top 0.1%" output.
 >
 > This file complements `cold-outbound-craft.md` (frameworks) and `cold-email-data-report-stats.md` (quantitative benchmarks) with **what the validator and eval still don't catch**. Every requirement here is a place where the current skill output reads as competent but not as *the kind of email a top rep would actually send*.
 >
-> Scope: the items here go in a follow-up PR after the in-flight the cold-outbound canon encoding (`feat/cold-outbound-validators`) lands. This file is the spec for that follow-up.
+> Scope: this file captures the quality bar behind the current validator and the next refinements worth encoding.
 
 ---
 
@@ -194,18 +194,18 @@ Post-sequence eval:
 - [ ] New eval: `conversationalToneEval` (1-5 LLM judge per touch)
 - [ ] New eval: `questionQualityEval` (4 sub-scores: genuineness, cost-of-inaction, specificity, scratch-head)
 - [ ] New eval: `distinctPainAnglesEval` (sequence-level, must hit 4+ angles in a 6-touch sequence)
-- [ ] Re-run RSA + SaaStr + Money20/20 examples; manual review confirms each touch reads naturally and uses a unique angle
+- [ ] Re-run Black Hat USA + SaaStr + Money20/20 examples; manual review confirms each touch reads naturally and uses a unique angle
 - [ ] Prompt rewrite: 4T framework + per-step CTA strategy table + 3 cost-of-inaction question exemplars + 3 surface-level fails
-- [ ] All 12 RSA touches pass the new validators AND score ≥4 on the conversational-tone eval
+- [ ] All first-party worked-example touches pass the new validators AND score ≥4 on the conversational-tone eval
 
 ---
 
 ## What this changes about the LinkedIn post
 
-The LinkedIn post we draft after this PR lands should NOT claim "100% the cold-outbound canon compliant from day one." The honest story is:
+The launch copy should not claim "100% cold-outbound canon compliant from day one." The honest story is:
 
-1. *"I built the skill, ran it end-to-end on RSA, the validator caught real misalignments — channel-uniform length, false-positive flags on LinkedIn, surface-level questions."*
+1. *"I built the skill, ran it end-to-end on real event examples, and the validator caught real misalignments — channel-uniform length, false-positive flags on LinkedIn, surface-level questions."*
 2. *"I encoded the cold-outbound canon's frameworks plus the Gong/30MPC 85M-email data report, added LLM-graded evals, refactored the sequencer to track sequence state across touches so pains don't recycle and CTA placement is strategic."*
 3. *"Now every touch passes hard validators AND scores 4+ on the conversational-tone eval. Each step uses a distinct angle. Not every step pitches; some are just signal."*
 
-That's a credible "I built this, dog-fed it, found bugs, fixed them" story. The user gets to share something honest, specific, and useful — not a marketing claim.
+That is a credible "built it, tested it, found the weak spots, fixed them" story. The launch message should feel honest, specific, and useful, not like a marketing claim.

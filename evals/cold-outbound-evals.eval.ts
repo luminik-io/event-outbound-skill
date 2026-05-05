@@ -6,9 +6,10 @@
  *      hard validator and assert at least one rule fires. No LLM required.
  *      These also verify the 10 canonical PASS examples don't trip false
  *      positives on the rules they're supposed to demonstrate.
- *   2. **LLM-judge evals** — for each canonical PASS, ask a pluggable
- *      `TouchJudge` whether the touch satisfies a 4T criterion. Skipped in CI
- *      unless GEMINI_API_KEY is set (or a mock judge is injected).
+ *   2. **External-judge evals** — for each canonical PASS, ask a pluggable
+ *      `TouchJudge` whether the touch satisfies a 4T criterion. Skipped in CI.
+ *      Our own eval harness can inject any model adapter outside the public
+ *      plugin install path.
  *
  * Run: `npx vitest run evals/`
  *
@@ -18,9 +19,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { generateObject } from 'ai';
-import { z } from 'zod';
 
 import { validateTouchExternal } from '../src/agents/sequencer.js';
 import type { CTAType, EventContext, AttendeePersona } from '../src/types/index.js';
@@ -101,41 +99,16 @@ export type TouchJudge = (args: {
   rubric: string;
 }) => Promise<JudgeVerdict>;
 
-export function makeGeminiJudge(apiKey?: string): TouchJudge {
-  const key = apiKey ?? process.env.GEMINI_API_KEY;
-  if (!key) {
-    throw new Error('GEMINI_API_KEY required for makeGeminiJudge');
+export function makeExternalJudge(judge?: TouchJudge): TouchJudge {
+  if (!judge) {
+    throw new Error(
+      'External LLM judge is not bundled with the public skill. Inject a TouchJudge from your private eval harness.',
+    );
   }
-  const google = createGoogleGenerativeAI({ apiKey: key });
-  const model = google('gemini-2.5-flash');
-  const VerdictSchema = z.object({
-    pass: z.boolean(),
-    score: z.number().min(0).max(5),
-    reasoning: z.string(),
-  });
-  return async ({ touch, criterion, rubric }) => {
-    const prompt = `Evaluate this outbound touch against the criterion below.
-
-CRITERION: ${criterion}
-
-RUBRIC: ${rubric}
-
-TOUCH:
-Subject: ${touch.subject || '(none)'}
-Body: ${touch.body}
-
-Reply with: pass (true/false), score (0-5), reasoning (one sentence).`;
-    const { object } = await generateObject({
-      model,
-      schema: VerdictSchema,
-      prompt,
-      temperature: 0.2,
-    });
-    return object;
-  };
+  return judge;
 }
 
-const judgeAvailable = !!process.env.GEMINI_API_KEY;
+const judgeAvailable = false;
 
 // ---------------------------------------------------------------------------
 // Eval 1: 4T structure (LLM-judge, skipped in CI without key)
@@ -149,7 +122,7 @@ describe('Eval 1: 4T structure scoring', () => {
   it.skipIf(!judgeAvailable)(
     'every canonical PASS cold email scores >=3 on each of the 4 Ts',
     async () => {
-      const judge = makeGeminiJudge();
+      const judge = makeExternalJudge();
       for (const ex of coldEmailPasses) {
         for (const T of ['Trigger', 'Think', 'Third-party', 'Talk?']) {
           const v = await judge({
@@ -180,7 +153,7 @@ describe('Eval 2: Trigger-Think coherence', () => {
   it.skipIf(!judgeAvailable)(
     'PASS examples have Trigger and Think that ladder together; FAIL examples do not',
     async () => {
-      const judge = makeGeminiJudge();
+      const judge = makeExternalJudge();
       const irrelevantTrigger = examples.fail_examples.find(
         (e) => e.id === 'irrelevant_trigger',
       )!;
@@ -203,7 +176,7 @@ describe('Eval 3: Question neutrality', () => {
   it.skipIf(!judgeAvailable)(
     'leading_question_yesno fails neutrality; canonical Warmbox passes',
     async () => {
-      const judge = makeGeminiJudge();
+      const judge = makeExternalJudge();
       const leading = examples.fail_examples.find(
         (e) => e.id === 'leading_question_yesno',
       )!;
@@ -233,9 +206,9 @@ describe('Eval 3: Question neutrality', () => {
 
 describe('Eval 4: Voice authenticity vs canonical', () => {
   it.skipIf(!judgeAvailable)(
-    'each PASS cold-email scores >=3 for permission-based voice authenticity',
+    'each PASS cold-email scores >=3 for buyer-first voice authenticity',
     async () => {
-      const judge = makeGeminiJudge();
+      const judge = makeExternalJudge();
       const coldEmailPasses = examples.pass_examples.filter(
         (e) => e.touch_type === 'email_cold',
       );
@@ -292,7 +265,7 @@ describe('Eval 6: One-problem-per-email', () => {
   it.skipIf(!judgeAvailable)(
     'multi_problem_mash FAIL is flagged; canonical PASS is not',
     async () => {
-      const judge = makeGeminiJudge();
+      const judge = makeExternalJudge();
       const multi = examples.fail_examples.find((e) => e.id === 'multi_problem_mash')!;
       const captivate = examples.pass_examples.find(
         (e) => e.id === 'captivateiq_cold_first_touch',

@@ -52,11 +52,11 @@
   <g filter="url(#paperShadow)">
     <rect x="80" y="340" width="620" height="180" rx="10" fill="#F5F5F3"/>
     <text x="110" y="380" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14" fill="#8A8F98" letter-spacing="2">SUBJECT</text>
-    <text x="110" y="408" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0B0D10">rsa runtime stack</text>
+    <text x="110" y="408" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22" font-weight="600" fill="#0B0D10">stale detections</text>
     <line x1="110" y1="420" x2="200" y2="420" stroke="#FF4F8B" stroke-width="3"/>
-    <text x="110" y="456" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">{{first_name}}, the tooling-stack overlap question keeps</text>
-    <text x="110" y="478" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">coming up before RSA: EDR + CSPM + CWPP + ITDR each surface</text>
-    <text x="110" y="500" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">the same exec-server CVE. How are you rationalising that...</text>
+    <text x="110" y="456" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">{{first_name}}, when a detection rule outlives its</text>
+    <text x="110" y="478" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">original owner, how are you deciding who owns</text>
+    <text x="110" y="500" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" fill="#3A3F48">the answer at {{company}}? Coffee at Black Hat?</text>
   </g>
 
   <!-- Validator checklist panel -->

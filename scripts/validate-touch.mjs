@@ -111,6 +111,15 @@ const countWords = (s) =>
   String(s || '')
     .split(/\s+/)
     .filter((w) => w.length > 0).length;
+const previewTokens = (text, maxWords) =>
+  String(text || '')
+    .toLowerCase()
+    .match(/\{\{[a-z0-9_]+\}\}|[a-z0-9]+(?:[/-][a-z0-9]+)*(?:'[a-z]+)?/g)
+    ?.slice(0, maxWords) || [];
+const normalizePreviewToken = (token) =>
+  token
+    .replace(/^i(?:'m|'d|'ll|'ve)?$/, 'i')
+    .replace(/^we(?:'re|'d|'ll|'ve)?$/, 'we');
 const countSentences = (s) => {
   // Match a sentence terminator [.!?] only when it is NOT inside a number
   // (e.g. "1.4%" should not count as two sentences). The negative lookahead
@@ -122,6 +131,126 @@ const countSentences = (s) => {
 const findHits = (text, list) => {
   const hay = lower(text);
   return list.filter((p) => p && hay.includes(lower(p)));
+};
+const patternHits = (text, patterns) => {
+  const found = new Set();
+  for (const pattern of patterns) {
+    const match = String(text || '').match(pattern.regex);
+    if (match?.[0]) found.add(match[0]);
+  }
+  return Array.from(found);
+};
+const escapeRegex = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const eventAliases = (eventName) => {
+  const name = lower(eventName);
+  const aliases = new Set();
+  if (name.includes('rsa')) {
+    aliases.add('rsa');
+    aliases.add('rsa conference');
+  }
+  if (name.includes('money20/20') || name.includes('money2020')) {
+    aliases.add('money20/20');
+    aliases.add('money2020');
+    aliases.add('m20/20');
+    aliases.add('m2020');
+  }
+  if (name.includes('black hat') || name.includes('blackhat')) {
+    aliases.add('black hat');
+    aliases.add('blackhat');
+  }
+  const stripped = name
+    .replace(/\b(20\d{2}|conference|europe|usa|us|global|summit|event)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (stripped.length >= 3) aliases.add(stripped);
+  if (aliases.size === 0) {
+    aliases.add('rsa');
+    aliases.add('money20/20');
+    aliases.add('money2020');
+    aliases.add('m20/20');
+    aliases.add('m2020');
+  }
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+};
+const findPermissionToSendPhrasing = (text) =>
+  patternHits(text, [
+    {
+      regex: /\b(?:should|can|may)\s+i\s+(?:send|share|forward|drop|pass|show|walk)\b/i,
+    },
+    {
+      regex: /\b(?:want|need)\s+(?:me|us)\s+to\s+(?:send|share|forward|drop|pass|show|walk)\b/i,
+    },
+    {
+      regex: /\bhappy to\s+(?:send|share|chat|connect|jump|hop|forward|drop|walk)\b/i,
+    },
+    {
+      regex: /\b(?:want|need)\s+the\s+(?:one[-\s]?pager|one[-\s]?page|write[-\s]?up|map|checklist|worksheet|recap|diagram|note|sheet)\b/i,
+    },
+    {
+      regex: /\breply\s+(?:yes|y)\b[^.!?]*(?:send|share|forward|drop)\b/i,
+    },
+    {
+      regex: /\bsay so\b[^.!?]*(?:send|share|forward|drop|come back)\b/i,
+    },
+    {
+      regex: /\b(?:free for|worth)\s+(?:ten|fifteen|twenty|thirty|\d+)\s+minutes?\b/i,
+    },
+  ]);
+const findForcedEventPhrasing = (text, eventName) => {
+  const aliases = eventAliases(eventName).map(escapeRegex).join('|');
+  return patternHits(text, [
+    {
+      regex: new RegExp(
+        `\\b(?:keeps?\\s+coming\\s+up|comes\\s+up|keep\\s+hearing|hearing)\\b[^.!?]{0,100}\\b(?:before|into)\\s+(?:${aliases})\\b`,
+        'i',
+      ),
+    },
+    { regex: new RegExp(`\\bweek\\s+of\\s+(?:${aliases})\\b`, 'i') },
+    {
+      regex: new RegExp(
+        `\\b(?:week\\s+one|two\\s+weeks?)\\s+post[-\\s](?:${aliases})\\b`,
+        'i',
+      ),
+    },
+    { regex: new RegExp(`\\btoday\\s+at\\s+(?:${aliases})\\b`, 'i') },
+    {
+      regex: new RegExp(
+        `\\bhow\\s+(?:are|do|is|can|could|would|should|did)\\s+(?:you|your)\\b[^?]{0,140}\\bbefore\\s+(?:${aliases})\\?`,
+        'i',
+      ),
+    },
+    { regex: /\bm(?:20\/20|2020)\b/i },
+  ]);
+};
+const findSellerFirstPreviewPhrasing = (
+  text,
+  wordWindow = 18,
+  bannedPronouns = ['i', 'me', 'my', 'we', 'us', 'our', 'ours'],
+) => {
+  const banned = new Set(bannedPronouns.map((p) => lower(p)));
+  const found = new Set();
+  for (const token of previewTokens(text, wordWindow).map(normalizePreviewToken)) {
+    if (banned.has(token)) found.add(token);
+  }
+  return Array.from(found);
+};
+const findEventFirstPreviewPhrasing = (text, eventName, wordWindow = 12) => {
+  const tokens = previewTokens(text, wordWindow);
+  const preview = tokens
+    .filter((t) => !/^\{\{[a-z0-9_]+\}\}$/.test(t))
+    .join(' ')
+    .trim();
+  const found = new Set();
+  for (const alias of eventAliases(eventName).map(escapeRegex)) {
+    const direct = new RegExp(`^(?:the\\s+)?${alias}\\b`, 'i');
+    const prep = new RegExp(
+      `^(?:at|before|ahead\\s+of|going\\s+into|during|after|today\\s+at|week\\s+of|the\\s+week\\s+of)\\s+(?:the\\s+)?${alias}\\b`,
+      'i',
+    );
+    const match = preview.match(prep) || preview.match(direct);
+    if (match?.[0]) found.add(match[0]);
+  }
+  return Array.from(found);
 };
 const youVsWe = (s) => {
   const y = (lower(s).match(/\b(you|your)\b/g) || []).length;
@@ -162,6 +291,12 @@ if (!isLinkedIn) {
     subject !== subject.toLowerCase()
   ) {
     errors.push({ rule: 'allLowercase', message: 'Subject must be all lowercase.' });
+  }
+  if (benchmarks.subject_line_rules.numbers_banned && /\d/.test(subject)) {
+    errors.push({
+      rule: 'subjectNumbers',
+      message: 'Subject must not contain digits.',
+    });
   }
   const subjectBuzzHits = findHits(
     subject,
@@ -226,6 +361,62 @@ if (banHits.length > 0) {
     rule: 'bannedWords',
     message: `Banned phrases present: ${banHits.join(', ')}.`,
     offendingValue: banHits.join(', '),
+  });
+}
+
+const permissionToSendHits = findPermissionToSendPhrasing(combined);
+if (permissionToSendHits.length > 0) {
+  errors.push({
+    rule: 'permissionToSendCta',
+    message:
+      'Body asks permission to send/share an asset or uses minutes as the CTA. Attach/link the useful thing and ask one real question instead.',
+    offendingValue: permissionToSendHits.join(', '),
+  });
+}
+
+const forcedEventPhrasingHits = findForcedEventPhrasing(combined, touch.eventName);
+if (forcedEventPhrasingHits.length > 0) {
+  errors.push({
+    rule: 'forcedEventPhrasing',
+    message:
+      'Event reference feels forced. Use the buyer responsibility as the reason to write; use the event naturally only when it helps the ask.',
+    offendingValue: forcedEventPhrasingHits.join(', '),
+  });
+}
+
+const previewSpec = rules.preview_line_rules;
+const previewApplies = Boolean(
+  Array.isArray(previewSpec?.applies_to) && previewSpec.applies_to.includes(touchType),
+);
+const previewSellerHits = previewApplies
+  ? findSellerFirstPreviewPhrasing(
+      body,
+      previewSpec?.word_window ?? 18,
+      previewSpec?.seller_pronouns_banned,
+    )
+  : [];
+if (previewSellerHits.length > 0) {
+  errors.push({
+    rule: 'previewLineSellerFirst',
+    message:
+      'First inbox-preview words are seller-first. Open with buyer responsibility, not I/we/us.',
+    offendingValue: previewSellerHits.join(', '),
+  });
+}
+
+const previewEventHits = previewApplies
+  ? findEventFirstPreviewPhrasing(
+      body,
+      touch.eventName,
+      previewSpec?.event_first_word_window ?? 12,
+    )
+  : [];
+if (previewEventHits.length > 0) {
+  errors.push({
+    rule: 'previewLineEventFirst',
+    message:
+      'First inbox-preview words are event-first. Use the buyer responsibility as the opener and the event as supporting context.',
+    offendingValue: previewEventHits.join(', '),
   });
 }
 
@@ -375,6 +566,10 @@ const checks = {
   hasEmDash: /—/.test(combined),
   hasExclamation: /[!]/.test(combined),
   specificityHits,
+  permissionToSendHits,
+  forcedEventPhrasingHits,
+  previewSellerHits,
+  previewEventHits,
 };
 
 process.stdout.write(

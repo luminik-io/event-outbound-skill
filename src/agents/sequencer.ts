@@ -1,7 +1,3 @@
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { generateObject } from 'ai';
-import { z } from 'zod';
-
 import {
   EventContext,
   CompanyICP,
@@ -25,30 +21,22 @@ import {
   ColdEmailBenchmarks,
   ColdOutboundRules,
   ChannelLengthRule,
+  findPermissionToSendPhrasing,
+  findForcedEventPhrasing,
+  findSellerFirstPreviewPhrasing,
+  findEventFirstPreviewPhrasing,
 } from '../lib/ruleService.js';
 import { generateTimeline } from '../lib/timeline.js';
 
 // ---------------------------------------------------------------------------
-// Zod schema for a single touch returned by the LLM.
+// Shape for a single touch returned by an injected generator.
 // ---------------------------------------------------------------------------
 
-const OutreachTouchSchema = z.object({
-  subject: z
-    .string()
-    .describe(
-      'All-lowercase subject line, max 4 words. Empty string only for LinkedIn touches.',
-    ),
-  body: z
-    .string()
-    .describe(
-      'Channel-aware body. Cold email: 50-100 words, 3-5 sentences. LinkedIn connect: 18-35 words / under 200 chars. LinkedIn DM: 50-120 words. Day-of nudge: 30-60 words. Post-event: 40-90 words. Follows the 4T framework: Trigger -> Think (illumination question) -> Third-party validation -> Talk? (lean-back CTA).',
-    ),
-  cta_type: z.enum(CTA_TYPES).describe(
-    'CTA type. Prefer make_offer or ask_for_interest. "none" only for LinkedIn connection requests.',
-  ),
-});
-
-type LLMTouch = z.infer<typeof OutreachTouchSchema>;
+type LLMTouch = {
+  subject: string;
+  body: string;
+  cta_type: CTAType;
+};
 
 // ---------------------------------------------------------------------------
 // Validation helpers
@@ -248,6 +236,65 @@ function validateTouch(
     });
   }
 
+  const permissionToSendHits = findPermissionToSendPhrasing(combined);
+  if (permissionToSendHits.length > 0) {
+    errors.push({
+      rule: 'permissionToSendCta',
+      message:
+        'Body asks permission to send/share an asset or uses minutes as the CTA. Attach/link the useful thing and ask one real question instead.',
+      offendingValue: permissionToSendHits.join(', '),
+    });
+  }
+
+  const forcedEventPhrasingHits = findForcedEventPhrasing(
+    combined,
+    eventContext.name,
+  );
+  if (forcedEventPhrasingHits.length > 0) {
+    errors.push({
+      rule: 'forcedEventPhrasing',
+      message:
+        'Event reference feels forced. Use the buyer responsibility as the reason to write; use the event naturally only when it helps the ask.',
+      offendingValue: forcedEventPhrasingHits.join(', '),
+    });
+  }
+
+  const previewSpec = jbRules.preview_line_rules;
+  const previewApplies = Boolean(
+    previewSpec?.applies_to?.includes(ruleKey),
+  );
+  const previewSellerHits = previewApplies
+    ? findSellerFirstPreviewPhrasing(
+        touch.body,
+        previewSpec?.word_window ?? 18,
+        previewSpec?.seller_pronouns_banned,
+      )
+    : [];
+  if (previewSellerHits.length > 0) {
+    errors.push({
+      rule: 'previewLineSellerFirst',
+      message:
+        'First inbox-preview words are seller-first. Open with buyer responsibility, not I/we/us.',
+      offendingValue: previewSellerHits.join(', '),
+    });
+  }
+
+  const previewEventHits = previewApplies
+    ? findEventFirstPreviewPhrasing(
+        touch.body,
+        eventContext.name,
+        previewSpec?.event_first_word_window ?? 12,
+      )
+    : [];
+  if (previewEventHits.length > 0) {
+    errors.push({
+      rule: 'previewLineEventFirst',
+      message:
+        'First inbox-preview words are event-first. Use the buyer responsibility as the opener and the event as supporting context.',
+      offendingValue: previewEventHits.join(', '),
+    });
+  }
+
   // ---- LLM-cliche blocklist ----------------------------------------------
   // Catches phrases that mark text as LLM-generated even when the canon and
   // CEB lists pass: performative empathy openers ("stuck with me"),
@@ -388,6 +435,10 @@ function validateTouch(
     hasExclamation,
     hasEmoji,
     specificityHits,
+    permissionToSendHits,
+    forcedEventPhrasingHits,
+    previewSellerHits,
+    previewEventHits,
   };
 
   return { result: { isValid: errors.length === 0, errors }, checks };
@@ -459,9 +510,9 @@ function buildSystemPrompt(rules: ColdEmailBenchmarks, jb: ColdOutboundRules): s
     })
     .join('\n');
 
-  return `You are writing B2B outbound touches using the **permission-based 4T framework**. Every line must read
+  return `You are writing B2B outbound touches using the buyer-first 4T framework. Every line must read
 aloud like a text from a smart peer noticing something specific, not a vendor blast. The bar: if the
-recipient screenshots your copy, the comment should be "this is permission-based outreach done right", not "another LLM blast".
+recipient screenshots your copy, the comment should be "this person understands the work", not "another LLM blast".
 
 ==========================================================================================
 THE 4T FRAMEWORK (every cold email and post-event email follows this; LinkedIn DMs follow it
@@ -487,11 +538,13 @@ loosely; LinkedIn connection requests compress it to 2-3 sentences)
    us to [outcome] [SHARP NUMBER] compared to [old number] before." Then ONE bridging sentence on
    how it works ("it involves [crispy specific mechanism]"). NEVER "we're the best",
    "industry-leading", "world-class".
-4. **Talk?** - interest-based CTA, with a question mark. Lean-back energy. Approved closers:
+4. **Talk?** - direct CTA, with a question mark. Lean-back energy, but no permission theatre.
+   If you have a useful asset, attach or link it. Do not ask permission to send it. Approved closers:
      "Worth a look?" / "Worth a peek sometime?" / "Worth a skim?" / "Worth an exchange?"
-     "Open to learning more?" / "Open to comparing notes?" / "Worth a conversation?"
+     "Open to learning more?" / "Worth a conversation?" / "Worth coffee at {{event_name}}?"
    BANNED closers: "Do you have 15 minutes?", "Would you be open to a 30-minute call?",
-   "Can we book time on your calendar?", "schedule a meeting".
+   "Can we book time on your calendar?", "schedule a meeting", "Should I send it?",
+   "Can I send it?", "Want me to send it?", "Want the one-pager?"
 
 ==========================================================================================
 CHANNEL-SPECIFIC LENGTH TABLE (HARD RULES)
@@ -560,10 +613,18 @@ HARD VALIDATOR RULES (auto-rejected)
 - Subject: all lowercase, max ${rules.subject_line_rules.max_word_count} words, no colons, no
   digits, no buzzwords. Subject is static text - do NOT put merge fields in the subject.
 - Body length: per the channel table above.
+- Cold first touches and post-connect DMs: the first 18 words must be buyer-first. Do not put
+  seller pronouns ("I", "we", "our", "us") or the event name at the front of the inbox preview.
 - Cold emails AND post-connect DMs MUST contain a "how/what/why ARE/DO/IS you/your"
   illumination question. (Connection requests are exempt.)
 - NO leading / moon-and-stars patterns: "if I could...", "would you be interested?",
   "wouldn't you agree?", "would you agree...", "don't you think..." - AUTO-REJECTED.
+- NO permission-to-send CTAs. Auto-rejected: "should I send", "can I send",
+  "want me to send/share/walk", "want the one-pager", "happy to send/share".
+  Send or attach the asset, then ask a real question.
+- NO forced event phrasing. Auto-rejected: "keeps coming up before RSA",
+  "week of Money20/20", "today at RSA", "into m2020", and any illumination question
+  that bolts "before [event]" onto the end. The event is the occasion, not the point.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.
@@ -585,7 +646,7 @@ HARD VALIDATOR RULES (auto-rejected)
   Never open with "Most X..." even if the X is ICP-shaped.
 - ONE problem per email. Don't mash multiple value props in one touch.
 - Address {{first_name}} at least once; reference {{company}} at least once.
-- Lean-back CTA from the approved list. ONE per touch.
+- Direct CTA from the approved list. ONE per touch.
 
 Preferred CTAs by reply-rate delta:
 ${rules.cta_type_ranking.map((c) => `  - ${c.type}: ${c.reply_rate_delta > 0 ? '+' : ''}${(c.reply_rate_delta * 100).toFixed(0)}%`).join('\n')}
@@ -625,7 +686,9 @@ signature block, no greeting with "Hey".`;
 }
 
 // ---------------------------------------------------------------------------
-// LLM provider. Allows an injected stub for tests / examples.
+// Generator boundary. Claude Code uses SKILL.md and scripts/validate-touch.mjs
+// directly. The TypeScript API is only for headless callers that inject their
+// own generator.
 // ---------------------------------------------------------------------------
 
 export type TouchGenerator = (args: {
@@ -633,27 +696,6 @@ export type TouchGenerator = (args: {
   user: string;
   temperature: number;
 }) => Promise<LLMTouch>;
-
-export function makeGeminiTouchGenerator(apiKey?: string): TouchGenerator {
-  const key = apiKey ?? process.env.GEMINI_API_KEY;
-  if (!key) {
-    throw new Error(
-      'GEMINI_API_KEY is not set. Provide an API key or inject a TouchGenerator.',
-    );
-  }
-  const google = createGoogleGenerativeAI({ apiKey: key });
-  const model = google('gemini-2.5-flash');
-  return async ({ system, user, temperature }) => {
-    const { object } = await generateObject({
-      model,
-      schema: OutreachTouchSchema,
-      system,
-      prompt: user,
-      temperature,
-    });
-    return object;
-  };
-}
 
 // ---------------------------------------------------------------------------
 // Validator-only entry point - used by evals + external callers.
@@ -694,7 +736,12 @@ export async function generateSequence(
 
   const systemPrompt = buildSystemPrompt(validationRules, jbRules);
 
-  const llm = touchGenerator ?? makeGeminiTouchGenerator();
+  if (!touchGenerator) {
+    throw new Error(
+      'generateSequence() requires an injected TouchGenerator outside Claude Code. The installed skill uses the active Claude session plus the local validator; no external API key is required.',
+    );
+  }
+  const llm = touchGenerator;
 
   if (!companyIcp.personas || companyIcp.personas.length === 0) {
     console.warn('No personas in CompanyICP; returning empty output.');
@@ -814,5 +861,3 @@ export async function generateSequence(
 
   return { sequencesByPersona };
 }
-
-export { OutreachTouchSchema };
