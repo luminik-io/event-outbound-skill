@@ -39,6 +39,35 @@ export function generateTimeline(
   }
 
   type Draft = Omit<TimelineTouchpoint, 'touch_slot'>;
+  const enabled = new Set(channels);
+
+  if (enabled.size === 1 && enabled.has('email')) {
+    const weeks =
+      leadTimeWeeks <= 6
+        ? Array.from({ length: leadTimeWeeks }, (_, i) => leadTimeWeeks - i)
+        : [
+            leadTimeWeeks,
+            Math.ceil(leadTimeWeeks * 0.75),
+            Math.ceil(leadTimeWeeks * 0.5),
+            3,
+            2,
+            1,
+          ];
+    const preEvent = Array.from(new Set(weeks))
+      .sort((a, b) => b - a)
+      .map((week) => ({ offset_days: -week * 7, channel: 'email' as const }));
+    const plan: Draft[] = [
+      ...preEvent,
+      { offset_days: 0, channel: 'email' },
+      { offset_days: 3, channel: 'email' },
+    ];
+
+    return plan.map((t, i) => ({
+      offset_days: t.offset_days,
+      channel: t.channel,
+      touch_slot: i + 1,
+    }));
+  }
 
   // Canonical 4-week plan. Other lead times are derived from this.
   const base: Draft[] = [
@@ -99,7 +128,6 @@ export function generateTimeline(
   }
 
   // Filter by enabled channels.
-  const enabled = new Set(channels);
   plan = plan.filter((t) => enabled.has(t.channel));
 
   // Sort chronologically and assign touch_slot 1..N.

@@ -86,7 +86,12 @@ function resolveTouchTypeKey(briefLabel: string): string {
   switch (briefLabel) {
     case 'email_cold':
       return 'cold_email_first_touch';
-    case 'email_followup':
+    case 'email_followup_2':
+      return 'cold_email_followup_2';
+    case 'email_followup_3plus':
+    case 'email_day_of':
+      return 'cold_email_followup_3plus';
+    case 'email_post_event':
       return 'post_event_followup';
     case 'linkedin_connect':
       return 'linkedin_connection_request';
@@ -540,16 +545,37 @@ function touchBrief(
     };
   }
   if (channel === 'email' && offset_days < 0) {
+    if (touchpoint.touch_slot === 1) {
+      return {
+        label: 'email_cold',
+        instruction:
+          'Pre-event cold email. 50-100 words / 3-5 sentences. Subject all lowercase, max 4 words, no colons, no digits. Follow the 4T framework: Trigger (specific observation) -> Think (neutral how/what/why-are-you illumination question) -> Third-party validation if real proof exists -> Talk? (lean-back CTA). CTA type: make_offer.',
+      };
+    }
+    if (touchpoint.touch_slot === 2) {
+      return {
+        label: 'email_followup_2',
+        instruction:
+          'Second pre-event email. 40-90 words / 3-4 sentences. Continue the same buyer problem without pretending familiarity. Use one neutral question and one lean-back CTA. CTA type: ask_for_interest.',
+      };
+    }
     return {
-      label: 'email_cold',
+      label: 'email_followup_3plus',
       instruction:
-        'Pre-event cold email. 50-100 words / 3-5 sentences. Subject all lowercase, max 4 words, no colons, no digits. Follow the 4T framework: Trigger (specific observation) -> Think (neutral how/what/why-are-you illumination question) -> Third-party validation (peer/customer + contrast number) -> Talk? (lean-back CTA). CTA type: make_offer.',
+        'Later pre-event email. 25-60 words / 2-3 sentences. Stay on one buyer problem, no fake familiarity, no meeting-first ask. CTA type: ask_for_interest.',
+    };
+  }
+  if (channel === 'email' && offset_days === 0) {
+    return {
+      label: 'email_day_of',
+      instruction:
+        'Day-of email. 25-60 words / 2-3 sentences. Reference the event day without inventing a location, session, or attendee behavior. CTA type: ask_for_interest.',
     };
   }
   return {
-    label: 'email_followup',
+    label: 'email_post_event',
     instruction:
-      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive". Trigger from a session/topic, neutral question, third-party validation, lean-back CTA. CTA type: make_offer.',
+      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive". Use a neutral question and no fabricated session, location, or peer proof. CTA type: ask_for_interest.',
   };
 }
 

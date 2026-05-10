@@ -41,20 +41,30 @@ describe('generateTimeline', () => {
     );
   });
 
-  it('email-only variant drops all LinkedIn touches', () => {
+  it('4-week email-only variant expands into a full 6-touch cadence', () => {
     const plan = generateTimeline(4, ['email']);
-    expect(plan.every((t) => t.channel === 'email')).toBe(true);
-    expect(plan.length).toBeGreaterThan(0);
-    // slots renumbered 1..N
-    expect(plan.map((t) => t.touch_slot)).toEqual(
-      plan.map((_, i) => i + 1),
-    );
+    expect(plan).toEqual([
+      { offset_days: -28, channel: 'email', touch_slot: 1 },
+      { offset_days: -21, channel: 'email', touch_slot: 2 },
+      { offset_days: -14, channel: 'email', touch_slot: 3 },
+      { offset_days: -7, channel: 'email', touch_slot: 4 },
+      { offset_days: 0, channel: 'email', touch_slot: 5 },
+      { offset_days: 3, channel: 'email', touch_slot: 6 },
+    ]);
   });
 
   it('linkedin-only variant drops all email touches', () => {
     const plan = generateTimeline(4, ['linkedin']);
     expect(plan.every((t) => t.channel === 'linkedin')).toBe(true);
     expect(plan.length).toBeGreaterThan(0);
+  });
+
+  it('8-week email-only variant stays within the 8-touch ceiling', () => {
+    const plan = generateTimeline(8, ['email']);
+    expect(plan.every((t) => t.channel === 'email')).toBe(true);
+    expect(plan.length).toBe(8);
+    expect(plan[0].offset_days).toBe(-56);
+    expect(plan.at(-1)?.offset_days).toBe(3);
   });
 
   it('rejects out-of-range lead times', () => {

@@ -66,7 +66,7 @@ For event-led outbound, it is acceptable to ask for the sender's website first a
 
 ## How Claude executes this skill
 
-For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. Each touch is a separate generation step.
+For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. A 4-week email-only sequence defaults to 6 touches: T-28, T-21, T-14, T-7, T0, T+3. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
 
 Use this validator path. Do not assume the current working directory is the plugin root:
 
@@ -76,11 +76,11 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 
 1. **Pick the channel + offset** for this touch from the timeline (see "Timeline" below).
 2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
 4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 5. **Append** to the sequence; move to the next touch.
 
-After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, average quality, score-band counts, CTA mix, illumination-question coverage.
+After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, average quality, score-band counts, CTA mix, illumination-question coverage, and validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
@@ -135,6 +135,8 @@ Subject lines: ≤ 4 words, all lowercase, no digits-only buzzwords, no banned s
 
 ## Timeline (default 4-week lead time, both channels)
 
+### Both-channel default
+
 | offset | channel | touch type |
 |---|---|---|
 | T-28d | linkedin | `linkedin_connection_request` |
@@ -145,6 +147,19 @@ Subject lines: ≤ 4 words, all lowercase, no digits-only buzzwords, no banned s
 | T+2d | email | `post_event_followup` |
 | T+7d | linkedin | `linkedin_day_of_nudge` (post follow-up) |
 | T+14d | email | `cold_email_followup_2` (final) |
+
+### Email-only default
+
+| offset | channel | touch type |
+|---|---|---|
+| T-28d | email | `cold_email_first_touch` |
+| T-21d | email | `cold_email_followup_2` |
+| T-14d | email | `cold_email_followup_3plus` |
+| T-7d | email | `cold_email_followup_3plus` |
+| T0 | email | `cold_email_followup_3plus` |
+| T+3d | email | `post_event_followup` |
+
+If the user says "pre-event only", use T-28, T-21, T-14, and T-7 only. Otherwise event-led outreach includes day-of and post-event touches by default.
 
 For other lead times or single-channel cadences, adjust proportionally; the generator at `src/lib/timeline.ts` can be invoked directly if needed (`node -e "import('./src/lib/timeline.ts').then(m => console.log(m.generateTimeline(2, ['email'])))"`).
 
@@ -168,6 +183,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - No floor/booth-shopping framing in cold copy. Don't talk about "47 fraud-platform vendors", "five vendors with real numbers", "which booths can answer X". The recipient cares about the risk they manage, not your vendor census.
 - One problem per email. Don't mash multiple value props.
 - Address the recipient with `{{first_name}}` and reference their company as `{{company}}` at least once. Never hard-code real names or companies in the output, those are merge-field substitutions that happen at send time.
+- Never say the sequence is ready to send, cleared for deployment, or approved for outreach. This skill produces drafts for human review.
 
 ## Validating a touch from inside this skill
 

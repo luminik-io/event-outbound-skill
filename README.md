@@ -47,7 +47,7 @@ The same plugin package is used for Claude Code and Cowork. The local validator 
 
 | Audience | What you get |
 |---|---|
-| **AEs and SDRs** working a trade-show attendee list four weeks out | Multi-touch email + LinkedIn sequence per persona, ready to paste into Apollo, Outreach, Salesloft, Instantly, or Smartlead |
+| **AEs and SDRs** working a trade-show attendee list four weeks out | Multi-touch email + LinkedIn sequence per persona, ready for human review before loading into Apollo, Outreach, Salesloft, Instantly, or Smartlead |
 | **Event marketers** running dinner invites, side events, speaker meet-and-greets, booth-visit campaigns | Channel-appropriate copy that gets opened and RSVP'd, not blasted and ignored |
 | **Founders doing their own outbound** | The same workflow and the same validated output, without hiring an SDR |
 
@@ -82,7 +82,7 @@ You hand the skill five things:
 
 If proof or assets are missing, the skill asks for them before drafting. If the user explicitly proceeds without them, strict mode writes around the gap instead of inventing matrices, briefs, peer teams, or before/after numbers.
 
-It returns an Outbound Research Brief plus a full sequence per persona. Six to twelve touches on a four-week lead time, distributed across email and LinkedIn, covering pre-event, day-of, and post-event.
+It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run, six to twelve touches for multi-channel runs, covering pre-event, day-of, and post-event unless the user asks for pre-event only.
 
 ## What the output looks like
 
@@ -158,7 +158,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-79 tests across 6 files (cliche-validator unit tests, strict context checks, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+82 tests across 6 files (cliche-validator unit tests, strict context checks, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 ### Headless / batch generation (optional)
 
