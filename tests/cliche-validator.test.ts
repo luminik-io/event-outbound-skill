@@ -316,11 +316,25 @@ describe('strict-context validator helpers', () => {
     expect(hits.length).toBeGreaterThan(0);
   });
 
+  it('does not treat normal asset nouns as invented asset promises', () => {
+    const hits = findAssetPromisePhrasing(
+      '{{first_name}}, when the audit timeline at {{company}} gets compressed, how are you deciding which control owners need the first look?',
+    );
+    expect(hits).toEqual([]);
+  });
+
   it('detects invented peer proof claims that need supplied proofPoints', () => {
     const hits = findProofClaimPhrasing(
       'Three payments orgs cut false positives from 18% to 9% using the same review.',
     );
     expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('does not treat "using your API to" as a proof claim', () => {
+    const hits = findProofClaimPhrasing(
+      '{{first_name}}, how are your customers using your API to reconcile FedNow exceptions when SCA rules disagree?',
+    );
+    expect(hits).toEqual([]);
   });
 });
 
