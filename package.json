@@ -1,6 +1,6 @@
 {
   "name": "event-outbound-skill",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Claude skill for generating event-driven outbound sequences.",
   "main": "dist/index.js",
   "type": "module",

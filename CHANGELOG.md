@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.5 (2026-05-10)
+
+Buyer-first quality-bar hardening for thin event-outbound inputs.
+
+### Changed
+- Skill intake now requires an Outbound Research Brief before drafting: buyer job, current workaround, hidden risk, customer-language pain, trigger, proof points, available assets, and likely objection.
+- Skill frontmatter now allows web fetch/search so Claude can research the sender company and event page before asking the user to restate facts that are public.
+- `CompanyICP` and `AttendeePersona` types now support optional `website`, `productSummary`, `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`.
+- Sequencer prompt now treats proof and assets as sacred: no invented matrices, briefs, peer teams, named customers, before/after numbers, agenda sessions, day-of slots, or locations.
+
+### Added
+- Strict validator mode via `strictTruth: true`.
+- `missingMergeFields` check for Apollo-ready `{{first_name}}` and `{{company}}`.
+- `unsourcedAssetPromise` check when copy mentions attached/linked assets without `availableAssets`.
+- `unsourcedProofClaim` check when copy uses customer, peer, or before/after proof without `proofPoints`.
+- 6 new tests covering strict context helpers and CLI rejection/acceptance paths. 79 tests + evals pass.
+
 ## v0.2.4 (2026-05-05)
 
 Cowork support hardening before official plugin-directory submission.

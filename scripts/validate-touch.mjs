@@ -19,6 +19,9 @@
 //     "eventName": "Money20/20 USA 2026",
 //     "personaPriorities": ["..."],   // 0-N strings
 //     "personaPainPoints":  ["..."]   // 0-N strings
+//     "strictTruth": true,             // optional; rejects invented assets/proof
+//     "availableAssets": ["..."],      // optional; real assets sender can attach/link
+//     "proofPoints": ["..."]           // optional; real customer/public proof
 //   }
 //
 // Output shape (always exit 0; errors are part of the contract):
@@ -194,6 +197,34 @@ const findPermissionToSendPhrasing = (text) =>
     },
     {
       regex: /\b(?:free for|worth)\s+(?:ten|fifteen|twenty|thirty|\d+)\s+minutes?\b/i,
+    },
+  ]);
+const findMissingMergeFields = (text, requiredFields = ['{{first_name}}', '{{company}}']) => {
+  const hay = lower(text);
+  return requiredFields.filter((field) => !hay.includes(lower(field)));
+};
+const findAssetPromisePhrasing = (text) =>
+  patternHits(text, [
+    {
+      regex: /\b(?:attached|linked|enclosed|included)\b[^.!?]{0,80}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      regex: /\b(?:i\s+)?(?:put together|wrote up|pulled together|built|made)\b[^.!?]{0,100}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      regex: /\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map)\b/i,
+    },
+  ]);
+const findProofClaimPhrasing = (text) =>
+  patternHits(text, [
+    {
+      regex: /\b(?:using|used by|worked with|helped|seen|customer|customers|client|clients)\b[^.!?]{0,120}\b(?:from|to|compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit)\b/i,
+    },
+    {
+      regex: /\b(?:two|three|four|five|\d+)\s+(?:payments?|fintech|security|cybersecurity|saas|identity|compliance|risk|fraud)?\s*(?:orgs?|teams?|companies|customers|clients|leaders|operators)\b[^.!?]{0,120}\b(?:from|to|compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit|kept|killed)\b/i,
+    },
+    {
+      regex: /\b(?:from\s+\d+(?:\.\d+)?%?\s+to\s+\d+(?:\.\d+)?%?|compared to\s+\d+(?:\.\d+)?%?\s+before|\d+(?:\.\d+)?%?\s+instead of\s+\d+(?:\.\d+)?%?)\b/i,
     },
   ]);
 const findForcedEventPhrasing = (text, eventName) => {
@@ -384,6 +415,51 @@ if (forcedEventPhrasingHits.length > 0) {
   });
 }
 
+const strictContext = touch.strictTruth === true;
+const mergeSpec = rules.strict_context_rules?.apollo_merge_fields;
+const mergeApplies =
+  touch.apolloMergeFieldsRequired === true ||
+  (strictContext &&
+    Array.isArray(mergeSpec?.applies_to) &&
+    mergeSpec.applies_to.includes(touchType));
+const requiredMergeFields = mergeSpec?.required_fields || ['{{first_name}}', '{{company}}'];
+const missingMergeFields = mergeApplies
+  ? findMissingMergeFields(body, requiredMergeFields)
+  : [];
+if (missingMergeFields.length > 0) {
+  errors.push({
+    rule: 'missingMergeFields',
+    message: `Body must include Apollo-ready merge fields: ${missingMergeFields.join(', ')}.`,
+    offendingValue: missingMergeFields.join(', '),
+  });
+}
+
+const availableAssets = Array.isArray(touch.availableAssets)
+  ? touch.availableAssets.filter(Boolean)
+  : [];
+const proofPoints = Array.isArray(touch.proofPoints)
+  ? touch.proofPoints.filter(Boolean)
+  : [];
+const assetPromiseHits = findAssetPromisePhrasing(combined);
+if (strictContext && assetPromiseHits.length > 0 && availableAssets.length === 0) {
+  errors.push({
+    rule: 'unsourcedAssetPromise',
+    message:
+      'Body promises or references an asset, but no availableAssets were supplied. Do not invent matrices, briefs, worksheets, or reports.',
+    offendingValue: assetPromiseHits.join(', '),
+  });
+}
+
+const proofClaimHits = findProofClaimPhrasing(combined);
+if (strictContext && proofClaimHits.length > 0 && proofPoints.length === 0) {
+  errors.push({
+    rule: 'unsourcedProofClaim',
+    message:
+      'Body makes a customer, peer, or before/after proof claim, but no proofPoints were supplied. Ask for proof or write without fabricated validation.',
+    offendingValue: proofClaimHits.join(', '),
+  });
+}
+
 const previewSpec = rules.preview_line_rules;
 const previewApplies = Boolean(
   Array.isArray(previewSpec?.applies_to) && previewSpec.applies_to.includes(touchType),
@@ -568,6 +644,9 @@ const checks = {
   specificityHits,
   permissionToSendHits,
   forcedEventPhrasingHits,
+  missingMergeFields,
+  assetPromiseHits,
+  proofClaimHits,
   previewSellerHits,
   previewEventHits,
 };

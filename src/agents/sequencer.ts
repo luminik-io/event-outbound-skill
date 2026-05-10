@@ -25,6 +25,9 @@ import {
   findForcedEventPhrasing,
   findSellerFirstPreviewPhrasing,
   findEventFirstPreviewPhrasing,
+  findMissingMergeFields,
+  findAssetPromisePhrasing,
+  findProofClaimPhrasing,
 } from '../lib/ruleService.js';
 import { generateTimeline } from '../lib/timeline.js';
 
@@ -109,6 +112,10 @@ function validateTouch(
     cta_type: CTAType;
     channel: 'email' | 'linkedin';
     touch_type: string;
+    strictTruth?: boolean;
+    apolloMergeFieldsRequired?: boolean;
+    availableAssets?: string[];
+    proofPoints?: string[];
   },
   eventContext: EventContext,
   persona: AttendeePersona,
@@ -256,6 +263,54 @@ function validateTouch(
       message:
         'Event reference feels forced. Use the buyer responsibility as the reason to write; use the event naturally only when it helps the ask.',
       offendingValue: forcedEventPhrasingHits.join(', '),
+    });
+  }
+
+  const strictContext = touch.strictTruth === true;
+  const mergeSpec = jbRules.strict_context_rules?.apollo_merge_fields;
+  const mergeApplies =
+    touch.apolloMergeFieldsRequired === true ||
+    (strictContext &&
+      Boolean(mergeSpec?.applies_to?.includes(ruleKey)));
+  const missingMergeFields = mergeApplies
+    ? findMissingMergeFields(
+        touch.body,
+        mergeSpec?.required_fields ?? ['{{first_name}}', '{{company}}'],
+      )
+    : [];
+  if (missingMergeFields.length > 0) {
+    errors.push({
+      rule: 'missingMergeFields',
+      message: `Body must include Apollo-ready merge fields: ${missingMergeFields.join(', ')}.`,
+      offendingValue: missingMergeFields.join(', '),
+    });
+  }
+
+  const assetPromiseHits = findAssetPromisePhrasing(combined);
+  if (
+    strictContext &&
+    assetPromiseHits.length > 0 &&
+    (touch.availableAssets ?? []).length === 0
+  ) {
+    errors.push({
+      rule: 'unsourcedAssetPromise',
+      message:
+        'Body promises or references an asset, but no availableAssets were supplied.',
+      offendingValue: assetPromiseHits.join(', '),
+    });
+  }
+
+  const proofClaimHits = findProofClaimPhrasing(combined);
+  if (
+    strictContext &&
+    proofClaimHits.length > 0 &&
+    (touch.proofPoints ?? []).length === 0
+  ) {
+    errors.push({
+      rule: 'unsourcedProofClaim',
+      message:
+        'Body makes a customer, peer, or before/after proof claim, but no proofPoints were supplied.',
+      offendingValue: proofClaimHits.join(', '),
     });
   }
 
@@ -437,6 +492,9 @@ function validateTouch(
     specificityHits,
     permissionToSendHits,
     forcedEventPhrasingHits,
+    missingMergeFields,
+    assetPromiseHits,
+    proofClaimHits,
     previewSellerHits,
     previewEventHits,
   };
@@ -557,18 +615,18 @@ TWO CANONICAL PASS EXAMPLES (study the SHAPE, not the literal copy)
 Pass A - Warmbox cold email (4T canonical):
 > Subject: cold emails in spam?
 >
-> noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are
-> you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver
-> 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises
-> your inbox reputation. open to a look?
+> {{first_name}}, noticed {{company}} is hiring SDRs, which suggests your team might be sending
+> more cold email this quarter. How are you ensuring those emails do not land in spam? Google
+> and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before.
+> It involves a warm-up tool that raises inbox reputation. Open to a look?
 
 Pass B - TitanX cold email (canonical LinkedIn 4T post):
 > Subject: more at bats
 >
-> Pete, looks like you have 9 SDRs cold calling Directors of Benefits and CHROs. how are you
-> giving your reps more at bats? SDRs using TitanX have 6-8 conversations every 50 dials,
-> compared to 1-2 before. we identify the people most likely to answer. no long-term contracts
-> or new tech to implement. open to learning more?
+> {{first_name}}, looks like {{company}} has SDRs cold calling Directors of Benefits and CHROs.
+> How are you giving your reps more at bats? SDRs using TitanX have 6-8 conversations every
+> 50 dials, compared to 1-2 before. We identify the people most likely to answer. Open to
+> learning more?
 
 ==========================================================================================
 ONE CANONICAL FAIL EXAMPLE (do NOT regress to this)
@@ -608,11 +666,25 @@ company ("Klarna"), or a titled cohort. REQUIRED:
 NEVER write [Name] / [Company] / <first_name> placeholders.
 
 ==========================================================================================
+STRICT TRUTH RULES (hard requirement)
+==========================================================================================
+- Do not invent assets. If available assets are empty, never mention "attached", "linked",
+  "matrix", "brief", "worksheet", "one-pager", "report", "audit", "recap", "doc", or "map".
+- Do not invent proof. If proof points are empty, never write named customers, "three orgs",
+  "two teams", public-sounding before/after numbers, or peer benchmarks.
+- If proof is missing, write a mechanism sentence or buyer-risk sentence instead. Better:
+  ask for proof before drafting.
+- If the event agenda or dates are unknown, do not imply a real session, track conflict,
+  Tuesday slot, or day-of location.
+- The event is only the occasion. The opener belongs to the buyer job, workaround, or hidden risk.
+
+==========================================================================================
 HARD VALIDATOR RULES (auto-rejected)
 ==========================================================================================
 - Subject: all lowercase, max ${rules.subject_line_rules.max_word_count} words, no colons, no
   digits, no buzzwords. Subject is static text - do NOT put merge fields in the subject.
 - Body length: per the channel table above.
+- Body grammar: first letter of each sentence capitalized. Subject stays lowercase.
 - Cold first touches and post-connect DMs: the first 18 words must be buyer-first. Do not put
   seller pronouns ("I", "we", "our", "us") or the event name at the front of the inbox preview.
 - Cold emails AND post-connect DMs MUST contain a "how/what/why ARE/DO/IS you/your"

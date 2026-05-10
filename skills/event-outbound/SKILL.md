@@ -2,8 +2,8 @@
 name: event-outbound
 description: Create validated email and LinkedIn outreach sequences for B2B events, from pre-event to post-event, grounded in buyer priorities and checked by a local validator.
 when_to_use: Use when the user asks to create an outreach sequence for a conference, write cold emails for an event, build a LinkedIn cadence for attendees, invite people to a side event or dinner, or turn an event plus ICP into booked meetings.
-allowed-tools: Read, Write, Bash(node *)
-version: 0.2.4
+allowed-tools: Read, Write, WebFetch, WebSearch, Bash(node *)
+version: 0.2.5
 ---
 
 # Event Outbound Skill
@@ -21,15 +21,48 @@ Use this skill when the user wants:
 
 Do **not** use this skill for: lifecycle/nurture email, transactional email, content marketing, generic always-on outbound. The generator is tuned for event-shaped triggers and will produce weak copy when forced into general use.
 
+## Non-Negotiable Quality Contract
+
+Do **not** generate a sequence from thin inputs like event + persona + channel + sender name. That produces plausible vendor copy, not buyer-first cold outbound.
+
+Before drafting, build a short **Outbound Research Brief**. If the user gives a company website or event URL, fetch it. If the user only gives a company name, use web search to find the official site before asking. If web tools are unavailable, say that and ask for the missing facts.
+
+The brief must contain:
+
+1. **Buyer job**, the progress this persona is trying to make.
+2. **Current workaround**, how they probably handle the job today.
+3. **Hidden risk / cost of doing nothing**, the expensive, awkward, or audit-facing thing they may not be seeing.
+4. **Customer-language pain**, concrete words from case studies, customer quotes, docs, or the user's notes. Avoid marketing nouns.
+5. **Trigger**, either a real observed signal or a truthful situation trigger. Never fake a post, session, hire, or customer.
+6. **Proof points**, named customers, public numbers, case-study facts, or a clear statement that no proof was supplied.
+7. **Available assets**, actual links/files/attachments the sender can truthfully include. If none are supplied, do not promise a matrix, brief, worksheet, one-pager, report, recap, audit, or doc.
+8. **Likely objection/anxiety**, the thing the buyer would silently think before replying.
+
+If any of buyer job, current workaround, hidden risk, proof points, or available assets are unknown, ask targeted follow-up questions before drafting. If the user explicitly says to proceed without proof or assets, write in **strict no-invention mode** and say the sequence will avoid asset promises and customer proof.
+
 ## Inputs
 
 The user (or upstream agent) provides three things:
 
 1. **Event context**, name, dates, location, optionally agenda titles, speakers, exhibitors, venue. Either inline or as a JSON file. If the user provides an event URL only, fetch it first; if you can't fetch it, ask the user for the basics.
-2. **Company ICP + personas**, for each target persona, supply: `role`, `seniority`, `priorities` (3-5 outcomes the persona owns this quarter), `painPoints` (3-5 specific operational scars in their own language). Sample fixtures live at `examples/*/company-icp.json`.
+2. **Company ICP + personas**, for each target persona, supply: `role`, `seniority`, `buyerJob`, `currentWorkaround`, `priorities` (3-5 outcomes the persona owns this quarter), `painPoints` (3-5 specific operational scars in their own language), `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`. Sample fixtures live at `examples/*/company-icp.json`.
 3. **Sequence parameters**, `leadTimeWeeks` (1-8, default 4), `channels` (`email`, `linkedin`, or both), and `sendingIdentity` (sender name, title, company).
 
-If any of these are missing or vague, ask the user for them before generating. Vague inputs produce vague output and the validator will reject most touches.
+If any of these are missing or vague, ask the user for them before generating. Vague inputs produce vague output and, now, strict validation must reject the touches rather than letting Claude invent substance.
+
+### Minimum follow-up questions
+
+Use these when the user gives a thin request:
+
+1. What is the sender company website, and what does it sell in plain English?
+2. Who buys it, and what job are they trying to get done this quarter?
+3. What are they using today or manually stitching together?
+4. What goes wrong if they do nothing for 30-90 days?
+5. What proof can we truthfully use, named customers, public data, customer quotes, or before/after numbers?
+6. What assets already exist that we can attach or link, if any?
+7. What is the event URL or agenda page, and which track/session makes this outreach timely?
+
+For event-led outbound, it is acceptable to ask for the sender's website first and research the ICP yourself. Prefer researching before asking the user to explain basics that the website can answer.
 
 ## How Claude executes this skill
 
@@ -51,13 +84,15 @@ After all touches generate, write the final output as `final_sequence.md` (human
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
+Before the sequence, include the Outbound Research Brief in the response so the user can see the buyer job, hidden risk, proof, assets, and assumptions. The brief is part of quality control, not extra decoration.
+
 ## Voice (read this before drafting anything)
 
 The bar is **authentic, honest, empathetic, no theatrics**. Not slang. Not coolness-signalling. Not corporate-sales-speak either. Write as a real person who has worked the job and is genuinely curious whether the recipient is dealing with the same thing.
 
 Concrete rules that follow from that:
 
-- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the Q4 chargeback target is about to land in the CFO review"). The situation is honest; the fake signal isn't.
+- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, customer quote, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the Q4 chargeback target is about to land in the CFO review"). The situation is honest; the fake signal isn't.
 - **Poke the bear via pain illumination + cost of inaction, not theatrics.** Name the specific tradeoff the persona is managing this quarter, then quietly draw the line to what happens if it goes unaddressed (Q4 board deck, regulator audit, CFO QBR). No drama. No "this is wild." No "honestly?". Just the operational reality the persona is already living.
 - **Empathy over swagger.** When the persona is dealing with a hard tradeoff, name it honestly. "Tightening the rules drops approval rates 4-7 points and Sales escalates inside 48 hours" is honest empathy. "Most VPs walk in already knowing the pitch" is performative.
 - **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
@@ -68,7 +103,8 @@ Concrete rules that follow from that:
   - `"Attached a one-pager from our work with [A] and [B] on [topic]."`
   - `"I attached the writeup from [A]'s review last quarter."`
   - `"[A] and [B] hit [number]. I attached the short version."`
-- **Do not ask permission to send the useful thing.** If the asset is useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"`
+- **Do not ask permission to send the useful thing.** If the asset is real and useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"` If the asset does not exist, do not mention it.
+- **Proof is sacred.** Never invent "three orgs", named customers, before/after numbers, or "peer teams" because the framework wants third-party validation. If proof is missing, ask for it. If the user says none exists, use a mechanism or buyer-risk sentence instead and mark the proof gap in the brief.
 - **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Stronger when grounded: `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} right now, or queued for Q3?"`. Banned because every cold-email guide overuses it: `"comparing notes"`, `"compare notes"`, `"swap notes"`.
 - **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
 
@@ -78,7 +114,7 @@ Every cold email and post-event email follows this shape. LinkedIn DMs follow it
 
 1. **Trigger**, why this person, why now? A specific observation or situation. Patterns: `"noticed [observable thing] which suggests [deduction]"`, `"saw you're [doing X] at [event]"`. If you have no signal, use a situation trigger sized to the role (e.g. "end of Q3 and the CFO is locking the FY27 plan"). **Never open with a population claim** ("Most teams…", "Most VPs…", "In our experience…", "Many fintechs…"). Auto-rejected.
 2. **Think**, the **illumination question**. A neutral how/what/why-are-you question that shines a light on a problem the persona owns. Not a leading question. Auto-rejected: `"if I could…"`, `"would you be interested?"`, `"wouldn't you agree?"`, `"don't you think?"`. Required for cold emails and post-connect DMs.
-3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references when possible; if not, frame as "we wrote up the workflow used by two payments teams" rather than fabricating named customers. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
+3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references, customer-approved proof, or supplied case-study facts. If no proof exists, stop and ask for proof before drafting; if the user explicitly says to proceed, omit third-party validation rather than fabricating it. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
 4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth a look?"`, `"Worth a skim?"`, `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} this quarter?"`. Banned: `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
 
 ## Channel-specific length rules (hard)
@@ -126,6 +162,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - "you/your" must outnumber "we/our" in the body.
 - No banned phrases, see `additional_banned_phrases` in `data/cold-outbound-rules.json`. Includes `happy to send`, `should I send`, `can I send`, `want me to send`, `want the one-pager`, `15 minutes`, `30 minutes`, `calendar link`, `book a call`, `schedule a meeting`, `cutting-edge`, `industry-leading`, `world-class`, etc.
 - No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, or a question that bolts `"before [event]"` onto the end. Use buyer responsibility as the reason to write and the event as the route to a clear ask.
+- In strict mode, no unsourced assets or proof. If the touch mentions an attached/linked/pulled-together asset, pass `availableAssets`. If it uses named customers, peer teams, or before/after numbers, pass `proofPoints`. Otherwise the validator must reject it.
 - No LLM-cliché phrases, 200+ phrases across 10 categories. See `llm_cliche_blocklist` in the same file. Categories: `performative_empathy`, `generic_compliments`, `sales_speak_openers`, `manufactured_intimacy`, `marketing_buzzwords`, `cold_email_overused`, `lazy_generalization_openers`, `llm_transition_tics`, `gpt_vocabulary`. (`hedge_softener_warnings` is soft, does not fail.)
 - No anti-flex selling tics: `"no deck"`, `"no demo"`, `"no calendar invite"`, `"no follow-up deck"`, `"reply yes and i'll send"`. These read as soulless-selling-with-extra-steps. If you'd write one, just don't include the assurance, write copy that doesn't need it.
 - No floor/booth-shopping framing in cold copy. Don't talk about "47 fraud-platform vendors", "five vendors with real numbers", "which booths can answer X". The recipient cares about the risk they manage, not your vendor census.
@@ -143,7 +180,10 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --touch <(cat <<'JSON'
   "touch_type": "cold_email_first_touch",
   "eventName": "Money20/20 USA 2026",
   "personaPriorities": ["ship a measurable reduction in chargeback rate to the CFO before Q4 close"],
-  "personaPainPoints": ["rules-vs-models false-positive tradeoff..."]
+  "personaPainPoints": ["rules-vs-models false-positive tradeoff..."],
+  "strictTruth": true,
+  "availableAssets": ["field-level worksheet approved for this campaign"],
+  "proofPoints": ["Adyen and Marqeta public case-study comparison, 94% vs 12% inbox placement"]
 }
 JSON
 )

@@ -10,6 +10,10 @@ export type EventContext = {
 export type CompanyICP = {
   industry: string;
   sizeRange: string;
+  website?: string;
+  productSummary?: string;
+  proofPoints?: string[];
+  availableAssets?: string[];
   personas: AttendeePersona[];
 };
 
@@ -26,6 +30,12 @@ export type AttendeePersona = {
     | 'other'
     | 'unknown';
   company?: string;
+  buyerJob?: string;
+  currentWorkaround?: string;
+  hiddenRisk?: string;
+  objections?: string[];
+  proofPoints?: string[];
+  availableAssets?: string[];
   priorities: string[];
   painPoints: string[];
   exampleTitles: string[];
@@ -82,6 +92,9 @@ export type OutreachTouch = {
     specificityHits: number;
     permissionToSendHits?: string[];
     forcedEventPhrasingHits?: string[];
+    missingMergeFields?: string[];
+    assetPromiseHits?: string[];
+    proofClaimHits?: string[];
     previewSellerHits?: string[];
     previewEventHits?: string[];
   };

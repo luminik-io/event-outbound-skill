@@ -9,9 +9,12 @@ import { describe, expect, it, beforeAll } from 'vitest';
 
 import {
   findForcedEventPhrasing,
+  findAssetPromisePhrasing,
   findEventFirstPreviewPhrasing,
   findLlmCliches,
+  findMissingMergeFields,
   findPermissionToSendPhrasing,
+  findProofClaimPhrasing,
   findSellerFirstPreviewPhrasing,
   type ColdOutboundRules,
 } from '../src/lib/ruleService.js';
@@ -288,6 +291,36 @@ describe('permission-to-send and direct-asset CTA validator', () => {
       'I attached the one-page worksheet we use for that review. Is this useful for {{company}} this quarter?',
     );
     expect(hits).toEqual([]);
+  });
+});
+
+describe('strict-context validator helpers', () => {
+  it('detects missing Apollo merge fields', () => {
+    const missing = findMissingMergeFields(
+      'Daniel, payment teams are reconciling PSD3 and FedNow on separate spreadsheets.',
+    );
+    expect(missing).toEqual(['{{first_name}}', '{{company}}']);
+  });
+
+  it('passes required Apollo merge fields', () => {
+    const missing = findMissingMergeFields(
+      '{{first_name}}, payment teams at {{company}} are reconciling PSD3 and FedNow on separate spreadsheets.',
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('detects promised assets that need a supplied availableAssets list', () => {
+    const hits = findAssetPromisePhrasing(
+      'I attached the PSD3 and FedNow matrix for the audit review.',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('detects invented peer proof claims that need supplied proofPoints', () => {
+    const hits = findProofClaimPhrasing(
+      'Three payments orgs cut false positives from 18% to 9% using the same review.',
+    );
+    expect(hits.length).toBeGreaterThan(0);
   });
 });
 

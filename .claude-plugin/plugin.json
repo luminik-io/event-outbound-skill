@@ -1,7 +1,7 @@
 {
   "name": "event-outbound",
   "description": "Create buyer-first email and LinkedIn outreach for B2B trade shows and conferences. Built from 20K+ outbound touches reviewed across 50+ events. Runs in Claude Code and Claude Cowork with no extra API key.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "author": {
     "name": "Luminik",
     "email": "prasad@luminik.io",

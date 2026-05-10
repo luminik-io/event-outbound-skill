@@ -41,6 +41,14 @@ export type ChannelLengthRule = {
 export type ColdOutboundRules = {
   channel_length_rules: { [touchType: string]: ChannelLengthRule };
   median_sentence_length_max: number;
+  strict_context_rules?: {
+    apollo_merge_fields?: {
+      applies_to: string[];
+      required_fields: string[];
+    };
+    asset_promise_terms?: string[];
+    proof_claim_terms?: string[];
+  };
   preview_line_rules?: {
     applies_to: string[];
     word_window: number;
@@ -232,6 +240,48 @@ function eventAliases(eventName?: string): string[] {
  */
 export function findPermissionToSendPhrasing(text: string): string[] {
   return patternHits(text, PERMISSION_TO_SEND_PATTERNS);
+}
+
+export function findMissingMergeFields(
+  text: string,
+  requiredFields = ['{{first_name}}', '{{company}}'],
+): string[] {
+  const lowerText = text.toLowerCase();
+  return requiredFields.filter((field) => !lowerText.includes(field.toLowerCase()));
+}
+
+export function findAssetPromisePhrasing(text: string): string[] {
+  return patternHits(text, [
+    {
+      label: 'attached-or-linked-asset',
+      regex: /\b(?:attached|linked|enclosed|included)\b[^.!?]{0,80}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      label: 'created-asset',
+      regex: /\b(?:i\s+)?(?:put together|wrote up|pulled together|built|made)\b[^.!?]{0,100}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      label: 'asset noun',
+      regex: /\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map)\b/i,
+    },
+  ]);
+}
+
+export function findProofClaimPhrasing(text: string): string[] {
+  return patternHits(text, [
+    {
+      label: 'named-customer-proof',
+      regex: /\b(?:using|used by|worked with|helped|seen|customer|customers|client|clients)\b[^.!?]{0,120}\b(?:from|to|compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit)\b/i,
+    },
+    {
+      label: 'peer-count-proof',
+      regex: /\b(?:two|three|four|five|\d+)\s+(?:payments?|fintech|security|cybersecurity|saas|identity|compliance|risk|fraud)?\s*(?:orgs?|teams?|companies|customers|clients|leaders|operators)\b[^.!?]{0,120}\b(?:from|to|compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit|kept|killed)\b/i,
+    },
+    {
+      label: 'before-after-number',
+      regex: /\b(?:from\s+\d+(?:\.\d+)?%?\s+to\s+\d+(?:\.\d+)?%?|compared to\s+\d+(?:\.\d+)?%?\s+before|\d+(?:\.\d+)?%?\s+instead of\s+\d+(?:\.\d+)?%?)\b/i,
+    },
+  ]);
 }
 
 /**
