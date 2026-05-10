@@ -22,7 +22,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 > **Built on 20,000+ personalized touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns event, ICP, sender identity, proof, and real campaign assets into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, body 50–100 words, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, and no unsourced proof. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, and no unsourced proof. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
 ## Install
 
@@ -66,6 +66,7 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **Pronoun ratio** | "you/your" must outnumber "we/our" |
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
+| **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
 | **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations or forced event phrasing |
 | **Strict truth** | In `strictTruth` mode, asset promises require `availableAssets`, proof claims require `proofPoints`, and Apollo-ready `{{first_name}}` / `{{company}}` fields are required |
@@ -78,11 +79,11 @@ You hand the skill five things:
 2. **ICP**, industry, size range, website, and one or more buyer personas with concrete priorities and pain points (vague aspirations like "build the brand" or "scale the team" fail the specificity check).
 3. **Buyer research**, buyer job, current workaround, hidden risk, likely objections, and customer-language pain.
 4. **Truth sources**, proof points and assets the sender can truthfully attach or link.
-5. **Sequence params**, lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), sending identity.
+5. **Sequence params**, lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), optional touch count, minimum gap days, event dates, today's date, sending identity.
 
 If proof or assets are missing, the skill asks for them before drafting. If the user explicitly proceeds without them, strict mode writes around the gap instead of inventing matrices, briefs, peer teams, or before/after numbers.
 
-It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run, six to twelve touches for multi-channel runs, covering pre-event, day-of, and post-event unless the user asks for pre-event only.
+It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run by default, configurable when the user wants more or fewer steps. The cadence planner enforces at least four days between adjacent touches and uses the event date plus today's date to avoid scheduling in the past.
 
 ## What the output looks like
 
@@ -158,7 +159,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-82 tests across 6 files (cliche-validator unit tests, strict context checks, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+86 tests across 6 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 ### Headless / batch generation (optional)
 
@@ -170,10 +171,10 @@ Full TypeScript types in `src/types/index.ts`. The short version:
 
 | Input | Required fields | Notes |
 |---|---|---|
-| `EventContext` | `name`, `dates`, `location`, `agendaTitles` | Speaker + exhibitor lists improve specificity but are optional |
+| `EventContext` | `name`, `dates`, optional `startDate`, optional `endDate`, `location`, `agendaTitles` | Speaker + exhibitor lists improve specificity but are optional |
 | `CompanyICP` | `industry`, `sizeRange`, `personas[]` | Optional `website`, `productSummary`, `proofPoints`, and `availableAssets` improve strict-mode output |
 | `AttendeePersona` | `personaId`, `role`, `seniority`, `priorities[]`, `painPoints[]` | Optional `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets` prevent generic copy |
-| `SequenceParams` | `leadTimeWeeks` (1–8), `channels`, `sendingIdentity` | 4 weeks is the sweet spot |
+| `SequenceParams` | `leadTimeWeeks` (1–8), `channels`, optional `touchCount`, optional `minGapDays`, optional `today`, `sendingIdentity` | 4 weeks and 4-day gaps are the default |
 
 ## Output shape
 

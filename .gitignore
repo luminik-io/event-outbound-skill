@@ -10,6 +10,7 @@ scripts/*
 !scripts/run-example.ts
 !scripts/scan-deliverables.ts
 !scripts/validate-touch.mjs
+!scripts/plan-timeline.mjs
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log

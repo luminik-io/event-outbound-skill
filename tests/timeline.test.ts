@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import { generateTimeline } from '../src/lib/timeline.js';
 
 describe('generateTimeline', () => {
@@ -9,14 +10,14 @@ describe('generateTimeline', () => {
       { offset_days: -14, channel: 'email', touch_slot: 2 },
       { offset_days: -7, channel: 'linkedin', touch_slot: 3 },
       { offset_days: 0, channel: 'linkedin', touch_slot: 4 },
-      { offset_days: 2, channel: 'email', touch_slot: 5 },
-      { offset_days: 7, channel: 'linkedin', touch_slot: 6 },
+      { offset_days: 4, channel: 'email', touch_slot: 5 },
+      { offset_days: 8, channel: 'linkedin', touch_slot: 6 },
     ]);
   });
 
-  it('1-week lead is collapsed to 4 touches', () => {
+  it('1-week lead is collapsed while preserving 4-day gaps', () => {
     const plan = generateTimeline(1, ['email', 'linkedin']);
-    expect(plan.length).toBe(4);
+    expect(plan.length).toBe(3);
     expect(plan[0].offset_days).toBeGreaterThanOrEqual(-7);
     expect(plan[0].offset_days).toBeLessThan(0);
     // day-of present
@@ -26,7 +27,10 @@ describe('generateTimeline', () => {
       expect(plan[i].offset_days).toBeGreaterThanOrEqual(plan[i - 1].offset_days);
     }
     // touch_slots start at 1 and increment
-    expect(plan.map((t) => t.touch_slot)).toEqual([1, 2, 3, 4]);
+    expect(plan.map((t) => t.touch_slot)).toEqual([1, 2, 3]);
+    for (let i = 1; i < plan.length; i++) {
+      expect(plan[i].offset_days - plan[i - 1].offset_days).toBeGreaterThanOrEqual(4);
+    }
   });
 
   it('8-week lead adds earlier seeding touches', () => {
@@ -49,7 +53,7 @@ describe('generateTimeline', () => {
       { offset_days: -14, channel: 'email', touch_slot: 3 },
       { offset_days: -7, channel: 'email', touch_slot: 4 },
       { offset_days: 0, channel: 'email', touch_slot: 5 },
-      { offset_days: 3, channel: 'email', touch_slot: 6 },
+      { offset_days: 4, channel: 'email', touch_slot: 6 },
     ]);
   });
 
@@ -64,7 +68,57 @@ describe('generateTimeline', () => {
     expect(plan.every((t) => t.channel === 'email')).toBe(true);
     expect(plan.length).toBe(8);
     expect(plan[0].offset_days).toBe(-56);
-    expect(plan.at(-1)?.offset_days).toBe(3);
+    expect(plan.at(-1)?.offset_days).toBe(4);
+  });
+
+  it('supports user-configured touch count', () => {
+    const plan = generateTimeline(4, ['email'], { touchCount: 4 });
+    expect(plan.length).toBe(4);
+    expect(plan.map((t) => t.touch_slot)).toEqual([1, 2, 3, 4]);
+    for (let i = 1; i < plan.length; i++) {
+      expect(plan[i].offset_days - plan[i - 1].offset_days).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('uses today and eventStartDate to avoid scheduling in the past', () => {
+    const plan = generateTimeline(4, ['email'], {
+      today: '2026-05-10',
+      eventStartDate: '2026-06-02',
+      touchCount: 6,
+      minGapDays: 4,
+    });
+    expect(plan[0].offset_days).toBe(-23);
+    expect(plan.every((t) => t.offset_days >= -23)).toBe(true);
+    for (let i = 1; i < plan.length; i++) {
+      expect(plan[i].offset_days - plan[i - 1].offset_days).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it('rejects impossible touch counts for the available lead window', () => {
+    expect(() =>
+      generateTimeline(1, ['email'], {
+        touchCount: 6,
+        minGapDays: 4,
+      }),
+    ).toThrow(/pre-event touches/);
+  });
+
+  it('exposes the same planning contract through the installed-skill CLI', () => {
+    const output = execFileSync('node', ['scripts/plan-timeline.mjs'], {
+      input: JSON.stringify({
+        leadTimeWeeks: 4,
+        channels: ['email'],
+        touchCount: 6,
+        minGapDays: 4,
+        today: '2026-05-10',
+        eventStartDate: '2026-06-02',
+      }),
+      encoding: 'utf8',
+    });
+    const parsed = JSON.parse(output);
+    expect(parsed.isValid).toBe(true);
+    expect(parsed.timeline[0].offset_days).toBe(-23);
+    expect(parsed.timeline).toHaveLength(6);
   });
 
   it('rejects out-of-range lead times', () => {

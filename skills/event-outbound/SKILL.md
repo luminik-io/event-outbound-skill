@@ -37,6 +37,7 @@ The brief must contain:
 6. **Proof points**, named customers, public numbers, case-study facts, or a clear statement that no proof was supplied.
 7. **Available assets**, actual links/files/attachments the sender can truthfully include. If none are supplied, do not promise a matrix, brief, worksheet, one-pager, report, recap, audit, or doc.
 8. **Likely objection/anxiety**, the thing the buyer would silently think before replying.
+9. **Cadence feasibility**, event start date, event end date if known, today's date, requested touch count, minimum gap, and whether any requested touch would fall in the past.
 
 If any of buyer job, current workaround, hidden risk, proof points, or available assets are unknown, ask targeted follow-up questions before drafting. If the user explicitly says to proceed without proof or assets, write in **strict no-invention mode** and say the sequence will avoid asset promises and customer proof.
 
@@ -44,9 +45,9 @@ If any of buyer job, current workaround, hidden risk, proof points, or available
 
 The user (or upstream agent) provides three things:
 
-1. **Event context**, name, dates, location, optionally agenda titles, speakers, exhibitors, venue. Either inline or as a JSON file. If the user provides an event URL only, fetch it first; if you can't fetch it, ask the user for the basics.
+1. **Event context**, name, `startDate` (`YYYY-MM-DD`), `endDate` (`YYYY-MM-DD` if multi-day), location, optionally agenda titles, speakers, exhibitors, venue. Either inline or as a JSON file. If the user provides an event URL only, fetch it first; if you can't fetch it, ask the user for the basics.
 2. **Company ICP + personas**, for each target persona, supply: `role`, `seniority`, `buyerJob`, `currentWorkaround`, `priorities` (3-5 outcomes the persona owns this quarter), `painPoints` (3-5 specific operational scars in their own language), `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`. Sample fixtures live at `examples/*/company-icp.json`.
-3. **Sequence parameters**, `leadTimeWeeks` (1-8, default 4), `channels` (`email`, `linkedin`, or both), and `sendingIdentity` (sender name, title, company).
+3. **Sequence parameters**, `leadTimeWeeks` (1-8, default 4), `channels` (`email`, `linkedin`, or both), optional `touchCount`, optional `minGapDays` (default 4), optional `preEventOnly`, and `sendingIdentity` (sender name, title, company).
 
 If any of these are missing or vague, ask the user for them before generating. Vague inputs produce vague output and, now, strict validation must reject the touches rather than letting Claude invent substance.
 
@@ -61,12 +62,34 @@ Use these when the user gives a thin request:
 5. What proof can we truthfully use, named customers, public data, customer quotes, or before/after numbers?
 6. What assets already exist that we can attach or link, if any?
 7. What is the event URL or agenda page, and which track/session makes this outreach timely?
+8. How many steps do you want? If unsure, say "default" and use the cadence planner.
 
 For event-led outbound, it is acceptable to ask for the sender's website first and research the ICP yourself. Prefer researching before asking the user to explain basics that the website can answer.
 
 ## How Claude executes this skill
 
-For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. A 4-week email-only sequence defaults to 6 touches: T-28, T-21, T-14, T-7, T0, T+3. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
+For each persona, build one outreach sequence with a user-configurable number of touches distributed across the lead-time window. The standard gap is **at least 4 days between adjacent steps**. A 4-week email-only sequence defaults to 6 touches, but if today is already inside the lead window, the first touch starts no earlier than today. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
+
+Before drafting, run the deterministic cadence planner:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/plan-timeline.mjs"
+```
+
+Pass JSON on stdin:
+
+```json
+{
+  "leadTimeWeeks": 4,
+  "channels": ["email"],
+  "touchCount": 6,
+  "minGapDays": 4,
+  "today": "2026-05-10",
+  "eventStartDate": "2026-06-02"
+}
+```
+
+Use the active session date as `today` unless the user provides another date. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, reduce channels, change `minGapDays`, or include post-event steps.
 
 Use this validator path. Do not assume the current working directory is the plugin root:
 
@@ -74,13 +97,13 @@ Use this validator path. Do not assume the current working directory is the plug
 node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 ```
 
-1. **Pick the channel + offset** for this touch from the timeline (see "Timeline" below).
+1. **Pick the channel + offset** from the planner output. Do not invent dates by hand.
 2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
 3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
 4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 5. **Append** to the sequence; move to the next touch.
 
-After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, average quality, score-band counts, CTA mix, illumination-question coverage, and validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
+After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, and validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
@@ -157,11 +180,11 @@ Subject lines: ≤ 4 words, all lowercase, no digits-only buzzwords, no banned s
 | T-14d | email | `cold_email_followup_3plus` |
 | T-7d | email | `cold_email_followup_3plus` |
 | T0 | email | `cold_email_followup_3plus` |
-| T+3d | email | `post_event_followup` |
+| T+4d | email | `post_event_followup` |
 
 If the user says "pre-event only", use T-28, T-21, T-14, and T-7 only. Otherwise event-led outreach includes day-of and post-event touches by default.
 
-For other lead times or single-channel cadences, adjust proportionally; the generator at `src/lib/timeline.ts` can be invoked directly if needed (`node -e "import('./src/lib/timeline.ts').then(m => console.log(m.generateTimeline(2, ['email'])))"`).
+For other lead times, touch counts, dates, or single-channel cadences, use `scripts/plan-timeline.mjs`; do not adjust proportionally in your head.
 
 ## Hard validator rules (auto-rejected)
 

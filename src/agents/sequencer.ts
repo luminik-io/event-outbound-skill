@@ -852,11 +852,23 @@ export async function generateSequence(
       touches: [],
       leadTimeWeeks: sequenceParams.leadTimeWeeks,
       channels: sequenceParams.channels,
+      touchCount: sequenceParams.touchCount,
+      minGapDays: sequenceParams.minGapDays ?? 4,
+      today: sequenceParams.today,
     };
 
     const timeline = generateTimeline(
       sequenceParams.leadTimeWeeks,
       sequenceParams.channels,
+      {
+        touchCount: sequenceParams.touchCount,
+        minGapDays: sequenceParams.minGapDays,
+        today: sequenceParams.today,
+        eventStartDate: eventContext.startDate,
+        includeDayOf: sequenceParams.includeDayOf,
+        includePostEvent: sequenceParams.includePostEvent,
+        preEventOnly: sequenceParams.preEventOnly,
+      },
     );
 
     for (const touchpoint of timeline) {

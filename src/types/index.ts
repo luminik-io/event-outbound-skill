@@ -1,6 +1,8 @@
 export type EventContext = {
   name: string;
   dates: string;
+  startDate?: string; // YYYY-MM-DD, used for date-aware cadence planning.
+  endDate?: string; // YYYY-MM-DD.
   location: string;
   agendaTitles: string[];
   speakers: string[];
@@ -107,6 +109,9 @@ export type OutreachSequence = {
   touches: OutreachTouch[];
   leadTimeWeeks: number;
   channels: ('email' | 'linkedin')[];
+  touchCount?: number;
+  minGapDays?: number;
+  today?: string;
 };
 
 export type SequencerOutput = {
@@ -116,6 +121,12 @@ export type SequencerOutput = {
 export type SequenceParams = {
   leadTimeWeeks: number; // 1-8, default 4
   channels: ('email' | 'linkedin')[];
+  touchCount?: number;
+  minGapDays?: number; // Default 4. Adjacent steps should not be closer.
+  today?: string; // YYYY-MM-DD. Defaults to the active session date in skill usage.
+  includeDayOf?: boolean;
+  includePostEvent?: boolean;
+  preEventOnly?: boolean;
   sendingIdentity: {
     name: string;
     title: string;
