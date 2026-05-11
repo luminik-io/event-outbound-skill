@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-107%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-110%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -22,7 +22,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 > **Built on 20,000+ personalized touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, and no unsourced proof. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, no unsourced proof, and no recycled pain angles across steps. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
 ## Install
 
@@ -67,6 +67,7 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
+| **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, and high-overlap pain vocabulary across email and LinkedIn |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
 | **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations, forced event phrasing, or location-pasted CTAs |
 | **Strict truth** | In `strictTruth` mode, asset promises require `availableAssets`, proof claims require `proofPoints`, and Apollo-ready `{{first_name}}` / `{{company}}` fields are required |
@@ -160,7 +161,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-107 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+110 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 
@@ -169,6 +170,12 @@ npm run check:showcase
 ```
 
 This deterministic check reads [`examples/claude-showcase/`](examples/claude-showcase/), verifies cadence dates, validator-clean touches, strict no-invention output, and guardrail behavior for thin input, impossible cadence, and wrong-persona prompts. It does not call Claude, so it is safe for CI.
+
+To validate pain-angle diversity for a full generated sequence:
+
+```bash
+node scripts/validate-sequence.mjs --sequence examples/claude-showcase/rich-positive-availability-unknown/sequencer-output.json
+```
 
 To rerun the live Claude showcase locally:
 
@@ -211,6 +218,8 @@ type SequencerOutput = {
 Each `OutreachTouch` carries a `checks` block so you can see exactly why it passed. Touches that burned all three validation retries return with `quality_flag: 'rules_violated'`. They are the minority, and they are your cue to rewrite by hand.
 
 Strict mode adds `missingMergeFields`, `assetPromiseHits`, and `proofClaimHits` to the checks block so a reviewer can see whether Claude tried to invent a useful-sounding but unsourced claim.
+
+Angle diversity adds `pain_angle` to every touch, plus `reusedPainAngleHits` and `painAngleBodyOverlap` in the checks block. A sequence only passes when `validate-sequence.mjs` sees one distinct pain angle per touch across all channels.
 
 ## Validation rules
 

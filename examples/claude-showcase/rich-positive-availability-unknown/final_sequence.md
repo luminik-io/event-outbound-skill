@@ -16,6 +16,8 @@
 - Score-band counts: 4× ship, 0× top-tier, 0× review, 0× rewrite
 - CTA mix: roadmap-timing (×3), closer-look (×1)
 - Illumination-question coverage: 2/4 (touches 1 and 4; followup_2 and followup_3plus do not require one)
+- Distinct pain-angle coverage: 4/4
+- Sequence validator: passing
 
 ## Outbound Research Brief
 
@@ -29,6 +31,7 @@
 - **Sender logistics:** Attendance, booth, agenda track, and availability all unknown. No meetup CTAs. No invented sender availability phrasing. No track names. Buyer-timing CTAs only.
 - **Likely objection:** "We already have rail-specific dashboards" or "This is a Slack-channel problem, not a platform problem."
 - **Cadence feasibility:** Planner returned valid 4-touch timeline (May 11, May 29, June 2, June 6).
+- **Pain-angle ledger:** Step-up owner → evidence pack latency → roadmap queue → vendor-note translation.
 
 ---
 
@@ -38,12 +41,13 @@
 - **Channel:** email
 - **Quality band:** 4/5 (ship)
 - **Validator:** passing
+- **Pain angle:** step-up owner
 
-**Subject:** instant pay ownership
+**Subject:** step-up owner
 
 **Body:**
 
-{{first_name}}, the exceptions at {{company}} that touch both step-up authentication and funds-flow operations are the awkward ones: product owns the SCA path, risk owns the funds movement, and the audit evidence lives in spreadsheets and rail-specific dashboards. How are you reconciling those two sides today, especially across FedNow, RTP, and SEPA Instant? The piece that keeps surfacing this close to the Q3 roadmap freeze is who actually owns the exception when it crosses both. Is that something you are trying to settle before the freeze, or parked for later?
+{{first_name}}, when a step-up decision at {{company}} changes the payment state, the owner can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns that handoff when SCA, FedNow, RTP, and SEPA Instant all have different evidence trails? The expensive part is not the exception itself; it is the unresolved owner when Q3 roadmap tradeoffs start. Is this something you are trying to settle before the freeze, or parked for later?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -56,12 +60,13 @@ VP Partnerships, Northstar Ledger
 - **Channel:** email
 - **Quality band:** 4/5 (ship)
 - **Validator:** passing
+- **Pain angle:** evidence pack latency
 
-**Subject:** exception ownership
+**Subject:** evidence pack
 
 **Body:**
 
-{{first_name}}, sent a note a couple of weeks back on the exceptions at {{company}} that cross SCA and funds-flow ownership. The piece that usually surfaces this close to a roadmap freeze: how does your team route an exception when the answer needs both the auth log and the rail-level funds trace, without it turning into a Slack chain for your on-call? If pulling that together across FedNow, RTP, SEPA Instant, and cards is on your Q3 list, is this worth a closer look?
+{{first_name}}, separate thread from my earlier note: audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. The question is less who owns the exception and more how quickly your team can reconstruct why a payment moved after authentication changed. If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -74,12 +79,13 @@ VP Partnerships, Northstar Ledger
 - **Channel:** email
 - **Quality band:** 4/5 (ship)
 - **Validator:** passing
+- **Pain angle:** roadmap queue
 
-**Subject:** who owns step-up
+**Subject:** roadmap queue
 
 **Body:**
 
-{{first_name}}, the cross-rail exceptions at {{company}} that touch SCA and funds-flow ownership tend to surface during roadmap-freeze conversations, not in your weekly. Where is that sitting on your side this week, with product, with risk, or still being argued out?
+{{first_name}}, this is usually the week new rails get attention, but the roadmap queue at {{company}} may still treat auth-and-payments cleanup as ops work. Where is that sitting on your side now: a Q3 product item, a risk cleanup, or something nobody owns yet?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -92,12 +98,13 @@ VP Partnerships, Northstar Ledger
 - **Channel:** email
 - **Quality band:** 4/5 (ship)
 - **Validator:** passing
+- **Pain angle:** vendor-note translation
 
-**Subject:** back to the freeze
+**Subject:** after the notes
 
 **Body:**
 
-{{first_name}}, back at your desk after a week of vendor conversations is usually when the exception-ownership question lands hardest at {{company}}: which roadmap actually picks up the cross-rail SCA and funds-flow work before Q3 closes? What is your working answer this week, and is the audit-evidence side of it being treated as a product problem or a risk problem? Is this on your Q3 list, or parked for later?
+{{first_name}}, after the event, the hard part at {{company}} is usually turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your working answer now: product-owned, risk-owned, or parked until the next rail change?
 
 Maya Rao
 VP Partnerships, Northstar Ledger

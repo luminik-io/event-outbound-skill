@@ -23,6 +23,9 @@
 //     "strictTruth": true,             // optional; rejects invented assets/proof
 //     "availableAssets": ["..."],      // optional; real assets sender can attach/link
 //     "proofPoints": ["..."]           // optional; real customer/public proof
+//     "strictAngleDiversity": true,     // optional; rejects recycled sequence angles
+//     "painAngle": { "label": "...", "sourcePain": "...", ... },
+//     "usedPainAngles": [{ "label": "..." }] // prior touches across all channels
 //   }
 //
 // Output shape (always exit 0; errors are part of the contract):
@@ -352,6 +355,126 @@ const youVsWe = (s) => {
   const w = (lower(s).match(/\b(we|our)\b/g) || []).length;
   return { you: y, we: w };
 };
+const PAIN_STOPWORDS = new Set([
+  'about',
+  'across',
+  'after',
+  'again',
+  'against',
+  'also',
+  'before',
+  'being',
+  'between',
+  'could',
+  'every',
+  'from',
+  'have',
+  'into',
+  'just',
+  'like',
+  'more',
+  'most',
+  'need',
+  'only',
+  'over',
+  'still',
+  'that',
+  'their',
+  'there',
+  'these',
+  'they',
+  'this',
+  'those',
+  'through',
+  'today',
+  'using',
+  'what',
+  'when',
+  'where',
+  'which',
+  'while',
+  'with',
+  'without',
+  'would',
+  'your',
+]);
+const painAngleText = (angle) => {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return [
+    angle.label,
+    angle.sourcePain || angle.source_pain,
+    angle.mechanism,
+    angle.costOfInaction || angle.cost_of_inaction,
+    angle.illuminationQuestion || angle.illumination_question,
+  ]
+    .filter(Boolean)
+    .join(' ');
+};
+const painAngleLabel = (angle) => {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return angle.label || angle.sourcePain || angle.source_pain || '';
+};
+const painAngleTokens = (text) => {
+  const tokens =
+    lower(text)
+      .replace(/\{\{[a-z0-9_]+\}\}/g, ' ')
+      .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g) || [];
+  return Array.from(
+    new Set(
+      tokens
+        .map((token) =>
+          token
+            .replace(/(?:ing|tion|sion|ment|ness|ities|ity|ed|es|s)$/i, '')
+            .replace(/[-/]/g, ''),
+        )
+        .filter((token) => token.length >= 4 && !PAIN_STOPWORDS.has(token)),
+    ),
+  );
+};
+const painSimilarity = (a, b) => {
+  const left = new Set(painAngleTokens(a));
+  const right = new Set(painAngleTokens(b));
+  if (left.size === 0 || right.size === 0) return 0;
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) intersection++;
+  }
+  return intersection / new Set([...left, ...right]).size;
+};
+const normalizedPainLabel = (angle) => painAngleTokens(painAngleLabel(angle)).join(' ');
+const findReusedPainAngles = (current, previousAngles = [], bodyText = '') => {
+  const hits = new Set();
+  const currentLabel = normalizedPainLabel(current);
+  const currentText = painAngleText(current);
+  let bodyOverlap = 0;
+  const bodyTokenSet = new Set(painAngleTokens(bodyText));
+  for (const previous of previousAngles) {
+    const previousLabel = normalizedPainLabel(previous);
+    const previousText = painAngleText(previous);
+    if (!previousText.trim()) continue;
+    const previousTokens = painAngleTokens(previousText);
+    const sharedWithBody = previousTokens.filter((token) => bodyTokenSet.has(token));
+    const overlap =
+      previousTokens.length === 0 ? 0 : sharedWithBody.length / previousTokens.length;
+    bodyOverlap = Math.max(bodyOverlap, overlap);
+    if (
+      (currentLabel && previousLabel && currentLabel === previousLabel) ||
+      painSimilarity(currentText, previousText) >= 0.42 ||
+      (sharedWithBody.length >= 2 && overlap >= 0.6)
+    ) {
+      hits.add(painAngleLabel(previous) || previousText);
+    }
+  }
+  return { hits: Array.from(hits), bodyOverlap: Number(bodyOverlap.toFixed(2)) };
+};
+const painAngleMatchesBody = (angle, bodyText) => {
+  const tokens = painAngleTokens(painAngleText(angle));
+  if (tokens.length === 0) return false;
+  const bodyTokenSet = new Set(painAngleTokens(bodyText));
+  return tokens.some((token) => bodyTokenSet.has(token));
+};
 
 // --- Validate --------------------------------------------------------------
 
@@ -564,6 +687,37 @@ if (previewEventHits.length > 0) {
   });
 }
 
+const strictAngleDiversity = touch.strictAngleDiversity === true;
+const currentPainAngle = touch.painAngle || touch.pain_angle;
+const usedPainAngles = Array.isArray(touch.usedPainAngles || touch.used_pain_angles)
+  ? touch.usedPainAngles || touch.used_pain_angles
+  : [];
+const reusedPainAngle = findReusedPainAngles(currentPainAngle, usedPainAngles, body);
+const painAngleBodyMatches =
+  !currentPainAngle || painAngleMatchesBody(currentPainAngle, body);
+if (strictAngleDiversity && !currentPainAngle) {
+  errors.push({
+    rule: 'missingPainAngle',
+    message: 'Strict angle diversity requires a painAngle label for every touch.',
+  });
+}
+if (strictAngleDiversity && currentPainAngle && !painAngleBodyMatches) {
+  errors.push({
+    rule: 'painAngleMismatch',
+    message:
+      'Touch declares a pain angle, but the body does not visibly use that angle. Rewrite so the metadata and copy match.',
+    offendingValue: painAngleLabel(currentPainAngle),
+  });
+}
+if (strictAngleDiversity && reusedPainAngle.hits.length > 0) {
+  errors.push({
+    rule: 'painAngleReused',
+    message:
+      'Touch reuses a pain angle or angle vocabulary from an earlier sequence step. Pick a different buyer problem, consequence, or illumination route.',
+    offendingValue: reusedPainAngle.hits.join(', '),
+  });
+}
+
 // LLM-cliche blocklist
 const hardBans = {};
 for (const cat of HARD_BAN_CATEGORIES) {
@@ -717,6 +871,9 @@ const checks = {
   proofClaimHits,
   previewSellerHits,
   previewEventHits,
+  painAngleLabel: currentPainAngle ? painAngleLabel(currentPainAngle) : undefined,
+  reusedPainAngleHits: reusedPainAngle.hits,
+  painAngleBodyOverlap: reusedPainAngle.bodyOverlap,
 };
 
 process.stdout.write(

@@ -444,6 +444,165 @@ export function findEventFirstPreviewPhrasing(
   return Array.from(found);
 }
 
+export type PainAngleInput =
+  | string
+  | {
+      label?: string;
+      sourcePain?: string;
+      source_pain?: string;
+      mechanism?: string;
+      costOfInaction?: string;
+      cost_of_inaction?: string;
+      illuminationQuestion?: string;
+      illumination_question?: string;
+    };
+
+const PAIN_ANGLE_STOPWORDS = new Set([
+  'about',
+  'across',
+  'after',
+  'again',
+  'against',
+  'also',
+  'before',
+  'being',
+  'between',
+  'could',
+  'every',
+  'from',
+  'have',
+  'into',
+  'just',
+  'like',
+  'more',
+  'most',
+  'need',
+  'only',
+  'over',
+  'still',
+  'that',
+  'their',
+  'there',
+  'these',
+  'they',
+  'this',
+  'those',
+  'through',
+  'today',
+  'using',
+  'what',
+  'when',
+  'where',
+  'which',
+  'while',
+  'with',
+  'without',
+  'would',
+  'your',
+]);
+
+export function painAngleText(angle: PainAngleInput | undefined): string {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return [
+    angle.label,
+    angle.sourcePain ?? angle.source_pain,
+    angle.mechanism,
+    angle.costOfInaction ?? angle.cost_of_inaction,
+    angle.illuminationQuestion ?? angle.illumination_question,
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+export function painAngleLabel(angle: PainAngleInput | undefined): string {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return angle.label || angle.sourcePain || angle.source_pain || '';
+}
+
+export function painAngleTokens(text: string): string[] {
+  const normalized = text
+    .toLowerCase()
+    .replace(/\{\{[a-z0-9_]+\}\}/g, ' ')
+    .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g);
+  if (!normalized) return [];
+  const tokens = normalized
+    .map((token) =>
+      token
+        .replace(/(?:ing|tion|sion|ment|ness|ities|ity|ed|es|s)$/i, '')
+        .replace(/[-/]/g, ''),
+    )
+    .filter((token) => token.length >= 4 && !PAIN_ANGLE_STOPWORDS.has(token));
+  return Array.from(new Set(tokens));
+}
+
+export function painAngleSimilarity(a: string, b: string): number {
+  const left = new Set(painAngleTokens(a));
+  const right = new Set(painAngleTokens(b));
+  if (left.size === 0 || right.size === 0) return 0;
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) intersection++;
+  }
+  const union = new Set([...left, ...right]).size;
+  return union === 0 ? 0 : intersection / union;
+}
+
+export function normalizePainAngleLabel(angle: PainAngleInput | undefined): string {
+  return painAngleTokens(painAngleLabel(angle)).join(' ');
+}
+
+export function findReusedPainAngles(
+  current: PainAngleInput | undefined,
+  previousAngles: PainAngleInput[] = [],
+  body = '',
+): { hits: string[]; bodyOverlap: number } {
+  const hits = new Set<string>();
+  const currentLabel = normalizePainAngleLabel(current);
+  const currentText = painAngleText(current);
+  let bodyOverlap = 0;
+
+  for (const previous of previousAngles) {
+    const previousLabel = normalizePainAngleLabel(previous);
+    const previousText = painAngleText(previous);
+    const readableLabel = painAngleLabel(previous) || previousText;
+    if (!previousText.trim()) continue;
+
+    const labelMatches =
+      currentLabel.length > 0 &&
+      previousLabel.length > 0 &&
+      currentLabel === previousLabel;
+    const metadataSimilarity = painAngleSimilarity(currentText, previousText);
+    const previousTokens = painAngleTokens(previousText);
+    const bodyTokens = new Set(painAngleTokens(body));
+    const sharedWithBody = previousTokens.filter((token) => bodyTokens.has(token));
+    const overlap =
+      previousTokens.length === 0 ? 0 : sharedWithBody.length / previousTokens.length;
+    bodyOverlap = Math.max(bodyOverlap, overlap);
+
+    if (
+      labelMatches ||
+      metadataSimilarity >= 0.42 ||
+      (sharedWithBody.length >= 2 && overlap >= 0.6)
+    ) {
+      hits.add(readableLabel);
+    }
+  }
+
+  return { hits: Array.from(hits), bodyOverlap: Number(bodyOverlap.toFixed(2)) };
+}
+
+export function painAngleMatchesBody(
+  angle: PainAngleInput | undefined,
+  body: string,
+): boolean {
+  const angleTokens = painAngleTokens(painAngleText(angle));
+  if (angleTokens.length === 0) return false;
+  const bodyTokens = new Set(painAngleTokens(body));
+  return angleTokens.some((token) => bodyTokens.has(token));
+}
+
 const DATA_DIR = path.join(process.cwd(), 'data');
 
 let coldEmailBenchmarksCache: ColdEmailBenchmarks | null = null;

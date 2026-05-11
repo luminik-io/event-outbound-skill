@@ -10,6 +10,7 @@ scripts/*
 !scripts/run-example.ts
 !scripts/scan-deliverables.ts
 !scripts/validate-touch.mjs
+!scripts/validate-sequence.mjs
 !scripts/plan-timeline.mjs
 !scripts/check-claude-showcase.mjs
 !scripts/run-claude-showcase.mjs

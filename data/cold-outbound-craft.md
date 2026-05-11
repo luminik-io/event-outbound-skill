@@ -37,6 +37,7 @@ Every rule below is mechanically testable. Each one is tagged with where it came
 | H17 | No gating language | Ban "want me to send", "yours to keep", "if it's of interest" | (CEB) | In CEB ✅ |
 | H18 | No defensive throat-clearing | Ban "not a pitch", "no strings", "no pressure" | (CEB) | In CEB ⚠️ — note the canon DOES use "low-pressure" / "low pressure" (~7 hits). Distinguish: ban defensive *opener*, allow descriptive *adjective*. |
 | H19 | One problem per email | Each email isolates ONE pain — don't mash multiple value props in one touch | `cold-email-archive.txt:758-789` | **NEW — eval-graded** (hard for a regex; LLM-judge) |
+| H20 | One fresh pain angle per touch | A sequence cannot repeat the same buyer pain across email and LinkedIn; each touch needs a new angle, consequence, or illumination route | `quality-bar-refinements.md:114-129` | `validate-sequence.mjs` + `painAngleReused` |
 | H20 | Em-dash policy (workspace override) | Workspace `CLAUDE.md` bans em-dashes in agent output. the canon's author uses 382 em-dashes in his LinkedIn corpus. **Resolution:** keep banned in skill output (workspace wins); convert any canon-quoted em-dash to comma or period when emitting. | Workspace `CLAUDE.md`; the corpus (382 em-dashes) | **DOCUMENTED conflict — already enforceable via workspace policy** |
 
 ---

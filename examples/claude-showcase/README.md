@@ -14,7 +14,7 @@ claude --plugin-dir /path/to/event-outbound \
 
 | Case | What it proves |
 |---|---|
-| `rich-positive-availability-unknown/` | Rich input produces a validator-passing sequence without invented proof, assets, or sender logistics. |
+| `rich-positive-availability-unknown/` | Rich input produces a validator-passing sequence without invented proof, assets, sender logistics, or recycled pain angles. |
 | `thin-input-probe/` | Thin input does not produce plausible vendor copy. Claude asks for the missing sender, proof, asset, and fit context. |
 | `impossible-cadence/` | The skill refuses impossible cadence math instead of squeezing six pre-event emails into seven days. |
 | `wrong-persona-guard/` | Persona-angle mismatch is flagged before drafting. |
@@ -25,4 +25,4 @@ Run the deterministic checks:
 npm run check:showcase
 ```
 
-To regenerate these with Claude, run the prompts in each case directory. Because Claude output is nondeterministic and requires local auth, regeneration is intentionally not part of CI.
+To regenerate these with Claude, run the prompts in each case directory. Because Claude output is nondeterministic and requires local auth, regeneration is intentionally not part of CI. Any refreshed positive fixture must pass both `validate-touch.mjs` per step and `validate-sequence.mjs` across the whole cadence.

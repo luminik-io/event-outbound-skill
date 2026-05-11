@@ -9,6 +9,7 @@
     "test": "vitest",
     "lint": "eslint . --ext .ts",
     "scan": "tsx scripts/scan-deliverables.ts",
+    "validate:sequence": "node scripts/validate-sequence.mjs",
     "check:showcase": "node scripts/check-claude-showcase.mjs",
     "e2e:claude": "node scripts/run-claude-showcase.mjs",
     "verify": "npm run build && npm run test -- --run && npm run scan && npm run check:showcase"

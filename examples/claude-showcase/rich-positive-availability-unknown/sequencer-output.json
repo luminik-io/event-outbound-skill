@@ -30,7 +30,9 @@
       "closer_look": 1
     },
     "illuminationQuestionCoverage": "2/4",
+    "distinctPainAngleCoverage": "4/4",
     "validatorStatus": "all_passing",
+    "sequenceValidatorStatus": "all_passing",
     "humanReviewStatus": "ready for human review"
   },
   "brief": {
@@ -55,20 +57,26 @@
       "channels": ["email"],
       "touches": [
         {
-          "touch_slot": 1,
+            "touch_slot": 1,
           "offset_days": -22,
           "send_date": "2026-05-11",
           "channel": "email",
           "touch_type": "cold_email_first_touch",
-          "subject": "instant pay ownership",
-          "body": "{{first_name}}, the exceptions at {{company}} that touch both step-up authentication and funds-flow operations are the awkward ones: product owns the SCA path, risk owns the funds movement, and the audit evidence lives in spreadsheets and rail-specific dashboards. How are you reconciling those two sides today, especially across FedNow, RTP, and SEPA Instant? The piece that keeps surfacing this close to the Q3 roadmap freeze is who actually owns the exception when it crosses both. Is that something you are trying to settle before the freeze, or parked for later?",
+          "subject": "step-up owner",
+          "body": "{{first_name}}, when a step-up decision at {{company}} changes the payment state, the owner can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns that handoff when SCA, FedNow, RTP, and SEPA Instant all have different evidence trails? The expensive part is not the exception itself; it is the unresolved owner when Q3 roadmap tradeoffs start. Is this something you are trying to settle before the freeze, or parked for later?",
+          "pain_angle": {
+            "label": "step-up owner",
+            "sourcePain": "SCA step-up owner unclear when auth changes payment state",
+            "mechanism": "authentication changes the payment state and ownership blurs",
+            "costOfInaction": "Q3 roadmap tradeoffs start without a named owner"
+          },
           "quality_band": "ship_4",
           "validation_errors": [],
           "checks": {
-            "subjectWordCount": 3,
+            "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 89,
-            "bodyCharCount": 567,
+            "bodyWordCount": 82,
+            "bodyCharCount": 509,
             "bodySentenceCount": 4,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -77,14 +85,17 @@
             "hasIlluminationQuestion": true,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 12,
+            "specificityHits": 10,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
             "assetPromiseHits": [],
             "proofClaimHits": [],
             "previewSellerHits": [],
-            "previewEventHits": []
+            "previewEventHits": [],
+            "painAngleLabel": "step-up owner",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0
           }
         },
         {
@@ -93,15 +104,21 @@
           "send_date": "2026-05-29",
           "channel": "email",
           "touch_type": "cold_email_followup_2",
-          "subject": "exception ownership",
-          "body": "{{first_name}}, sent a note a couple of weeks back on the exceptions at {{company}} that cross SCA and funds-flow ownership. The piece that usually surfaces this close to a roadmap freeze: how does your team route an exception when the answer needs both the auth log and the rail-level funds trace, without it turning into a Slack chain for your on-call? If pulling that together across FedNow, RTP, SEPA Instant, and cards is on your Q3 list, is this worth a closer look?",
+          "subject": "evidence pack",
+          "body": "{{first_name}}, separate thread from my earlier note: audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. The question is less who owns the exception and more how quickly your team can reconstruct why a payment moved after authentication changed. If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?",
+          "pain_angle": {
+            "label": "evidence pack latency",
+            "sourcePain": "audit evidence lives in rail dashboards and auth logs that do not line up",
+            "mechanism": "case notes, auth logs, and rail traces require manual stitching",
+            "costOfInaction": "the review takes longer than the exception itself"
+          },
           "quality_band": "ship_4",
           "validation_errors": [],
           "checks": {
             "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 83,
-            "bodyCharCount": 472,
+            "bodyWordCount": 71,
+            "bodyCharCount": 442,
             "bodySentenceCount": 3,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -110,14 +127,17 @@
             "hasIlluminationQuestion": false,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 8,
+            "specificityHits": 6,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
             "assetPromiseHits": [],
             "proofClaimHits": [],
             "previewSellerHits": [],
-            "previewEventHits": []
+            "previewEventHits": [],
+            "painAngleLabel": "evidence pack latency",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.25
           }
         },
         {
@@ -126,15 +146,21 @@
           "send_date": "2026-06-02",
           "channel": "email",
           "touch_type": "cold_email_followup_3plus",
-          "subject": "who owns step-up",
-          "body": "{{first_name}}, the cross-rail exceptions at {{company}} that touch SCA and funds-flow ownership tend to surface during roadmap-freeze conversations, not in your weekly. Where is that sitting on your side this week, with product, with risk, or still being argued out?",
+          "subject": "roadmap queue",
+          "body": "{{first_name}}, this is usually the week new rails get attention, but the roadmap queue at {{company}} may still treat auth-and-payments cleanup as ops work. Where is that sitting on your side now: a Q3 product item, a risk cleanup, or something nobody owns yet?",
+          "pain_angle": {
+            "label": "roadmap queue",
+            "sourcePain": "payments-auth work can miss Q3 roadmap when it is treated as ops cleanup",
+            "mechanism": "rail work gets classified as cleanup instead of product scope",
+            "costOfInaction": "another quarter passes before a named product owner exists"
+          },
           "quality_band": "ship_4",
           "validation_errors": [],
           "checks": {
-            "subjectWordCount": 3,
+            "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 40,
-            "bodyCharCount": 267,
+            "bodyWordCount": 44,
+            "bodyCharCount": 262,
             "bodySentenceCount": 2,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -150,7 +176,10 @@
             "assetPromiseHits": [],
             "proofClaimHits": [],
             "previewSellerHits": [],
-            "previewEventHits": []
+            "previewEventHits": [],
+            "painAngleLabel": "roadmap queue",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.08
           }
         },
         {
@@ -159,15 +188,21 @@
           "send_date": "2026-06-06",
           "channel": "email",
           "touch_type": "post_event_followup",
-          "subject": "back to the freeze",
-          "body": "{{first_name}}, back at your desk after a week of vendor conversations is usually when the exception-ownership question lands hardest at {{company}}: which roadmap actually picks up the cross-rail SCA and funds-flow work before Q3 closes? What is your working answer this week, and is the audit-evidence side of it being treated as a product problem or a risk problem? Is this on your Q3 list, or parked for later?",
+          "subject": "after the notes",
+          "body": "{{first_name}}, after the event, the hard part at {{company}} is usually turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your working answer now: product-owned, risk-owned, or parked until the next rail change?",
+          "pain_angle": {
+            "label": "vendor-note translation",
+            "sourcePain": "vendor notes do not translate into ownership decisions",
+            "mechanism": "event takeaways need to become one owner and one roadmap decision",
+            "costOfInaction": "another quarter of reviews that nobody can confidently close"
+          },
           "quality_band": "ship_4",
           "validation_errors": [],
           "checks": {
-            "subjectWordCount": 4,
+            "subjectWordCount": 3,
             "allLowercase": true,
-            "bodyWordCount": 69,
-            "bodyCharCount": 414,
+            "bodyWordCount": 59,
+            "bodyCharCount": 379,
             "bodySentenceCount": 3,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -176,14 +211,17 @@
             "hasIlluminationQuestion": true,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 8,
+            "specificityHits": 5,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
             "assetPromiseHits": [],
             "proofClaimHits": [],
             "previewSellerHits": [],
-            "previewEventHits": []
+            "previewEventHits": [],
+            "painAngleLabel": "vendor-note translation",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.31
           }
         }
       ]

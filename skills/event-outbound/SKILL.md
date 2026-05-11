@@ -38,6 +38,7 @@ The brief must contain:
 7. **Available assets**, actual links/files/attachments the sender can truthfully include. If none are supplied, do not promise a matrix, brief, worksheet, one-pager, report, recap, audit, or doc.
 8. **Likely objection/anxiety**, the thing the buyer would silently think before replying.
 9. **Cadence feasibility**, event start date, event end date if known, today's date, requested touch count, minimum gap, and whether any requested touch would fall in the past.
+10. **Pain-angle ledger**, one distinct angle per planned touch. Each angle needs a 2-5 word label, source pain, illumination mechanism, and cost of inaction. Do not reuse an angle across email and LinkedIn.
 
 If any of buyer job, current workaround, hidden risk, proof points, or available assets are unknown, ask targeted follow-up questions before drafting. If the user explicitly says to proceed without proof or assets, write in **strict no-invention mode** and say the sequence will avoid asset promises and customer proof.
 
@@ -97,12 +98,21 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 ```
 
 1. **Pick the channel, offset, and send date** from the planner output. Do not invent dates by hand.
-2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
-4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
-5. **Append** to the sequence; move to the next touch.
+2. **Assign a fresh pain angle** from the ledger. The touch must use that angle and no previous angle. Across the whole sequence, including mixed email + LinkedIn runs, no pain angle may repeat. If you do not have enough angles, split the buyer problem into different dimensions (current workaround, ownership, timing, audit evidence, stakeholder conflict, cost of inaction, objection) or ask the user for more customer-language pains.
+3. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
+4. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+5. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
+6. **Append** to the sequence; move to the next touch.
 
-After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, and validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
+After all touches generate, run the sequence-level validator:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-sequence.mjs"
+```
+
+Pass the full `sequencer-output.json` on stdin or with `--sequence`. This catches pain-angle recycling across all channels. The sequence is not validator-clean unless both every touch validator and the sequence validator return `"isValid": true`.
+
+After all validators pass or are explicitly flagged, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
@@ -201,6 +211,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, a question that bolts `"before [event]"` onto the end, or a CTA that makes the location do the buyer-priority work (`"worth pressure-testing before Amsterdam"`, `"useful for Amsterdam prep"`). Use buyer responsibility as the reason to write and the event as the route to a clear ask.
 - No generic post-event pleasantries: `"hope the event went well"`, `"hope the event was productive"`, `"hope the week in [city] went well"`. Start from the buyer's returned-to-desk work instead.
 - No invented sender logistics: do not say `"I'm around"`, `"I am around the [track] side of the agenda"`, `"I'll be at booth X"`, or name a session/track unless the user supplied that fact. If sender availability is missing, use a buyer-timing CTA instead of a meetup CTA.
+- No pain-angle recycling. Every touch needs `painAngle` metadata and must use a different buyer problem, consequence, or illumination route than all previous touches. This applies across email and LinkedIn in the same sequence. Rewording the same pain is still a failure.
 - In strict mode, no unsourced assets or proof. If the touch mentions an attached/linked/pulled-together asset, pass `availableAssets`. If it uses named customers, peer teams, or before/after numbers, pass `proofPoints`. Otherwise the validator must reject it.
 - No LLM-cliché phrases, 200+ phrases across 10 categories. See `llm_cliche_blocklist` in the same file. Categories: `performative_empathy`, `generic_compliments`, `sales_speak_openers`, `manufactured_intimacy`, `marketing_buzzwords`, `cold_email_overused`, `lazy_generalization_openers`, `llm_transition_tics`, `gpt_vocabulary`. (`hedge_softener_warnings` is soft, does not fail.)
 - No anti-flex selling tics: `"no deck"`, `"no demo"`, `"no calendar invite"`, `"no follow-up deck"`, `"reply yes and i'll send"`. These read as soulless-selling-with-extra-steps. If you'd write one, just don't include the assurance, write copy that doesn't need it.
@@ -223,7 +234,15 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --touch <(cat <<'JSON'
   "personaPainPoints": ["rules-vs-models false-positive tradeoff..."],
   "strictTruth": true,
   "availableAssets": ["field-level worksheet approved for this campaign"],
-  "proofPoints": ["Adyen and Marqeta public case-study comparison, 94% vs 12% inbox placement"]
+  "proofPoints": ["Adyen and Marqeta public case-study comparison, 94% vs 12% inbox placement"],
+  "strictAngleDiversity": true,
+  "painAngle": {
+    "label": "stale rule ownership",
+    "sourcePain": "stale rules keep tier-1 closing the same detection",
+    "mechanism": "rules ownership drifts between product and risk",
+    "costOfInaction": "audit answer gets harder to defend"
+  },
+  "usedPainAngles": []
 }
 JSON
 )

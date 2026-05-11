@@ -4,10 +4,10 @@ Done. Sequence is ready for human review.
 - `final_sequence.md` — human-readable, four touches with brief + reviewer notes
 - `sequencer-output.json` — machine-readable, includes full validator `checks` per touch
 
-**Cadence (all validator-passing):**
-- T-22 · May 11 · `cold_email_first_touch` · "instant pay ownership"
-- T-4 · May 29 · `cold_email_followup_2` · "exception ownership"
-- T0 · Jun 2 · `cold_email_followup_3plus` · "who owns step-up"
-- T+4 · Jun 6 · `post_event_followup` · "back to the freeze"
+**Cadence (all touch validators + sequence validator passing):**
+- T-22 · May 11 · `cold_email_first_touch` · "step-up owner" · pain angle: step-up owner
+- T-4 · May 29 · `cold_email_followup_2` · "evidence pack" · pain angle: evidence pack latency
+- T0 · Jun 2 · `cold_email_followup_3plus` · "roadmap queue" · pain angle: roadmap queue
+- T+4 · Jun 6 · `post_event_followup` · "after the notes" · pain angle: vendor-note translation
 
 **Strict-mode handling:** no proof, no assets, no sender logistics anywhere. CTAs are buyer-timing only (Q3 roadmap framing), never meetup. Money20/20 Europe is treated as the occasion, never as the buyer's reason to care — touch 3 deliberately avoids "today at Money20/20" because attendance is unknown.

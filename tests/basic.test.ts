@@ -129,3 +129,110 @@ test('validate-touch CLI rejects invented sender logistics', () => {
     expect.arrayContaining(['i am around', 'side of the agenda']),
   );
 });
+
+test('validate-touch CLI rejects recycled pain angles within a sequence', () => {
+  const payload = {
+    subject: 'exception routing',
+    body: '{{first_name}}, exception routing at {{company}} still breaks when the auth log and rail trace sit with different owners. Where is your exception owner landing this quarter?',
+    channel: 'email',
+    touch_type: 'cold_email_followup_3plus',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['instant-payment exception ownership'],
+    personaPainPoints: ['exception ownership split across auth and rail funds trace'],
+    strictAngleDiversity: true,
+    painAngle: {
+      label: 'exception ownership',
+      sourcePain: 'exception ownership split across auth and rail funds trace',
+      mechanism: 'auth log and rail trace sit with different owners',
+      costOfInaction: 'roadmap owner remains unclear',
+    },
+    usedPainAngles: [
+      {
+        label: 'exception ownership',
+        sourcePain: 'exception ownership split across auth and rail funds trace',
+      },
+    ],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('painAngleReused');
+});
+
+test('validate-sequence CLI rejects repeated pain angles across channels', () => {
+  const payload = {
+    sequencesByPersona: {
+      payments_leader: {
+        touches: [
+          {
+            touch_slot: 1,
+            channel: 'email',
+            body: '{{first_name}}, exception ownership at {{company}} is split across product and risk.',
+            pain_angle: {
+              label: 'exception ownership',
+              sourcePain: 'ownership split across product and risk',
+            },
+          },
+          {
+            touch_slot: 2,
+            channel: 'linkedin',
+            body: '{{first_name}}, the same exception ownership question at {{company}} can stall the roadmap.',
+            pain_angle: {
+              label: 'exception ownership',
+              sourcePain: 'ownership split across product and risk',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('painAngleReused');
+});
+
+test('validate-sequence CLI accepts distinct pain angles across a sequence', () => {
+  const payload = {
+    sequencesByPersona: {
+      payments_leader: {
+        touches: [
+          {
+            touch_slot: 1,
+            channel: 'email',
+            body: '{{first_name}}, audit evidence at {{company}} is scattered across rail dashboards.',
+            pain_angle: {
+              label: 'audit evidence split',
+              sourcePain: 'audit evidence scattered across rail dashboards',
+            },
+          },
+          {
+            touch_slot: 2,
+            channel: 'linkedin',
+            body: '{{first_name}}, roadmap freeze timing can bury the payment-auth work until Q4.',
+            pain_angle: {
+              label: 'roadmap freeze timing',
+              sourcePain: 'payment-auth work buried until Q4',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(parsed.checks.sequences.payments_leader.distinctPainAngleCount).toBe(2);
+});

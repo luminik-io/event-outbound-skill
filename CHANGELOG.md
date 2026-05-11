@@ -4,15 +4,20 @@
 
 Buyer-first quality-bar hardening for thin event-outbound inputs.
 
+### Added
+- Sequence-level pain-angle validation via `scripts/validate-sequence.mjs`. Every touch now needs a distinct `pain_angle`, and repeated angle labels or high-overlap pain vocabulary across email and LinkedIn are rejected.
+- Touch-level angle-diversity checks via `strictAngleDiversity`, `painAngle`, and `usedPainAngles`, so Claude gets feedback before a recycled-pain sequence reaches the final output.
+
 ### Changed
 - Skill intake now requires an Outbound Research Brief before drafting: buyer job, current workaround, hidden risk, customer-language pain, trigger, proof points, available assets, and likely objection.
+- Skill workflow now requires a pain-angle ledger before drafting and reports distinct pain-angle coverage in the sequence summary.
 - Skill frontmatter now allows web fetch/search so Claude can research the sender company and event page before asking the user to restate facts that are public.
 - `CompanyICP` and `AttendeePersona` types now support optional `website`, `productSummary`, `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`.
 - Sequencer prompt now treats proof and assets as sacred: no invented matrices, briefs, peer teams, named customers, before/after numbers, agenda sessions, day-of slots, or locations.
 - CTA guidance now separates buyer priorities from event logistics: "before [city]" and "[city] prep" closers are rejected unless the ask is literal meetup logistics.
 - Cadence planner output now includes deterministic `send_date` values so installed-skill runs do not hand-calculate calendar dates.
 
-### Added
+### Added Earlier
 - Strict validator mode via `strictTruth: true`.
 - `missingMergeFields` check for Apollo-ready `{{first_name}}` and `{{company}}`.
 - `unsourcedAssetPromise` check when copy mentions attached/linked assets without `availableAssets`.

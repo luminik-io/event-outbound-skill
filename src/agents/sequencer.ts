@@ -11,6 +11,7 @@ import {
   ValidationResult,
   ValidationError,
   TimelineTouchpoint,
+  PainAngle,
 } from '../types/index.js';
 import {
   getValidationRules,
@@ -28,6 +29,9 @@ import {
   findMissingMergeFields,
   findAssetPromisePhrasing,
   findProofClaimPhrasing,
+  findReusedPainAngles,
+  painAngleLabel,
+  painAngleMatchesBody,
 } from '../lib/ruleService.js';
 import { generateTimeline } from '../lib/timeline.js';
 
@@ -39,6 +43,7 @@ type LLMTouch = {
   subject: string;
   body: string;
   cta_type: CTAType;
+  pain_angle?: PainAngle;
 };
 
 // ---------------------------------------------------------------------------
@@ -106,6 +111,116 @@ function resolveTouchTypeKey(briefLabel: string): string {
   }
 }
 
+function wordsForLabel(text: string): string[] {
+  const banned = new Set([
+    'across',
+    'after',
+    'before',
+    'being',
+    'between',
+    'current',
+    'doing',
+    'handling',
+    'their',
+    'there',
+    'these',
+    'those',
+    'through',
+    'using',
+    'where',
+    'which',
+    'while',
+    'without',
+  ]);
+  return Array.from(
+    new Set(
+      text
+        .toLowerCase()
+        .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g)
+        ?.map((word) => word.replace(/[-/]/g, ''))
+        .filter((word) => word.length >= 5 && !banned.has(word)) ?? [],
+    ),
+  );
+}
+
+function labelFromText(text: string, fallback: string): string {
+  const words = wordsForLabel(text).slice(0, 4);
+  return words.length > 0 ? words.join(' ') : fallback;
+}
+
+function pushUniqueAngle(angles: PainAngle[], candidate: PainAngle): void {
+  const label = candidate.label.trim();
+  if (!label) return;
+  const normalized = label.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (
+    angles.some(
+      (angle) =>
+        angle.label.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() === normalized,
+    )
+  ) {
+    return;
+  }
+  angles.push({ ...candidate, label });
+}
+
+function buildPainAngleLedger(persona: AttendeePersona, touchCount: number): PainAngle[] {
+  const angles: PainAngle[] = [];
+  for (const pain of persona.painPoints) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(pain, `pain ${angles.length + 1}`),
+      sourcePain: pain,
+      mechanism: persona.currentWorkaround
+        ? `Current workaround: ${persona.currentWorkaround}`
+        : undefined,
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  if (persona.hiddenRisk) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(persona.hiddenRisk, 'hidden risk'),
+      sourcePain: persona.hiddenRisk,
+      mechanism: 'Cost of inaction / hidden risk',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  if (persona.currentWorkaround) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(persona.currentWorkaround, 'workaround drag'),
+      sourcePain: persona.currentWorkaround,
+      mechanism: 'Current workaround',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  for (const priority of persona.priorities) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(priority, `priority ${angles.length + 1}`),
+      sourcePain: priority,
+      mechanism: 'Priority pressure',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  for (const objection of persona.objections ?? []) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(objection, `objection ${angles.length + 1}`),
+      sourcePain: objection,
+      mechanism: 'Silent buyer objection',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  while (angles.length < touchCount) {
+    pushUniqueAngle(angles, {
+      label: `angle ${angles.length + 1}`,
+      sourcePain:
+        persona.buyerJob ||
+        persona.priorities[angles.length % Math.max(1, persona.priorities.length)] ||
+        persona.role,
+      mechanism: `Different dimension for touch ${angles.length + 1}`,
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  return angles.slice(0, touchCount);
+}
+
 // ---------------------------------------------------------------------------
 // Validation
 // ---------------------------------------------------------------------------
@@ -121,6 +236,9 @@ function validateTouch(
     apolloMergeFieldsRequired?: boolean;
     availableAssets?: string[];
     proofPoints?: string[];
+    strictAngleDiversity?: boolean;
+    painAngle?: PainAngle;
+    usedPainAngles?: PainAngle[];
   },
   eventContext: EventContext,
   persona: AttendeePersona,
@@ -356,6 +474,39 @@ function validateTouch(
     });
   }
 
+  const strictAngleDiversity = touch.strictAngleDiversity === true;
+  const painAngle = touch.painAngle;
+  const reusedPainAngle = findReusedPainAngles(
+    painAngle,
+    touch.usedPainAngles ?? [],
+    touch.body,
+  );
+  const painAngleBodyMatches =
+    !painAngle || painAngleMatchesBody(painAngle, touch.body);
+  if (strictAngleDiversity && !painAngle) {
+    errors.push({
+      rule: 'missingPainAngle',
+      message:
+        'Strict angle diversity requires a painAngle label for every touch.',
+    });
+  }
+  if (strictAngleDiversity && painAngle && !painAngleBodyMatches) {
+    errors.push({
+      rule: 'painAngleMismatch',
+      message:
+        'Touch declares a pain angle, but the body does not visibly use that angle. Rewrite so the metadata and copy match.',
+      offendingValue: painAngleLabel(painAngle),
+    });
+  }
+  if (strictAngleDiversity && reusedPainAngle.hits.length > 0) {
+    errors.push({
+      rule: 'painAngleReused',
+      message:
+        'Touch reuses a pain angle or angle vocabulary from an earlier sequence step. Pick a different buyer problem, consequence, or illumination route.',
+      offendingValue: reusedPainAngle.hits.join(', '),
+    });
+  }
+
   // ---- LLM-cliche blocklist ----------------------------------------------
   // Catches phrases that mark text as LLM-generated even when the canon and
   // CEB lists pass: performative empathy openers ("stuck with me"),
@@ -503,6 +654,9 @@ function validateTouch(
     proofClaimHits,
     previewSellerHits,
     previewEventHits,
+    painAngleLabel: painAngle ? painAngleLabel(painAngle) : undefined,
+    reusedPainAngleHits: reusedPainAngle.hits,
+    painAngleBodyOverlap: reusedPainAngle.bodyOverlap,
   };
 
   return { result: { isValid: errors.length === 0, errors }, checks };
@@ -735,6 +889,10 @@ HARD VALIDATOR RULES (auto-rejected)
   of the agenda", "I'll be at booth X", or fabricated session/track references
   unless the user supplied that fact. If sender availability is missing, use a
   buyer-timing CTA instead of a meetup CTA.
+- NO recycled pain angles. Each touch in the sequence must illuminate a different
+  buyer pain, consequence, or mechanism. Do not reuse the same pain across email
+  and LinkedIn, even in different wording. Return the selected pain_angle metadata
+  with every touch and make the body visibly match it.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.
@@ -771,6 +929,8 @@ function buildUserPrompt(
   touchpoint: TimelineTouchpoint,
   brief: ReturnType<typeof touchBrief>,
   previousErrors: ValidationError[],
+  assignedPainAngle: PainAngle,
+  usedPainAngles: PainAngle[],
 ): string {
   const retryNote = previousErrors.length
     ? `\n\nPREVIOUS ATTEMPT FAILED these rules - fix them: ${previousErrors.map((e) => e.rule + ': ' + e.message).join(' | ')}`
@@ -781,6 +941,10 @@ Agenda: ${eventContext.agendaTitles.slice(0, 6).join('; ') || 'n/a'}.
 Target persona: ${persona.role} (${persona.seniority}).
 Priorities: ${persona.priorities.join('; ')}.
 Pain points: ${persona.painPoints.join('; ')}.
+Assigned pain angle for this touch: ${JSON.stringify(assignedPainAngle)}.
+Pain angles already used in this sequence: ${
+    usedPainAngles.length > 0 ? usedPainAngles.map((angle) => angle.label).join('; ') : 'none'
+  }.
 
 Sender: ${sequenceParams.sendingIdentity.name}, ${sequenceParams.sendingIdentity.title} at ${sequenceParams.sendingIdentity.company}.
 
@@ -789,10 +953,15 @@ ${brief.instruction}${retryNote}
 
 Apply the 4T framework. Map the persona's pain points to the Trigger and Think question. Use a
 specific peer + contrast number for the Third-party slot. Close with a lean-back CTA.
+Do not reuse any pain angle already used. If the assigned angle is too close to a used angle,
+pick a distinct dimension from the buyer job and name it in pain_angle.
 
 Address the recipient with {{first_name}} and reference their company as {{company}}. NEVER
 hard-code a specific company name or persona cohort. Write only the subject and body - no
-signature block, no greeting with "Hey".`;
+signature block, no greeting with "Hey".
+
+Return JSON with subject, body, cta_type, and pain_angle. pain_angle must include label,
+sourcePain, mechanism, and costOfInaction.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -883,10 +1052,14 @@ export async function generateSequence(
         preEventOnly: sequenceParams.preEventOnly,
       },
     );
+    const painAngleLedger = buildPainAngleLedger(persona, timeline.length);
+    const usedPainAngles: PainAngle[] = [];
 
-    for (const touchpoint of timeline) {
+    for (let index = 0; index < timeline.length; index++) {
+      const touchpoint = timeline[index];
       const brief = touchBrief(touchpoint, sequenceParams.leadTimeWeeks);
       const touchTypeKey = resolveTouchTypeKey(brief.label);
+      const assignedPainAngle = painAngleLedger[index];
       const maxAttempts = 3;
       let previousErrors: ValidationError[] = [];
       let finalTouch: OutreachTouch | null = null;
@@ -902,6 +1075,8 @@ export async function generateSequence(
           touchpoint,
           brief,
           previousErrors,
+          assignedPainAngle,
+          usedPainAngles,
         );
 
         let llmTouch: LLMTouch;
@@ -932,6 +1107,9 @@ export async function generateSequence(
             cta_type: llmTouch.cta_type,
             channel: touchpoint.channel,
             touch_type: touchTypeKey,
+            strictAngleDiversity: true,
+            painAngle: llmTouch.pain_angle ?? assignedPainAngle,
+            usedPainAngles,
           },
           eventContext,
           persona,
@@ -945,6 +1123,7 @@ export async function generateSequence(
           touch_type: brief.label,
           subject: llmTouch.subject,
           body: llmTouch.body,
+          pain_angle: llmTouch.pain_angle ?? assignedPainAngle,
           word_count: countWords(llmTouch.body),
           cta_type: llmTouch.cta_type,
           checks,
@@ -976,6 +1155,9 @@ export async function generateSequence(
 
       if (finalTouch) {
         outreachSequence.touches.push(finalTouch);
+        if (finalTouch.pain_angle) {
+          usedPainAngles.push(finalTouch.pain_angle);
+        }
       }
     }
 

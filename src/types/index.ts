@@ -43,6 +43,14 @@ export type AttendeePersona = {
   exampleTitles: string[];
 };
 
+export type PainAngle = {
+  label: string;
+  sourcePain?: string;
+  mechanism?: string;
+  costOfInaction?: string;
+  illuminationQuestion?: string;
+};
+
 export const CTA_TYPES = [
   'make_offer',
   'ask_for_interest',
@@ -76,6 +84,7 @@ export type OutreachTouch = {
   touch_type: string;
   subject: string;
   body: string;
+  pain_angle?: PainAngle;
   word_count: number;
   cta_type: CTAType;
   checks: {
@@ -99,6 +108,9 @@ export type OutreachTouch = {
     proofClaimHits?: string[];
     previewSellerHits?: string[];
     previewEventHits?: string[];
+    painAngleLabel?: string;
+    reusedPainAngleHits?: string[];
+    painAngleBodyOverlap?: number;
   };
   validation_errors?: ValidationError[];
   quality_flag?: 'rules_violated';

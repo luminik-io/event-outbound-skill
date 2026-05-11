@@ -7,6 +7,7 @@
 // no proof/assets in strict no-invention mode, and sane cadence math.
 
 import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 
 const ROOT = process.cwd();
@@ -59,11 +60,24 @@ function checkPositiveCase() {
   const dir = join(SHOWCASE, 'rich-positive-availability-unknown');
   const finalSequence = readText(dir, 'final_sequence.md');
   const output = readJson(dir, 'sequencer-output.json');
+  const sequenceValidation = JSON.parse(
+    execFileSync('node', ['scripts/validate-sequence.mjs', '--sequence', join(dir, 'sequencer-output.json')], {
+      cwd: ROOT,
+      encoding: 'utf8',
+    }),
+  );
   const touches = flattenTouches(output);
 
   if (output.strictTruth !== true) fail('positive: strictTruth must be true');
   if (output.summary?.validatorStatus !== 'all_passing') {
     fail('positive: summary.validatorStatus must be all_passing');
+  }
+  if (sequenceValidation.isValid !== true) {
+    fail(
+      `positive: sequence-level angle validation failed: ${sequenceValidation.errors
+        .map((error) => error.rule)
+        .join(', ')}`,
+    );
   }
   if (touches.length !== 4) fail(`positive: expected 4 touches, got ${touches.length}`);
 
@@ -92,6 +106,7 @@ function checkPositiveCase() {
     if ((touch.validation_errors || []).length > 0) {
       fail(`${label}: validation_errors must be empty`);
     }
+    if (!touch.pain_angle?.label) fail(`${label}: missing pain_angle.label`);
     const checks = touch.checks || {};
     assertNotIncludes(touch.body || '', ['I am around', "I'm around", 'side of the agenda'], label);
     for (const key of [
