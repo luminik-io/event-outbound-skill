@@ -204,6 +204,12 @@ describe('findLlmCliches: existing categories still fire (regression coverage)',
     expect(result.hardBans.sales_speak_openers).toBeDefined();
   });
 
+  it('flags generic post-event pleasantries under sales_speak_openers', () => {
+    const text = '{{first_name}}, hope the week in Amsterdam went well.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.sales_speak_openers).toContain('hope the week in');
+  });
+
   it('flags "Moreover," under llm_transition_tics', () => {
     const text = 'Moreover, the data shows reply rates spike post-event.';
     const result = findLlmCliches(text, blocklist);

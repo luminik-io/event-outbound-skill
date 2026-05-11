@@ -576,7 +576,7 @@ function touchBrief(
   return {
     label: 'email_post_event',
     instruction:
-      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive". Use a neutral question and no fabricated session, location, or peer proof. CTA type: ask_for_interest.',
+      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive" or "hope the week in [city] went well". Use a neutral question and no fabricated session, location, or peer proof. CTA type: ask_for_interest.',
   };
 }
 
@@ -728,6 +728,9 @@ HARD VALIDATOR RULES (auto-rejected)
   that bolts "before [event]" onto the end, and CTAs like
   "worth pressure-testing before Amsterdam" or "useful for Amsterdam prep".
   The event is the occasion and route to the conversation, not the buyer's reason to care.
+- NO generic post-event pleasantries: "hope the event went well",
+  "hope the event was productive", "hope the week in [city] went well".
+  Start from the buyer's returned-to-desk work instead.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.

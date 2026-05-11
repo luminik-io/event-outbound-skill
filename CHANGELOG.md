@@ -10,12 +10,14 @@ Buyer-first quality-bar hardening for thin event-outbound inputs.
 - `CompanyICP` and `AttendeePersona` types now support optional `website`, `productSummary`, `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`.
 - Sequencer prompt now treats proof and assets as sacred: no invented matrices, briefs, peer teams, named customers, before/after numbers, agenda sessions, day-of slots, or locations.
 - CTA guidance now separates buyer priorities from event logistics: "before [city]" and "[city] prep" closers are rejected unless the ask is literal meetup logistics.
+- Cadence planner output now includes deterministic `send_date` values so installed-skill runs do not hand-calculate calendar dates.
 
 ### Added
 - Strict validator mode via `strictTruth: true`.
 - `missingMergeFields` check for Apollo-ready `{{first_name}}` and `{{company}}`.
 - `unsourcedAssetPromise` check when copy mentions attached/linked assets without `availableAssets`.
 - `unsourcedProofClaim` check when copy uses customer, peer, or before/after proof without `proofPoints`.
+- Generic post-event pleasantries such as "hope the week in [city] went well" are now blocked as sales-speak openers.
 - Source-grounded craft evals covering role fluency, current workaround language, cost of inaction, neutral illumination questions, lean-back CTAs, and wrong-persona failures.
 - 100+ tests covering strict context helpers, date-aware cadence, CTA location misuse, and CLI rejection/acceptance paths.
 

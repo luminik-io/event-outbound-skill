@@ -88,7 +88,7 @@ Pass JSON on stdin:
 }
 ```
 
-The planner uses the runtime's local date when `today` is omitted. Prefer passing `eventStartDate` when available; otherwise pass the human-readable `eventDates` string and let the planner infer the start date. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, adjust channels, change `minGapDays`, switch to pre/post-event mix, or accept fewer steps. Preserve the 4-day gap as the recommended default unless the user explicitly overrides it.
+The planner uses the runtime's local date when `today` is omitted. Prefer passing `eventStartDate` when available; otherwise pass the human-readable `eventDates` string and let the planner infer the start date. When the planner returns `send_date`, copy that exact date into the final files. Do not calculate calendar dates in your head. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, adjust channels, change `minGapDays`, switch to pre/post-event mix, or accept fewer steps. Preserve the 4-day gap as the recommended default unless the user explicitly overrides it.
 
 Use this validator path. Do not assume the current working directory is the plugin root:
 
@@ -96,7 +96,7 @@ Use this validator path. Do not assume the current working directory is the plug
 node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 ```
 
-1. **Pick the channel + offset** from the planner output. Do not invent dates by hand.
+1. **Pick the channel, offset, and send date** from the planner output. Do not invent dates by hand.
 2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
 3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
 4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
@@ -199,6 +199,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - "you/your" must outnumber "we/our" in the body.
 - No banned phrases, see `additional_banned_phrases` in `data/cold-outbound-rules.json`. Includes `happy to send`, `should I send`, `can I send`, `want me to send`, `want the one-pager`, `15 minutes`, `30 minutes`, `calendar link`, `book a call`, `schedule a meeting`, `cutting-edge`, `industry-leading`, `world-class`, etc.
 - No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, a question that bolts `"before [event]"` onto the end, or a CTA that makes the location do the buyer-priority work (`"worth pressure-testing before Amsterdam"`, `"useful for Amsterdam prep"`). Use buyer responsibility as the reason to write and the event as the route to a clear ask.
+- No generic post-event pleasantries: `"hope the event went well"`, `"hope the event was productive"`, `"hope the week in [city] went well"`. Start from the buyer's returned-to-desk work instead.
 - In strict mode, no unsourced assets or proof. If the touch mentions an attached/linked/pulled-together asset, pass `availableAssets`. If it uses named customers, peer teams, or before/after numbers, pass `proofPoints`. Otherwise the validator must reject it.
 - No LLM-cliché phrases, 200+ phrases across 10 categories. See `llm_cliche_blocklist` in the same file. Categories: `performative_empathy`, `generic_compliments`, `sales_speak_openers`, `manufactured_intimacy`, `marketing_buzzwords`, `cold_email_overused`, `lazy_generalization_openers`, `llm_transition_tics`, `gpt_vocabulary`. (`hedge_softener_warnings` is soft, does not fail.)
 - No anti-flex selling tics: `"no deck"`, `"no demo"`, `"no calendar invite"`, `"no follow-up deck"`, `"reply yes and i'll send"`. These read as soulless-selling-with-extra-steps. If you'd write one, just don't include the assurance, write copy that doesn't need it.

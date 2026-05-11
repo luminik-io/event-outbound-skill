@@ -128,6 +128,7 @@ describe('generateTimeline', () => {
     const parsed = JSON.parse(output);
     expect(parsed.isValid).toBe(true);
     expect(parsed.timeline[0].offset_days).toBe(-23);
+    expect(parsed.timeline[0].send_date).toBe('2026-05-10');
     expect(parsed.timeline).toHaveLength(6);
   });
 
@@ -152,6 +153,14 @@ describe('generateTimeline', () => {
       -4,
       0,
       4,
+    ]);
+    expect(parsed.timeline.map((touch: { send_date: string }) => touch.send_date)).toEqual([
+      '2026-05-11',
+      '2026-05-17',
+      '2026-05-23',
+      '2026-05-29',
+      '2026-06-02',
+      '2026-06-06',
     ]);
   });
 

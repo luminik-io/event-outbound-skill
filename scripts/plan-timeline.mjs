@@ -77,7 +77,7 @@ const parseStartDateFromText = (value) => {
 
 const resolveLeadWindowDays = (leadTimeWeeks, options) => {
   const requestedLeadDays = leadTimeWeeks * 7;
-  const eventStartDate = options.eventStartDate ?? parseStartDateFromText(options.eventDates);
+  const eventStartDate = resolveEventStartDate(options);
   if (!eventStartDate) return requestedLeadDays;
   const todayString = options.today ?? currentLocalDate();
   const eventStart = parseDateOnly(eventStartDate, 'eventStartDate');
@@ -87,6 +87,15 @@ const resolveLeadWindowDays = (leadTimeWeeks, options) => {
     throw new Error(`today (${todayString}) is after eventStartDate (${eventStartDate})`);
   }
   return Math.min(requestedLeadDays, daysUntilEvent);
+};
+
+const resolveEventStartDate = (options) =>
+  options.eventStartDate ?? parseStartDateFromText(options.eventDates);
+
+const dateStringFromOffset = (eventStartDate, offsetDays) => {
+  const eventStart = parseDateOnly(eventStartDate, 'eventStartDate');
+  const date = new Date(eventStart.getTime() + offsetDays * DAY_MS);
+  return date.toISOString().slice(0, 10);
 };
 
 const normalizeMinGap = (offsets, minGapDays) => {
@@ -253,7 +262,13 @@ const generateTimeline = (leadTimeWeeks, channels, options = {}) => {
 
 try {
   const input = JSON.parse(await readStdin());
-  const timeline = generateTimeline(input.leadTimeWeeks ?? 4, input.channels ?? ['email'], input);
+  const eventStartDate = resolveEventStartDate(input);
+  const timeline = generateTimeline(input.leadTimeWeeks ?? 4, input.channels ?? ['email'], input).map(
+    (touch) =>
+      eventStartDate
+        ? { ...touch, send_date: dateStringFromOffset(eventStartDate, touch.offset_days) }
+        : touch,
+  );
   process.stdout.write(JSON.stringify({ isValid: true, timeline }, null, 2));
 } catch (error) {
   process.stdout.write(
