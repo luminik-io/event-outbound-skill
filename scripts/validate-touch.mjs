@@ -17,6 +17,7 @@
 //     "channel": "email" | "linkedin",
 //     "touch_type": "cold_email_first_touch" | "cold_email_followup_2" | ...,
 //     "eventName": "Money20/20 USA 2026",
+//     "eventLocation": "Las Vegas",  // optional; catches CTAs that bolt on the city
 //     "personaPriorities": ["..."],   // 0-N strings
 //     "personaPainPoints":  ["..."]   // 0-N strings
 //     "strictTruth": true,             // optional; rejects invented assets/proof
@@ -175,6 +176,50 @@ const eventAliases = (eventName) => {
   }
   return Array.from(aliases).sort((a, b) => b.length - a.length);
 };
+const locationAliases = (eventLocation) => {
+  const name = lower(eventLocation);
+  const aliases = new Set();
+  const knownCities = [
+    'amsterdam',
+    'las vegas',
+    'new york',
+    'san francisco',
+    'london',
+    'paris',
+    'berlin',
+    'singapore',
+    'barcelona',
+    'miami',
+    'boston',
+    'chicago',
+    'austin',
+    'seattle',
+    'orlando',
+    'toronto',
+    'dubai',
+    'oslo',
+  ];
+  const cleaned = name
+    .replace(/[()[\]]/g, ' ')
+    .replace(/\b(online|virtual|hybrid|conference|venue|center|centre|hall)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleaned) return [];
+  for (const city of knownCities) {
+    if (cleaned.includes(city)) aliases.add(city);
+  }
+  for (const segment of cleaned.split(/[,|/]+/)) {
+    const stripped = segment
+      .replace(
+        /\b(netherlands|united states|usa|us|uk|united kingdom|germany|france|spain|italy|canada|norway|ca|ny|tx|nv|il|ma|dc)\b/g,
+        ' ',
+      )
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (stripped.length >= 3) aliases.add(stripped);
+  }
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+};
 const findPermissionToSendPhrasing = (text) =>
   patternHits(text, [
     {
@@ -230,9 +275,9 @@ const findProofClaimPhrasing = (text) =>
       regex: /\b(?:from\s+\d+(?:\.\d+)?%?\s+to\s+\d+(?:\.\d+)?%?|compared to\s+\d+(?:\.\d+)?%?\s+before|\d+(?:\.\d+)?%?\s+instead of\s+\d+(?:\.\d+)?%?)\b/i,
     },
   ]);
-const findForcedEventPhrasing = (text, eventName) => {
+const findForcedEventPhrasing = (text, eventName, eventLocation) => {
   const aliases = eventAliases(eventName).map(escapeRegex).join('|');
-  return patternHits(text, [
+  const patterns = [
     {
       regex: new RegExp(
         `\\b(?:keeps?\\s+coming\\s+up|comes\\s+up|keep\\s+hearing|hearing)\\b[^.!?]{0,100}\\b(?:before|into)\\s+(?:${aliases})\\b`,
@@ -253,8 +298,24 @@ const findForcedEventPhrasing = (text, eventName) => {
         'i',
       ),
     },
+    {
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into)\\s+(?:the\\s+)?(?:${aliases})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    },
     { regex: /\bm(?:20\/20|2020)\b/i },
-  ]);
+  ];
+  const locations = locationAliases(eventLocation).map(escapeRegex).join('|');
+  if (locations) {
+    patterns.push({
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into|in)\\s+(?:the\\s+)?(?:${locations})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    });
+  }
+  return patternHits(text, patterns);
 };
 const findSellerFirstPreviewPhrasing = (
   text,
@@ -408,7 +469,11 @@ if (permissionToSendHits.length > 0) {
   });
 }
 
-const forcedEventPhrasingHits = findForcedEventPhrasing(combined, touch.eventName);
+const forcedEventPhrasingHits = findForcedEventPhrasing(
+  combined,
+  touch.eventName,
+  touch.eventLocation,
+);
 if (forcedEventPhrasingHits.length > 0) {
   errors.push({
     rule: 'forcedEventPhrasing',

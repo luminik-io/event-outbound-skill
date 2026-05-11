@@ -234,6 +234,51 @@ function eventAliases(eventName?: string): string[] {
   return Array.from(aliases).sort((a, b) => b.length - a.length);
 }
 
+function locationAliases(eventLocation?: string): string[] {
+  const lower = (eventLocation || '').toLowerCase();
+  const aliases = new Set<string>();
+  const knownCities = [
+    'amsterdam',
+    'las vegas',
+    'new york',
+    'san francisco',
+    'london',
+    'paris',
+    'berlin',
+    'singapore',
+    'barcelona',
+    'miami',
+    'boston',
+    'chicago',
+    'austin',
+    'seattle',
+    'orlando',
+    'toronto',
+    'dubai',
+    'oslo',
+  ];
+  const cleaned = lower
+    .replace(/[()[\]]/g, ' ')
+    .replace(/\b(online|virtual|hybrid|conference|venue|center|centre|hall)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleaned) return [];
+  for (const city of knownCities) {
+    if (cleaned.includes(city)) aliases.add(city);
+  }
+  for (const segment of cleaned.split(/[,|/]+/)) {
+    const stripped = segment
+      .replace(
+        /\b(netherlands|united states|usa|us|uk|united kingdom|germany|france|spain|italy|canada|norway|ca|ny|tx|nv|il|ma|dc)\b/g,
+        ' ',
+      )
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (stripped.length >= 3) aliases.add(stripped);
+  }
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+}
+
 /**
  * Catch asset-gating CTAs. Good copy attaches or links the useful thing and
  * asks a real question. It does not ask permission to send the thing.
@@ -292,7 +337,11 @@ export function findProofClaimPhrasing(text: string): string[] {
  * Catch event references that read like a template variable was pushed into
  * the wrong sentence. Natural event asks such as "Worth coffee at RSA?" pass.
  */
-export function findForcedEventPhrasing(text: string, eventName?: string): string[] {
+export function findForcedEventPhrasing(
+  text: string,
+  eventName?: string,
+  eventLocation?: string,
+): string[] {
   const aliases = eventAliases(eventName).map(escapeRegex).join('|');
   const patterns: PhrasePattern[] = [
     {
@@ -325,10 +374,27 @@ export function findForcedEventPhrasing(text: string, eventName?: string): strin
       ),
     },
     {
+      label: 'forced-before-event CTA',
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into)\\s+(?:the\\s+)?(?:${aliases})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    },
+    {
       label: 'vague event shorthand',
       regex: /\bm(?:20\/20|2020)\b/i,
     },
   ];
+  const locations = locationAliases(eventLocation).map(escapeRegex).join('|');
+  if (locations) {
+    patterns.push({
+      label: 'event-location-as-buyer-reason CTA',
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into|in)\\s+(?:the\\s+)?(?:${locations})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    });
+  }
   return patternHits(text, patterns);
 }
 

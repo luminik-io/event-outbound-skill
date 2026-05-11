@@ -82,3 +82,26 @@ test('validate-touch CLI strict mode accepts sourced assets and proof', () => {
     'unsourcedProofClaim',
   );
 });
+
+test('validate-touch CLI rejects CTAs that use the event city as the buyer reason', () => {
+  const payload = {
+    subject: 'exception ownership',
+    body: '{{first_name}}, when instant-payment exceptions at {{company}} touch SCA, funds flow, and audit evidence at once, ownership can blur across risk and payments ops. How are you deciding who closes the loop when a step-up decision changes the payment state? Is this worth pressure-testing before Amsterdam?',
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    eventLocation: 'Amsterdam',
+    personaPriorities: ['instant-payment exception ownership'],
+    personaPainPoints: ['ownership can blur across risk and payments ops'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'forcedEventPhrasing',
+  );
+});

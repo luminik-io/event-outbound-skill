@@ -360,6 +360,33 @@ describe('forced event phrasing validator', () => {
     expect(hits.length).toBeGreaterThan(0);
   });
 
+  it('catches CTAs that use the event location as the buyer reason', () => {
+    const hits = findForcedEventPhrasing(
+      'How are you deciding who owns the payment exception? Is this worth pressure-testing before Amsterdam?',
+      'Money20/20 Europe 2026',
+      'Amsterdam',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches event prep CTAs that sound detached from the buyer job', () => {
+    const hits = findForcedEventPhrasing(
+      'I attached the handoff checklist. Is this useful for the Amsterdam prep?',
+      'Money20/20 Europe 2026',
+      'Amsterdam, Netherlands',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('passes a buyer-timing CTA that is not using the city as the reason', () => {
+    const hits = findForcedEventPhrasing(
+      'How are you deciding who owns the payment exception? Is this worth looking into before roadmap freeze?',
+      'Money20/20 Europe 2026',
+      'Amsterdam',
+    );
+    expect(hits).toEqual([]);
+  });
+
   it('passes a natural event CTA after buyer context', () => {
     const hits = findForcedEventPhrasing(
       'How are you deciding who owns the answer at {{company}}? I attached the worksheet. Worth talking through over coffee at RSA?',

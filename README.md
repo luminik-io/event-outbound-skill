@@ -68,7 +68,7 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
-| **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations or forced event phrasing |
+| **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations, forced event phrasing, or location-pasted CTAs |
 | **Strict truth** | In `strictTruth` mode, asset promises require `availableAssets`, proof claims require `proofPoints`, and Apollo-ready `{{first_name}}` / `{{company}}` fields are required |
 
 ## What it does
@@ -100,7 +100,7 @@ your inbound runs on. The booth touch is usually the 3rd interaction in an
 8-month fintech cycle, so the $200K {{event_name}} spend reads as sourcing $0
 by the time {{company}}'s board prep opens. Attached is a one-page recap of
 how three {{title}}s rebuilt the attribution window to surface the real
-number before the {{event_city}} show. Worth a skim before your board prep
+number before the {{event_city}} show. Worth looking into before board prep
 locks?
 
 channel: email · offset: -14d · type: email_cold · cta: make_offer · words: 96

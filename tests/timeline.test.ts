@@ -174,4 +174,26 @@ describe('generateTimeline', () => {
       expect(plan.some((t) => t.offset_days < 0)).toBe(true);
     }
   });
+
+  it('keeps spacing valid across many user-configured email-only cadences', () => {
+    for (const touchCount of [3, 4, 5, 6, 7, 8]) {
+      for (const minGapDays of [4, 5, 6]) {
+        const plan = generateTimeline(8, ['email'], {
+          today: '2026-05-01',
+          eventStartDate: '2026-06-30',
+          touchCount,
+          minGapDays,
+        });
+        expect(plan).toHaveLength(touchCount);
+        expect(plan.map((touch) => touch.touch_slot)).toEqual(
+          plan.map((_, index) => index + 1),
+        );
+        for (let i = 1; i < plan.length; i++) {
+          expect(plan[i].offset_days - plan[i - 1].offset_days).toBeGreaterThanOrEqual(
+            minGapDays,
+          );
+        }
+      }
+    }
+  });
 });

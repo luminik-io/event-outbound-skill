@@ -81,7 +81,7 @@ const CASES: CraftCase[] = [
     shouldPass: true,
     subject: 'exception ownership',
     body:
-      '{{first_name}}, when instant-payment exceptions at {{company}} touch SCA, funds flow, and audit evidence at once, ownership can blur across risk, payments ops, and compliance. How are you deciding who closes the loop when a step-up decision changes the payment state? If that handoff stays split across PSP dashboards, spreadsheets, and Slack, the Q3 roadmap freeze can lock in a process nobody fully owns. Is this worth pressure-testing before Amsterdam?',
+      '{{first_name}}, when instant-payment exceptions at {{company}} touch SCA, funds flow, and audit evidence at once, ownership can blur across risk, payments ops, and compliance. How are you deciding who closes the loop when a step-up decision changes the payment state? If that handoff stays split across PSP dashboards, spreadsheets, and Slack, the Q3 roadmap freeze can lock in a process nobody fully owns. Is this worth looking into before roadmap freeze?',
     note: 'Gold case: role-specific, no proof/assets, neutral question, cost of inaction, lean-back CTA.',
   },
   {
@@ -90,7 +90,7 @@ const CASES: CraftCase[] = [
     subject: 'handoff checklist',
     availableAssets: ['approved instant-payment exception handoff checklist'],
     body:
-      '{{first_name}}, a step-up exception at {{company}} can change the payment state while audit evidence lands in a different queue. How are you checking whether risk, ops, and compliance agree on ownership before roadmap freeze? Money20/20 Europe puts instant payments and regulation in the same room, so the timing is useful. I attached the approved handoff checklist for that review. Is this useful for the Amsterdam prep?',
+      '{{first_name}}, a step-up exception at {{company}} can change the payment state while audit evidence lands in a different queue. How are you checking whether risk, ops, and compliance agree on ownership before roadmap freeze? Money20/20 Europe puts instant payments and regulation in the same room, so the timing is useful. I attached the approved handoff checklist for that review. Is this useful for the ownership review?',
     note: 'Gold case with a real supplied asset. Asset mention must be grounded in availableAssets.',
   },
   {
@@ -98,7 +98,7 @@ const CASES: CraftCase[] = [
     shouldPass: false,
     subject: 'payment operations',
     body:
-      '{{first_name}}, instant payments are on the Money20/20 Europe agenda, and payments leaders at {{company}} are looking for better ways to manage SCA, audit evidence, and payment operations across rails. How are you thinking about improving payment operations this quarter? Northstar Ledger helps teams simplify orchestration across FedNow and RTP. Is this worth a look before Amsterdam?',
+      '{{first_name}}, instant payments are on the Money20/20 Europe agenda, and payments leaders at {{company}} are looking for better ways to manage SCA, audit evidence, and payment operations across rails. How are you thinking about improving payment operations this quarter? Northstar Ledger helps teams simplify orchestration across FedNow and RTP. Is this worth looking into?',
     expectedCraftFailures: ['role_specificity', 'current_workaround', 'cost_of_inaction', 'seller_centered'],
     note: 'Looks clean, but it is generic vendor copy and does not poke a real pain.',
   },
@@ -199,6 +199,9 @@ function evaluateCraft(touch: CraftCase): CraftCheckResult[] {
     /pipeline/,
     /booth leads?/,
   ]);
+  const eventDetachedCtaHits = wordHits(lower, [
+    /\b(?:before|for|around|into|in)\s+(?:the\s+)?amsterdam(?:\s+(?:prep|planning|review|readout|trip))?\?/,
+  ]);
   const sellerCenteredHits = wordHits(lower, [
     /\bhelps?\b/,
     /\bplatform\b/,
@@ -218,10 +221,13 @@ function evaluateCraft(touch: CraftCase): CraftCheckResult[] {
   ]);
   const leanBackHits = wordHits(lower, [
     /is this worth/,
-    /worth pressure-testing/,
+    /worth looking into/,
+    /open to taking a look/,
+    /worth a closer look/,
     /is this useful/,
     /what does that look like/,
     /is this on/,
+    /does this belong/,
   ]);
   const neutralQuestion =
     /\b(how|what)\s+(are|do|is|can|could|would)\s+(you|your)\b/i.test(firstQuestion) &&
@@ -251,8 +257,11 @@ function evaluateCraft(touch: CraftCase): CraftCheckResult[] {
     },
     {
       id: 'lean_back_cta',
-      pass: leanBackHits.length >= 1 && meetingAskHits.length === 0,
-      evidence: `lean-back hits: ${leanBackHits.length}, meeting asks: ${meetingAskHits.length}`,
+      pass:
+        leanBackHits.length >= 1 &&
+        meetingAskHits.length === 0 &&
+        eventDetachedCtaHits.length === 0,
+      evidence: `lean-back hits: ${leanBackHits.length}, meeting asks: ${meetingAskHits.length}, event-detached CTAs: ${eventDetachedCtaHits.length}`,
     },
     {
       id: 'seller_centered',

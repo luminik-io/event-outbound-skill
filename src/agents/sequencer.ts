@@ -261,6 +261,7 @@ function validateTouch(
   const forcedEventPhrasingHits = findForcedEventPhrasing(
     combined,
     eventContext.name,
+    eventContext.location,
   );
   if (forcedEventPhrasingHits.length > 0) {
     errors.push({
@@ -624,11 +625,13 @@ loosely; LinkedIn connection requests compress it to 2-3 sentences)
    "industry-leading", "world-class".
 4. **Talk?** - direct CTA, with a question mark. Lean-back energy, but no permission theatre.
    If you have a useful asset, attach or link it. Do not ask permission to send it. Approved closers:
-     "Worth a look?" / "Worth a peek sometime?" / "Worth a skim?" / "Worth an exchange?"
-     "Open to learning more?" / "Worth a conversation?" / "Worth coffee at {{event_name}}?"
+     "Worth looking into?" / "Open to taking a look?" / "Worth a closer look?"
+     "Is this on your roadmap, or parked for later?" / "Does this belong in the roadmap conversation?"
+     "Worth coffee at {{event_name}} if this is already on your list?"
    BANNED closers: "Do you have 15 minutes?", "Would you be open to a 30-minute call?",
    "Can we book time on your calendar?", "schedule a meeting", "Should I send it?",
-   "Can I send it?", "Want me to send it?", "Want the one-pager?"
+   "Can I send it?", "Want me to send it?", "Want the one-pager?", "Open to a look?",
+   "Is this worth pressure-testing before {{event_location}}?", "Is this useful for {{event_location}} prep?"
 
 ==========================================================================================
 CHANNEL-SPECIFIC LENGTH TABLE (HARD RULES)
@@ -644,7 +647,7 @@ Pass A - Warmbox cold email (4T canonical):
 > {{first_name}}, noticed {{company}} is hiring SDRs, which suggests your team might be sending
 > more cold email this quarter. How are you ensuring those emails do not land in spam? Google
 > and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before.
-> It involves a warm-up tool that raises inbox reputation. Open to a look?
+> It involves a warm-up tool that raises inbox reputation. Open to taking a look?
 
 Pass B - TitanX cold email (canonical LinkedIn 4T post):
 > Subject: more at bats
@@ -721,8 +724,10 @@ HARD VALIDATOR RULES (auto-rejected)
   "want me to send/share/walk", "want the one-pager", "happy to send/share".
   Send or attach the asset, then ask a real question.
 - NO forced event phrasing. Auto-rejected: "keeps coming up before RSA",
-  "week of Money20/20", "today at RSA", "into m2020", and any illumination question
-  that bolts "before [event]" onto the end. The event is the occasion, not the point.
+  "week of Money20/20", "today at RSA", "into m2020", any illumination question
+  that bolts "before [event]" onto the end, and CTAs like
+  "worth pressure-testing before Amsterdam" or "useful for Amsterdam prep".
+  The event is the occasion and route to the conversation, not the buyer's reason to care.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.
