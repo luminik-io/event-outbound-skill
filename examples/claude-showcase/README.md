@@ -2,7 +2,7 @@
 
 These fixtures are real Claude runs against the installed `event-outbound` skill. They are not golden copy to paste blindly. They are inspectable evidence for what Claude produced with the current skill instructions, plus deterministic checks for the quality invariants we care about.
 
-Generated on 2026-05-11 with:
+Generated on 2026-05-11 with the standard Claude Code CLI:
 
 ```bash
 claude --plugin-dir /path/to/event-outbound \
@@ -14,9 +14,9 @@ claude --plugin-dir /path/to/event-outbound \
 
 | Case | What it proves |
 |---|---|
-| `rich-positive-availability-unknown/` | Rich input produces a validator-passing sequence without invented proof, assets, sender logistics, or recycled pain angles. |
+| `rich-positive-availability-unknown/` | Rich input produces a validator-passing sequence without invented proof, assets, sender logistics, recycled pain angles, vague CTAs, or impossible cadence. |
 | `thin-input-probe/` | Thin input does not produce plausible vendor copy. Claude asks for the missing sender, proof, asset, and fit context. |
-| `impossible-cadence/` | The skill refuses impossible cadence math instead of squeezing six pre-event emails into seven days. |
+| `impossible-cadence/` | The skill refuses impossible cadence math instead of squeezing six pre-event emails into seven days or violating the 4-day gap default. |
 | `wrong-persona-guard/` | Persona-angle mismatch is flagged before drafting. |
 
 Run the deterministic checks:

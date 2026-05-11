@@ -93,26 +93,23 @@ It returns an Outbound Research Brief plus a full sequence per persona. Six touc
 
 ## What the output looks like
 
-A single touch from the Money20/20 Europe 2026 example (full sequence is 12 touches across two personas):
+A single validator-clean touch from the checked-in Claude showcase. This run was strict no-invention mode: no approved proof, no approved assets, and unknown sender attendance.
 
 ```
-Touch 2 · T-14d · email cold
+Touch 2 · T-4d · email cold
 
-Subject: money20/20 attribution
+Subject: evidence pack
 
-{{first_name}}, the {{event_name}} line item on {{company}}'s P&L is going to
-land in front of the CFO under the same last-touch, 90-day attribution rules
-your inbound runs on. The booth touch is usually the 3rd interaction in an
-8-month fintech cycle, so the $200K {{event_name}} spend reads as sourcing $0
-by the time {{company}}'s board prep opens. Attached is a one-page recap of
-how three {{title}}s rebuilt the attribution window to surface the real
-number before the {{event_city}} show. Worth looking into before board prep
-locks?
+{{first_name}}, audit evidence at {{company}} can become a scavenger hunt
+when the auth log, rail trace, and case notes live in different systems. How
+quickly can your team reconstruct why a payment moved after authentication
+changed? If that evidence pack still takes manual stitching across instant
+rails and cards, is the gap worth looking into?
 
-channel: email · offset: -14d · type: email_cold · cta: make_offer · words: 96
+channel: email · offset: -4d · type: cold_email_followup_2 · cta: ask_for_interest · words: 55 · pain_angle: evidence pack latency
 ```
 
-Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-anchored observation, not a population-shape generalization. The CTA is a concrete offer (one-page recap), not a meeting-ask. The touch passes the full validator stack at 5/5.
+Apollo-ready merge-field syntax. The opening sentence names a specific evidence-chain pain, not a population-shape generalization. The CTA is a clean buyer-timing question. Because no approved assets or sender logistics were supplied, the touch avoids attachments, proof claims, and meetup language.
 
 ## Worked examples
 
