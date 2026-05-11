@@ -1,0 +1,17 @@
+Before I plan dates or draft anything, I want to flag a persona-angle mismatch in the brief, because drafting through it would produce plausible-sounding but incoherent copy.
+
+**The mismatch**
+
+- **Persona: Head of Payments.** This buyer owns authorization rates, payment cost, scheme fees, gateway routing, chargebacks, BIN/issuer relationships, and (sometimes) PSP RFPs. They report into a CFO or COO at a merchant, or run the payments P&L at a PSP/processor.
+- **Angle: proving booth pipeline attribution after the event.** This is a *field marketing / demand gen / CMO* problem. The buyer who loses sleep over "did the €180K Money20/20 booth produce sourced pipeline, or did Sales claim it on accounts already in cycle?" is a **Head of Field Marketing, Head of Demand Gen, VP Marketing, or CMO**, not Head of Payments.
+
+A Head of Payments has no quarterly OKR tied to attributing booth scans to closed-won. If I draft to that combination, the illumination question either lands in the wrong job ("how are you proving Money20/20 sourced pipeline?" — they'd reply "ask marketing"), or I'd have to invent a payments-shaped pain to bolt the attribution angle onto, which is exactly the fabrication the validator and the brief contract are built to catch.
+
+**Two clean ways forward — which one do you want?**
+
+1. **Keep the angle, switch the persona** to Head of Field Marketing / Demand Gen / CMO at Money20/20-exhibiting fintechs. The booth-attribution pain is real and quarterly for them. This is also the natural Luminik ICP if the sender is Luminik.
+2. **Keep the persona, switch the angle** to something a Head of Payments actually owns at Money20/20: e.g. auth-rate uplift demos on the floor, PSP/orchestration evaluation in-flight, scheme-fee benchmarking conversations, chargeback-rate prep before Q3 board. Then I'd also need to know what the sender sells into payments.
+
+Either path needs the sender side filled in too: company website, what it sells in plain English, proof points (named customers / numbers), and any real assets you'd attach. Without those I can't write a sequence that passes the no-invention bar.
+
+Which direction — flip the persona, or flip the angle?

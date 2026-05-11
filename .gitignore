@@ -11,6 +11,8 @@ scripts/*
 !scripts/scan-deliverables.ts
 !scripts/validate-touch.mjs
 !scripts/plan-timeline.mjs
+!scripts/check-claude2-showcase.mjs
+!scripts/run-claude2-showcase.mjs
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log

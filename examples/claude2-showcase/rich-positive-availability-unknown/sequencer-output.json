@@ -1,0 +1,192 @@
+{
+  "event": {
+    "name": "Money20/20 Europe 2026",
+    "startDate": "2026-06-02",
+    "endDate": "2026-06-04",
+    "location": "Amsterdam"
+  },
+  "sender": {
+    "name": "Maya Rao",
+    "title": "VP Partnerships",
+    "company": "Northstar Ledger"
+  },
+  "generatedOn": "2026-05-11",
+  "strictTruth": true,
+  "summary": {
+    "totalTouches": 4,
+    "requestedTouchCount": 4,
+    "channels": ["email"],
+    "minGapDays": 4,
+    "actualGapsDays": [18, 4, 4],
+    "averageQuality": 4.0,
+    "scoreBandCounts": {
+      "top_tier_5": 0,
+      "ship_4": 4,
+      "review_3": 0,
+      "rewrite_1_5": 0
+    },
+    "ctaMix": {
+      "roadmap_timing": 3,
+      "closer_look": 1
+    },
+    "illuminationQuestionCoverage": "2/4",
+    "validatorStatus": "all_passing",
+    "humanReviewStatus": "ready for human review"
+  },
+  "brief": {
+    "buyerJob": "Reconcile instant-payment authentication, exception handling, and audit evidence across product, risk, and compliance before the Q3 roadmap freeze.",
+    "currentWorkaround": "Separate spreadsheets, rail-specific dashboards, and manual Slack escalations.",
+    "hiddenRisk": "Unclear ownership when exceptions touch both SCA / step-up authentication and funds-flow operations.",
+    "trigger": "Situation trigger: Q3 roadmap freeze. Money20/20 Europe is the occasion, not the buyer's reason to care.",
+    "proofPoints": [],
+    "availableAssets": [],
+    "senderLogisticsKnown": false,
+    "notes": [
+      "No approved proof; strict no-invention mode in effect.",
+      "No assets; no attachments, links, one-pagers, or worksheets referenced.",
+      "Sender attendance, booth, agenda track, and availability unknown; no meetup CTAs, no track names, buyer-timing CTAs only."
+    ]
+  },
+  "sequencesByPersona": {
+    "vp_director_head_of_payments": {
+      "personaId": "vp_director_head_of_payments",
+      "personaLabel": "VP / Director / Head of Payments at fintechs and digital banks",
+      "leadTimeWeeks": 4,
+      "channels": ["email"],
+      "touches": [
+        {
+          "touch_slot": 1,
+          "offset_days": -22,
+          "send_date": "2026-05-11",
+          "channel": "email",
+          "touch_type": "cold_email_first_touch",
+          "subject": "instant pay ownership",
+          "body": "{{first_name}}, the exceptions at {{company}} that touch both step-up authentication and funds-flow operations are the awkward ones: product owns the SCA path, risk owns the funds movement, and the audit evidence lives in spreadsheets and rail-specific dashboards. How are you reconciling those two sides today, especially across FedNow, RTP, and SEPA Instant? The piece that keeps surfacing this close to the Q3 roadmap freeze is who actually owns the exception when it crosses both. Is that something you are trying to settle before the freeze, or parked for later?",
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 89,
+            "bodyCharCount": 567,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 12,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": []
+          }
+        },
+        {
+          "touch_slot": 2,
+          "offset_days": -4,
+          "send_date": "2026-05-29",
+          "channel": "email",
+          "touch_type": "cold_email_followup_2",
+          "subject": "exception ownership",
+          "body": "{{first_name}}, sent a note a couple of weeks back on the exceptions at {{company}} that cross SCA and funds-flow ownership. The piece that usually surfaces this close to a roadmap freeze: how does your team route an exception when the answer needs both the auth log and the rail-level funds trace, without it turning into a Slack chain for your on-call? If pulling that together across FedNow, RTP, SEPA Instant, and cards is on your Q3 list, is this worth a closer look?",
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 2,
+            "allLowercase": true,
+            "bodyWordCount": 83,
+            "bodyCharCount": 472,
+            "bodySentenceCount": 3,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 8,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": []
+          }
+        },
+        {
+          "touch_slot": 3,
+          "offset_days": 0,
+          "send_date": "2026-06-02",
+          "channel": "email",
+          "touch_type": "cold_email_followup_3plus",
+          "subject": "who owns step-up",
+          "body": "{{first_name}}, the cross-rail exceptions at {{company}} that touch SCA and funds-flow ownership tend to surface during roadmap-freeze conversations, not in your weekly. Where is that sitting on your side this week, with product, with risk, or still being argued out?",
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 40,
+            "bodyCharCount": 267,
+            "bodySentenceCount": 2,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 7,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": []
+          }
+        },
+        {
+          "touch_slot": 4,
+          "offset_days": 4,
+          "send_date": "2026-06-06",
+          "channel": "email",
+          "touch_type": "post_event_followup",
+          "subject": "back to the freeze",
+          "body": "{{first_name}}, back at your desk after a week of vendor conversations is usually when the exception-ownership question lands hardest at {{company}}: which roadmap actually picks up the cross-rail SCA and funds-flow work before Q3 closes? What is your working answer this week, and is the audit-evidence side of it being treated as a product problem or a risk problem? Is this on your Q3 list, or parked for later?",
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 4,
+            "allLowercase": true,
+            "bodyWordCount": 69,
+            "bodyCharCount": 414,
+            "bodySentenceCount": 3,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 8,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": []
+          }
+        }
+      ]
+    }
+  }
+}

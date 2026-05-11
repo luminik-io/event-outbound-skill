@@ -21,6 +21,8 @@ Buyer-first quality-bar hardening for thin event-outbound inputs.
 - Invented sender logistics such as "I am around the [track] side of the agenda" are blocked unless supplied by the user.
 - Source-grounded craft evals covering role fluency, current workaround language, cost of inaction, neutral illumination questions, lean-back CTAs, and wrong-persona failures.
 - 100+ tests covering strict context helpers, date-aware cadence, CTA location misuse, and CLI rejection/acceptance paths.
+- Real `claude2` showcase outputs for positive and guardrail scenarios, plus a deterministic `npm run check:showcase` verifier for those artifacts.
+- Optional `npm run e2e:claude2` runner for regenerating showcase outputs with local Claude auth.
 
 ## v0.2.4 (2026-05-05)
 

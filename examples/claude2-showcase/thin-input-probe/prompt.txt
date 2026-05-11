@@ -1,0 +1,3 @@
+/event-outbound:event-outbound
+
+Build me a sequence for Identiverse 2026. Persona: Head of Payments. Sender: Daniel Craig. Email only.

@@ -1,0 +1,15 @@
+The cadence you've described is mathematically impossible. Here's the math:
+
+- 6 emails with ≥4 days between each = 5 gaps × 4 days = **20 days minimum** of runway needed
+- You have **7 days** before the event
+
+You can have at most **2 emails** in a 7-day window with a strict 4-day gap (e.g., day -7 and day -3), or **3 emails** if the spacing relaxes to ~3 days.
+
+A few ways forward — which do you want?
+
+1. **Keep 6 emails, loosen the gap** to ~1 day (day -7, -6, -5, -4, -3, -2). Risks fatigue / unsubscribes.
+2. **Keep the 4-day gap, drop to 2 emails** (day -7 invite, day -3 reminder). Cleaner, lower volume.
+3. **Keep 6 emails, extend the window** to start ~21 days out instead of 7. Standard pre-event cadence.
+4. **Mix pre + post**: 2 pre-event (day -7, -3 with 4-day gap) and 4 post-event follow-ups spaced 4+ days apart.
+
+Tell me which shape you want and I'll draft the sequence. I also need the event name, audience, and the offer/CTA before writing copy — none of that is in the request.

@@ -9,7 +9,9 @@
     "test": "vitest",
     "lint": "eslint . --ext .ts",
     "scan": "tsx scripts/scan-deliverables.ts",
-    "verify": "npm run build && npm run test -- --run && npm run scan"
+    "check:showcase": "node scripts/check-claude2-showcase.mjs",
+    "e2e:claude2": "node scripts/run-claude2-showcase.mjs",
+    "verify": "npm run build && npm run test -- --run && npm run scan && npm run check:showcase"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",

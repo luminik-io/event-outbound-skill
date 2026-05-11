@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-79%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-107%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -115,6 +115,7 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 | [`examples/black-hat-usa-2026/`](examples/black-hat-usa-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude with no API key |
+| [`examples/claude2-showcase/`](examples/claude2-showcase/) | Real `claude2` runs | Positive + guardrail cases | Mixed | Checked-in outputs with deterministic showcase checks |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
@@ -159,7 +160,23 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-100 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+107 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+
+The repo also includes real Claude-generated showcase outputs:
+
+```bash
+npm run check:showcase
+```
+
+This deterministic check reads [`examples/claude2-showcase/`](examples/claude2-showcase/), verifies cadence dates, validator-clean touches, strict no-invention output, and guardrail behavior for thin input, impossible cadence, and wrong-persona prompts. It does not call Claude, so it is safe for CI.
+
+To rerun the live Claude showcase locally:
+
+```bash
+npm run e2e:claude2 -- --case rich-positive-availability-unknown
+```
+
+Add `--update-fixtures` only when you intentionally want to refresh the checked-in showcase outputs after human review.
 
 ### Headless / batch generation (optional)
 
