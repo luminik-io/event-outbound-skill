@@ -186,6 +186,73 @@ test('validate-touch CLI rejects sequence-mechanics openers', () => {
   );
 });
 
+test('validate-touch CLI rejects vague calendar-trigger openers', () => {
+  const payload = {
+    subject: 'roadmap queue',
+    body: '{{first_name}}, this is usually the week new rails get attention, but the roadmap queue at {{company}} may still treat auth-and-payments cleanup as ops work. Where is that sitting on your side now: a Q3 product item, a risk cleanup, or something nobody owns yet?',
+    channel: 'email',
+    touch_type: 'cold_email_followup_3plus',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['payment-auth roadmap ownership'],
+    personaPainPoints: ['payment-auth cleanup can be misclassified as ops work'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('bannedWords');
+  expect(parsed.checks.bannedWordsFound).toEqual(
+    expect.arrayContaining(['this is usually the week', 'new rails get attention']),
+  );
+});
+
+test('validate-touch CLI rejects invented event logistics', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? I am hosting four risk leads Tuesday afternoon on this. Worth a seat?",
+    channel: 'linkedin',
+    touch_type: 'linkedin_dm_post_connect',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('bannedWords');
+  expect(parsed.checks.bannedWordsFound).toEqual(expect.arrayContaining(['i am hosting']));
+});
+
+test('validate-touch CLI rejects invented buyer state', () => {
+  const payload = {
+    subject: 'soc2 evidence',
+    body: '{{first_name}}, the Black Hat sessions map closely to the breach-readiness gap your auditor flagged at {{company}}. How are you deciding which takeaway becomes evidence for the next SOC2 review? Does this belong in the roadmap conversation?',
+    channel: 'linkedin',
+    touch_type: 'linkedin_day_of_nudge',
+    eventName: 'Black Hat USA 2026',
+    personaPriorities: ['SOC2 evidence readiness'],
+    personaPainPoints: ['audit evidence scattered across tools'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('bannedWords');
+  expect(parsed.checks.bannedWordsFound).toEqual(
+    expect.arrayContaining(['your auditor flagged']),
+  );
+});
+
 test('validate-sequence CLI rejects repeated pain angles across channels', () => {
   const payload = {
     sequencesByPersona: {

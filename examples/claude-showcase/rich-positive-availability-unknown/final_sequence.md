@@ -14,7 +14,7 @@
 - Validator status: 4/4 passing on first or second attempt
 - Average quality band: 4/5 (ship)
 - Score-band counts: 4× ship, 0× top-tier, 0× review, 0× rewrite
-- CTA mix: roadmap-timing (×3), closer-look (×1)
+- CTA mix: ownership-timing (×2), evidence-gap (×1), scope-question (×1)
 - Illumination-question coverage: 2/4 (touches 1 and 4; followup_2 and followup_3plus do not require one)
 - Distinct pain-angle coverage: 4/4
 - Sequence validator: passing
@@ -47,7 +47,7 @@
 
 **Body:**
 
-{{first_name}}, when a step-up decision at {{company}} changes the payment state, the owner can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns that handoff when SCA, FedNow, RTP, and SEPA Instant all have different evidence trails? The expensive part is not the exception itself; it is the unresolved owner when Q3 roadmap tradeoffs start. Is this something you are trying to settle before the freeze, or parked for later?
+{{first_name}}, when a step-up decision at {{company}} changes the payment state, ownership can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns the handoff when SCA evidence and payment evidence disagree? The expensive part is the unresolved owner when roadmap tradeoffs start. Is that ownership question worth sorting now, or later?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -66,7 +66,7 @@ VP Partnerships, Northstar Ledger
 
 **Body:**
 
-{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?
+{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across instant rails and cards, is the gap worth looking into?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -85,7 +85,7 @@ VP Partnerships, Northstar Ledger
 
 **Body:**
 
-{{first_name}}, this is usually the week new rails get attention, but the roadmap queue at {{company}} may still treat auth-and-payments cleanup as ops work. Where is that sitting on your side now: a Q3 product item, a risk cleanup, or something nobody owns yet?
+{{first_name}}, when payment-auth cleanup is framed as ops work at {{company}}, it can miss the product roadmap until the next rail change forces it back. Where is that sitting on your side now: product scope, risk cleanup, or still unnamed?
 
 Maya Rao
 VP Partnerships, Northstar Ledger
@@ -104,7 +104,7 @@ VP Partnerships, Northstar Ledger
 
 **Body:**
 
-{{first_name}}, after the event, the hard part at {{company}} is usually turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your working answer now: product-owned, risk-owned, or parked until the next rail change?
+{{first_name}}, after the event, the hard part at {{company}} is turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your threshold for putting one owner on this now?
 
 Maya Rao
 VP Partnerships, Northstar Ledger

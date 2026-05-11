@@ -896,6 +896,15 @@ HARD VALIDATOR RULES (auto-rejected)
 - NO sequence-mechanics openers. Do not write "separate thread", "sent a note",
   "earlier note", "previous note", or "following up on my..." in generated copy.
   Each step should stand on its own buyer-relevant angle.
+- NO vague calendar-trigger openers. Do not write "this is usually the week...",
+  "new rails get attention", or similar timing filler. Name the buyer-side job
+  or consequence directly.
+- NO invented event logistics. Do not invent hosting, roundtables, coffee times,
+  speaker-lounge locations, Business Hall locations, or prior conversations.
+  Only use those when supplied by the user.
+- NO invented buyer state. Do not write as if the buyer's auditor flagged
+  something, the buyer is carrying a named gap, or the buyer discussed
+  something with the sender unless that fact was supplied.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.

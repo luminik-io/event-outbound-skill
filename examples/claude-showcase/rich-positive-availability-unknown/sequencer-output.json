@@ -26,8 +26,9 @@
       "rewrite_1_5": 0
     },
     "ctaMix": {
-      "roadmap_timing": 3,
-      "closer_look": 1
+      "ownership_timing": 2,
+      "evidence_gap": 1,
+      "scope_question": 1
     },
     "illuminationQuestionCoverage": "2/4",
     "distinctPainAngleCoverage": "4/4",
@@ -63,7 +64,7 @@
           "channel": "email",
           "touch_type": "cold_email_first_touch",
           "subject": "step-up owner",
-          "body": "{{first_name}}, when a step-up decision at {{company}} changes the payment state, the owner can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns that handoff when SCA, FedNow, RTP, and SEPA Instant all have different evidence trails? The expensive part is not the exception itself; it is the unresolved owner when Q3 roadmap tradeoffs start. Is this something you are trying to settle before the freeze, or parked for later?",
+          "body": "{{first_name}}, when a step-up decision at {{company}} changes the payment state, ownership can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns the handoff when SCA evidence and payment evidence disagree? The expensive part is the unresolved owner when roadmap tradeoffs start. Is that ownership question worth sorting now, or later?",
           "pain_angle": {
             "label": "step-up owner",
             "sourcePain": "SCA step-up owner unclear when auth changes payment state",
@@ -75,8 +76,8 @@
           "checks": {
             "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 82,
-            "bodyCharCount": 509,
+            "bodyWordCount": 63,
+            "bodyCharCount": 419,
             "bodySentenceCount": 4,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -85,7 +86,7 @@
             "hasIlluminationQuestion": true,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 10,
+            "specificityHits": 9,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
@@ -105,7 +106,7 @@
           "channel": "email",
           "touch_type": "cold_email_followup_2",
           "subject": "evidence pack",
-          "body": "{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?",
+          "body": "{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across instant rails and cards, is the gap worth looking into?",
           "pain_angle": {
             "label": "evidence pack latency",
             "sourcePain": "audit evidence lives in rail dashboards and auth logs that do not line up",
@@ -117,8 +118,8 @@
           "checks": {
             "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 54,
-            "bodyCharCount": 344,
+            "bodyWordCount": 55,
+            "bodyCharCount": 348,
             "bodySentenceCount": 3,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -127,7 +128,7 @@
             "hasIlluminationQuestion": false,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 6,
+            "specificityHits": 5,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
@@ -147,7 +148,7 @@
           "channel": "email",
           "touch_type": "cold_email_followup_3plus",
           "subject": "roadmap queue",
-          "body": "{{first_name}}, this is usually the week new rails get attention, but the roadmap queue at {{company}} may still treat auth-and-payments cleanup as ops work. Where is that sitting on your side now: a Q3 product item, a risk cleanup, or something nobody owns yet?",
+          "body": "{{first_name}}, when payment-auth cleanup is framed as ops work at {{company}}, it can miss the product roadmap until the next rail change forces it back. Where is that sitting on your side now: product scope, risk cleanup, or still unnamed?",
           "pain_angle": {
             "label": "roadmap queue",
             "sourcePain": "payments-auth work can miss Q3 roadmap when it is treated as ops cleanup",
@@ -159,8 +160,8 @@
           "checks": {
             "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 44,
-            "bodyCharCount": 262,
+            "bodyWordCount": 40,
+            "bodyCharCount": 241,
             "bodySentenceCount": 2,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -169,7 +170,7 @@
             "hasIlluminationQuestion": false,
             "hasEmDash": false,
             "hasExclamation": false,
-            "specificityHits": 7,
+            "specificityHits": 3,
             "permissionToSendHits": [],
             "forcedEventPhrasingHits": [],
             "missingMergeFields": [],
@@ -179,7 +180,7 @@
             "previewEventHits": [],
             "painAngleLabel": "roadmap queue",
             "reusedPainAngleHits": [],
-            "painAngleBodyOverlap": 0.08
+            "painAngleBodyOverlap": 0.13
           }
         },
         {
@@ -189,7 +190,7 @@
           "channel": "email",
           "touch_type": "post_event_followup",
           "subject": "after the notes",
-          "body": "{{first_name}}, after the event, the hard part at {{company}} is usually turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your working answer now: product-owned, risk-owned, or parked until the next rail change?",
+          "body": "{{first_name}}, after the event, the hard part at {{company}} is turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your threshold for putting one owner on this now?",
           "pain_angle": {
             "label": "vendor-note translation",
             "sourcePain": "vendor notes do not translate into ownership decisions",
@@ -201,8 +202,8 @@
           "checks": {
             "subjectWordCount": 3,
             "allLowercase": true,
-            "bodyWordCount": 59,
-            "bodyCharCount": 379,
+            "bodyWordCount": 54,
+            "bodyCharCount": 331,
             "bodySentenceCount": 3,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
@@ -221,7 +222,7 @@
             "previewEventHits": [],
             "painAngleLabel": "vendor-note translation",
             "reusedPainAngleHits": [],
-            "painAngleBodyOverlap": 0.31
+            "painAngleBodyOverlap": 0.17
           }
         }
       ]

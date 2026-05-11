@@ -29,9 +29,9 @@
 
 _Subject:_ (none)
 
-> The Q4 chargeback target and the approval-rate tradeoff behind it are close to work I am doing with fintech risk leaders going to Money20/20.
+> The Q4 chargeback target and approval-rate tradeoff collide in the same fraud dashboard. Money20/20 seems like a useful moment for that conversation.
 
-`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 31` · `quality: 4.0/5 (ship)`
+`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 23` · `quality: 4.0/5 (ship)`
 
 ---
 
@@ -49,9 +49,9 @@ _Subject:_ `q4 chargeback target`
 
 _Subject:_ (none)
 
-> {{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and two weeks of chargebacks have already shipped by the time drift surfaces. How are you catching drift in real time at {{company}} before next year's loss-budget locks? A peer payments team shifted to a same-day drift signal last quarter and cut drift-attributable chargebacks 38%. I am hosting four risk leads Tuesday afternoon on this. Worth a seat?
+> {{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and two weeks of chargebacks have already shipped by the time drift surfaces. How are you catching drift in real time at {{company}} before next year's loss-budget locks? A peer payments team shifted to a same-day drift signal last quarter and cut drift-attributable chargebacks 38%. If same-day drift review is on your loss-budget list, does this belong in the roadmap conversation?
 
-`channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 77` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T-14d` · `type: linkedin_dm_post_connect` · `cta: make_offer` · `words: 81` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -69,9 +69,9 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, the RAI fraud-rule panels map back to the Q4 chargeback number you owe your CFO at {{company}}. How are you deciding which panel takeaways become rule changes and which stay as notes? I am near the speaker lounge at three if coffee is useful.
+> {{first_name}}, the RAI fraud-rule panels map back to the Q4 chargeback number you owe your CFO at {{company}}. How are you deciding which panel takeaways become rule changes and which stay as notes? Does this belong in the rule-change conversation while it is fresh?
 
-`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 39` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 42` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -79,7 +79,7 @@ _Subject:_ (none)
 
 _Subject:_ `chargeback recap`
 
-> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team defending the Q4 chargeback line for {{company}} to the CFO, when rule changes shipped this month may take 60 days to surface as loss impact? A peer payments team locked their false-positive review window the Monday after the show and held the chargeback line at 0.6% through Q4. I attached the review sheet.
+> {{first_name}}, after Money20/20 Europe, how is your team defending the Q4 chargeback line for {{company}} to the CFO, when rule changes shipped this month may take 60 days to surface as loss impact? A peer payments team locked their false-positive review window the Monday after the show and held the chargeback line at 0.6% through Q4. I attached the review sheet.
 
 `channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 68` · `quality: 5.0/5 (top-tier)`
 
@@ -95,9 +95,9 @@ _Subject:_ `chargeback recap`
 
 _Subject:_ (none)
 
-> The regulator question about who approved a flagged customer is close to work I am doing with Compliance leaders going to Money20/20.
+> The regulator question about who approved a flagged customer should not require screenshots from three KYC portals. Money20/20 seems like a useful moment for that conversation.
 
-`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 20` · `quality: 4.0/5 (ship)`
+`channel: linkedin` · `offset: T-28d` · `type: linkedin_connect` · `cta: none` · `words: 25` · `quality: 4.0/5 (ship)`
 
 ---
 
@@ -135,9 +135,9 @@ _Subject:_ (none)
 
 _Subject:_ (none)
 
-> {{first_name}}, the AML-AI panel at the RAI maps directly to SAR drafting lag when reports trail investigations by two months. How are you deciding what should change in {{company}}'s pipeline after the session? I am near the next hall if coffee is useful.
+> {{first_name}}, the AML and SAR sessions at the RAI map directly to drafting lag when reports trail investigations by two months. How are you deciding what should change in {{company}}'s pipeline after the event? Does this belong in the SAR pipeline conversation while it is fresh?
 
-`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 48` · `quality: 5.0/5 (top-tier)`
+`channel: linkedin` · `offset: T0` · `type: linkedin_day_of` · `cta: ask_for_interest` · `words: 49` · `quality: 5.0/5 (top-tier)`
 
 ---
 
@@ -145,6 +145,6 @@ _Subject:_ (none)
 
 _Subject:_ `kyc audit recap`
 
-> {{first_name}}, Money20/20 Europe wrapped Wednesday. How is your team planning to close the regulator-flagged KYC gaps at {{company}}, when the audit trail still stitches across three vendor portals? A peer fintech locked theirs into one dashboard after the show and cleared the next two audit reviews at 100%. I attached the audit-trail diagram.
+> {{first_name}}, after Money20/20 Europe, how is your team planning to close the regulator-flagged KYC gaps at {{company}}, when the audit trail still stitches across three vendor portals? A peer fintech locked theirs into one dashboard after the show and cleared the next two audit reviews at 100%. I attached the audit-trail diagram.
 
 `channel: email` · `offset: T+2d` · `type: email_followup` · `cta: make_offer` · `words: 65` · `quality: 5.0/5 (top-tier)`
