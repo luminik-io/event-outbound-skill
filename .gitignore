@@ -1,6 +1,14 @@
 node_modules/
 dist/
 .env
+.DS_Store
+*.log
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+*.tsbuildinfo
+*.tgz
 
 # Internal artefacts, not for public distribution
 marketing/
