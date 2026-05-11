@@ -1,0 +1,709 @@
+{
+  "cases": [
+    {
+      "id": "01-email-no-assets",
+      "name": "Cold email with no approved assets or proof",
+      "kind": "draft",
+      "validated": true,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["reconcile instant-payment authentication, exception handling, and audit evidence before roadmap freeze"],
+        "personaPainPoints": ["unclear ownership when SCA step-up decisions change the payment state"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "Money20/20 Europe 2026, June 2-4, 2026, Amsterdam",
+        "today": "2026-05-11",
+        "sender": "Maya Rao, VP Partnerships at Northstar Ledger",
+        "company": "Northstar Ledger helps fintech payments teams route, monitor, and audit instant-payment flows across FedNow, RTP, SEPA Instant, and card rails from one control layer.",
+        "persona": "VP, Director, or Head of Payments at fintechs and digital banks",
+        "buyerJob": "reconcile authentication, exception handling, and audit evidence across product, risk, and compliance",
+        "currentWorkaround": "rail-specific dashboards, spreadsheets, and manual Slack escalations",
+        "hiddenRisk": "no one can explain why authentication changed the payment state when audit asks",
+        "assets": "none approved",
+        "proof": "none approved",
+        "senderLogistics": "attendance and coffee availability unknown"
+      }
+    },
+    {
+      "id": "02-email-asset-known",
+      "name": "Cold email with a real worksheet asset",
+      "kind": "draft",
+      "validated": true,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "make_offer"
+      },
+      "validatorContext": {
+        "eventName": "Black Hat USA 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["prove detection-rule ownership before the SOC2 evidence review"],
+        "personaPainPoints": ["detection rules outlive their original owners and create audit evidence gaps"],
+        "strictTruth": true,
+        "availableAssets": ["SOC2 detection-rule ownership worksheet approved for Black Hat outreach"],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "Black Hat USA 2026, August 1-6, 2026, Las Vegas",
+        "today": "2026-05-11",
+        "sender": "Priya Menon, Security Solutions Lead at SentinelTrace",
+        "company": "SentinelTrace helps security teams keep detection rules, owners, evidence, and review notes connected.",
+        "persona": "Director of Security Engineering at mid-market SaaS",
+        "buyerJob": "show auditors who owns each high-risk detection and when it was last reviewed",
+        "currentWorkaround": "spreadsheet exports from SIEM, ticket notes, and Slack ownership threads",
+        "hiddenRisk": "evidence gaps surface during audit prep, not when the rule gets stale",
+        "assets": "SOC2 detection-rule ownership worksheet",
+        "proof": "none approved",
+        "senderLogistics": "attendance unknown"
+      }
+    },
+    {
+      "id": "03-linkedin-connect",
+      "name": "LinkedIn connection request with clear connection CTA",
+      "kind": "draft",
+      "validated": true,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_connection_request",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "RSA Conference 2026",
+        "eventLocation": "San Francisco",
+        "personaPriorities": ["reduce access-review exceptions before audit evidence locks"],
+        "personaPainPoints": ["access-review evidence is split across IAM exports and ticket comments"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "RSA Conference 2026, San Francisco",
+        "today": "2026-05-11",
+        "sender": "Leo Grant, Founder at AccessLedger",
+        "company": "AccessLedger helps security teams tie IAM exceptions to audit-ready evidence.",
+        "persona": "VP Security or Head of IAM",
+        "buyerJob": "reduce access-review exceptions before audit close",
+        "currentWorkaround": "IAM exports, spreadsheet signoffs, and ticket comments",
+        "hiddenRisk": "the team cannot defend why an exception stayed open",
+        "assets": "none approved",
+        "proof": "none approved",
+        "senderLogistics": "attendance unknown"
+      }
+    },
+    {
+      "id": "04-linkedin-dm-proof",
+      "name": "LinkedIn DM with approved proof and asset",
+      "kind": "draft",
+      "validated": true,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_dm_post_connect",
+        "cta_type": "make_offer"
+      },
+      "validatorContext": {
+        "eventName": "Identiverse 2026",
+        "eventLocation": "Washington, DC",
+        "personaPriorities": ["reduce account-takeover step-up false positives without adding manual review"],
+        "personaPainPoints": ["risk and IAM teams disagree on who owns payment step-up failures"],
+        "strictTruth": true,
+        "availableAssets": ["approved step-up failure review worksheet"],
+        "proofPoints": ["Customer-approved note: BreezePay reduced manual payment step-up reviews by 18% after connecting IAM risk and payment-state logs."],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "Identiverse 2026, Washington, DC",
+        "today": "2026-05-11",
+        "sender": "Daniel Craig, Partnerships at FlowAuth",
+        "company": "FlowAuth connects IAM risk signals to payment orchestration decisions.",
+        "persona": "Head of Payments or Director of Payments Risk",
+        "buyerJob": "reduce account-takeover exposure without creating step-up false positives",
+        "currentWorkaround": "IAM risk logs, payment-state logs, and manual review queues are reconciled after the fact",
+        "hiddenRisk": "step-up failures look like IAM problems until they start moving payment approval rates",
+        "assets": "approved step-up failure review worksheet",
+        "proof": "BreezePay customer-approved 18% manual-review reduction note",
+        "senderLogistics": "attendance unknown"
+      }
+    },
+    {
+      "id": "05-post-event-returned-work",
+      "name": "Post-event follow-up from returned-to-desk work",
+      "kind": "draft",
+      "validated": true,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "post_event_followup",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "SaaStr Annual 2026",
+        "eventLocation": "San Mateo",
+        "personaPriorities": ["show event-sourced pipeline quality before Q3 board reporting"],
+        "personaPainPoints": ["badge scans and CRM campaign members disagree on which accounts are actually in play"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "SaaStr Annual 2026, San Mateo",
+        "today": "2026-05-11",
+        "sender": "Nora Patel, Founder at Luminik",
+        "company": "Luminik helps event teams source, enrich, sequence, capture, and attribute event-sourced pipeline.",
+        "persona": "VP Demand Generation or Head of Field Marketing",
+        "buyerJob": "prove which event accounts deserve sales attention after the event",
+        "currentWorkaround": "badge scans, CRM campaign members, and spreadsheets",
+        "hiddenRisk": "sales follows the wrong accounts while the board asks whether event spend created pipeline",
+        "assets": "none approved",
+        "proof": "none approved",
+        "senderLogistics": "attendance unknown"
+      }
+    },
+    {
+      "id": "06-event-ask-known",
+      "name": "Event-specific ask with supplied coffee availability",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_followup_3plus",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 USA 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["defend RTP exception ownership in the Q4 risk review"],
+        "personaPainPoints": ["RTP exceptions fall between payment ops and risk when settlement changes"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "Money20/20 USA 2026",
+        "senderLogistics": "sender is attending and has two real coffee windows on Tuesday",
+        "persona": "Head of Payments",
+        "buyerJob": "defend exception ownership in Q4 risk review"
+      }
+    },
+    {
+      "id": "07-event-ask-unknown",
+      "name": "Meetup CTA must be blocked when logistics are unknown",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_followup_3plus",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["own instant-payment exception review"],
+        "personaPainPoints": ["exception review owner is unclear"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "instruction": "User asks for a coffee CTA but has not supplied sender attendance or availability.",
+        "event": "Money20/20 Europe 2026",
+        "persona": "Head of Payments"
+      }
+    },
+    {
+      "id": "08-thin-input",
+      "name": "Thin input should ask targeted follow-up questions",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Identiverse 2026",
+        "eventLocation": "Washington, DC",
+        "personaPriorities": [],
+        "personaPainPoints": [],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "instruction": "Build a sequence for Identiverse 2026. Persona: Head of Payments. Sender: Daniel Craig. Email only."
+      }
+    },
+    {
+      "id": "09-impossible-cadence",
+      "name": "Impossible cadence should not draft",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "RSA Conference 2026",
+        "eventLocation": "San Francisco",
+        "personaPriorities": ["reduce audit evidence gaps"],
+        "personaPainPoints": ["IAM evidence is scattered"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "today": "2026-05-11",
+        "eventStartDate": "2026-05-21",
+        "request": "Create 8 pre-event touches with at least 4 days between steps."
+      }
+    },
+    {
+      "id": "10-wrong-persona",
+      "name": "Wrong persona and event angle should be challenged",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Dreamforce 2026",
+        "eventLocation": "San Francisco",
+        "personaPriorities": ["field marketing attribution"],
+        "personaPainPoints": ["pipeline attribution is unclear"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "persona": "Head of Payments",
+        "product": "field marketing attribution for Salesforce campaign members",
+        "event": "Dreamforce 2026",
+        "issue": "persona and product angle do not match"
+      }
+    },
+    {
+      "id": "11-user-bad-cta",
+      "name": "User supplies a bad CTA that should not be echoed",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_meeting"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["instant-payment exception ownership"],
+        "personaPainPoints": ["exception ownership is unclear"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "badUserInstruction": "Close with a meeting ask and a location-based pressure-test CTA.",
+        "expectedBehavior": "Reject the posture and use the validation gate when tools are unavailable."
+      }
+    },
+    {
+      "id": "12-asset-gating",
+      "name": "Useful asset should be attached, not permission gated",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "make_offer"
+      },
+      "validatorContext": {
+        "eventName": "Black Hat USA 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["prove alert owner review before SOC2"],
+        "personaPainPoints": ["alert owner review lives in ticket comments"],
+        "strictTruth": true,
+        "availableAssets": ["alert owner review worksheet"],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "asset": "alert owner review worksheet",
+        "instruction": "Do not ask permission to send it."
+      }
+    },
+    {
+      "id": "13-no-proof",
+      "name": "No proof supplied should avoid peer claims",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Identiverse 2026",
+        "eventLocation": "Washington, DC",
+        "personaPriorities": ["connect IAM risk to payment-state decisions"],
+        "personaPainPoints": ["IAM and payments teams review step-up failures separately"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "proof": "none approved",
+        "expectedBehavior": "Do not invent customer names, peer teams, or numbers."
+      }
+    },
+    {
+      "id": "14-missing-event-date",
+      "name": "Missing event date should trigger research or follow-up",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Identiverse 2026",
+        "eventLocation": "Washington, DC",
+        "personaPriorities": ["payment authentication compliance"],
+        "personaPainPoints": ["step-up ownership is unclear"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "event": "Identiverse 2026",
+        "eventDate": "unknown",
+        "today": "determine from runtime if tools are available"
+      }
+    },
+    {
+      "id": "15-linkedin-no-subject",
+      "name": "LinkedIn DM should not carry a subject label",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_day_of_nudge",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Black Hat USA 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["triage detection evidence after a session-heavy week"],
+        "personaPainPoints": ["detection evidence still lives across SIEM exports and ticket notes"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "channel": "LinkedIn",
+        "expectedBehavior": "subject must be empty or absent"
+      }
+    },
+    {
+      "id": "16-post-connect-iq",
+      "name": "Post-connect DM needs a neutral illumination question",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_dm_post_connect",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["reduce manual exception review before Q3 planning"],
+        "personaPainPoints": ["manual exception review hides the root cause until finance asks"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "channel": "LinkedIn post-connect DM",
+        "expectedBehavior": "include a neutral how, what, or why question"
+      }
+    },
+    {
+      "id": "17-day-of-no-invented-location",
+      "name": "Day-of nudge must not invent booth or floor location",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_day_of_nudge",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "RSA Conference 2026",
+        "eventLocation": "San Francisco",
+        "personaPriorities": ["decide which IAM exceptions need audit evidence"],
+        "personaPainPoints": ["exceptions stay open because evidence owner is unclear"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "senderLogistics": "attendance unknown",
+        "expectedBehavior": "no invented booth, hall, track, coffee table, or session location"
+      }
+    },
+    {
+      "id": "18-no-recycled-pain",
+      "name": "Second touch should avoid a used pain angle",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_followup_2",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["own exception evidence and roadmap sequencing"],
+        "personaPainPoints": ["exception ownership is unclear", "roadmap freeze buries payment-auth cleanup"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": [
+          {
+            "label": "exception ownership",
+            "sourcePain": "exception ownership is unclear"
+          }
+        ]
+      },
+      "context": {
+        "usedPainAngle": "exception ownership",
+        "expectedBehavior": "use roadmap sequencing or another distinct pain instead"
+      }
+    },
+    {
+      "id": "19-current-date",
+      "name": "Skill should determine today's date for cadence planning",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Fintech Meetup 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["prioritize event accounts before Q3 planning"],
+        "personaPainPoints": ["event account priority is set after sales has already moved on"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "eventStartDate": "2026-06-15",
+        "request": "Use default 4-week lead time and determine today's date from runtime."
+      }
+    },
+    {
+      "id": "20-min-gap",
+      "name": "Minimum gap should default to 4 days",
+      "kind": "guard",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "SaaStr Annual 2026",
+        "eventLocation": "San Mateo",
+        "personaPriorities": ["sequence event-sourced pipeline follow-up"],
+        "personaPainPoints": ["sales follow-up arrives in bursts that look like spam"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "request": "User asks for daily touches for two weeks.",
+        "expectedBehavior": "recommend at least 4 days between steps unless explicitly overridden"
+      }
+    },
+    {
+      "id": "21-no-fake-session",
+      "name": "No fabricated agenda session references",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_followup_3plus",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Identiverse 2026",
+        "eventLocation": "Washington, DC",
+        "personaPriorities": ["align identity risk with payment approvals"],
+        "personaPainPoints": ["payment approval falls when identity risk rules are tightened"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "agenda": "not supplied",
+        "expectedBehavior": "do not name tracks, panels, session conflicts, or speakers"
+      }
+    },
+    {
+      "id": "22-cost-of-inaction",
+      "name": "Touch should illuminate cost of inaction",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 USA 2026",
+        "eventLocation": "Las Vegas",
+        "personaPriorities": ["reduce chargeback false positives without suppressing approvals"],
+        "personaPainPoints": ["tightening chargeback rules drops approval rates and escalates to finance"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "hiddenRisk": "approval-rate loss gets noticed after the Q4 target is already set",
+        "expectedBehavior": "make the consequence clear without dramatizing"
+      }
+    },
+    {
+      "id": "23-luminik-lead-magnet",
+      "name": "Luminik value should show through without a pitch",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "email",
+        "touch_type": "cold_email_first_touch",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "B2B Marketing Exchange 2026",
+        "eventLocation": "Scottsdale",
+        "personaPriorities": ["prove event-sourced pipeline quality before budget review"],
+        "personaPainPoints": ["event leads get sequenced before accounts are enriched or prioritized"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "company": "Luminik is an event pipeline platform for sourcing, enriching, sequencing, capturing, and attributing event-sourced pipeline.",
+        "persona": "VP Demand Generation",
+        "expectedBehavior": "show the product insight through buyer pain, not by pitching the platform"
+      }
+    },
+    {
+      "id": "24-linkedin-event-ask-known",
+      "name": "LinkedIn event ask should be natural when logistics are true",
+      "kind": "draft",
+      "validated": false,
+      "lite": true,
+      "requestedTouch": {
+        "channel": "linkedin",
+        "touch_type": "linkedin_day_of_nudge",
+        "cta_type": "ask_for_interest"
+      },
+      "validatorContext": {
+        "eventName": "Money20/20 Europe 2026",
+        "eventLocation": "Amsterdam",
+        "personaPriorities": ["decide whether payment-auth cleanup belongs in Q3 roadmap"],
+        "personaPainPoints": ["payment-auth cleanup gets misclassified as an ops task"],
+        "strictTruth": true,
+        "availableAssets": [],
+        "proofPoints": [],
+        "strictAngleDiversity": true,
+        "usedPainAngles": []
+      },
+      "context": {
+        "senderLogistics": "sender is attending and has one confirmed coffee window at the venue",
+        "expectedBehavior": "one natural event-specific question is allowed because logistics are supplied"
+      }
+    }
+  ]
+}

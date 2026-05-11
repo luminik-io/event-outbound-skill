@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.tmp/
 .env
 .DS_Store
 *.log
@@ -22,6 +23,8 @@ scripts/*
 !scripts/plan-timeline.mjs
 !scripts/check-claude-showcase.mjs
 !scripts/run-claude-showcase.mjs
+!scripts/run-claude-matrix.mjs
+!scripts/claude-matrix-cases.json
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log

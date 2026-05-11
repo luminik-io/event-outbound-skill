@@ -24,7 +24,9 @@
     "validate:sequence": "node scripts/validate-sequence.mjs",
     "check:showcase": "node scripts/check-claude-showcase.mjs",
     "e2e:claude": "node scripts/run-claude-showcase.mjs",
-    "verify": "npm run build && npm run test -- --run && npm run scan && npm run check:showcase"
+    "e2e:claude:matrix": "node scripts/run-claude-matrix.mjs",
+    "test:matrix-runner": "node scripts/run-claude-matrix.mjs --self-test",
+    "verify": "npm run build && npm run test -- --run && npm run test:matrix-runner && npm run scan && npm run check:showcase"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",

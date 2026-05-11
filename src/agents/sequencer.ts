@@ -35,6 +35,7 @@ import {
   findReusedPainAngles,
   painAngleLabel,
   painAngleMatchesBody,
+  canonicalTouchType,
 } from '../lib/ruleService.js';
 import { generateTimeline } from '../lib/timeline.js';
 
@@ -91,27 +92,7 @@ function computeYouVsWeRatio(body: string): number {
 // ---------------------------------------------------------------------------
 
 function resolveTouchTypeKey(briefLabel: string): string {
-  switch (briefLabel) {
-    case 'email_cold':
-      return 'cold_email_first_touch';
-    case 'email_followup_2':
-      return 'cold_email_followup_2';
-    case 'email_followup_3plus':
-    case 'email_day_of':
-      return 'cold_email_followup_3plus';
-    case 'email_post_event':
-      return 'post_event_followup';
-    case 'linkedin_connect':
-      return 'linkedin_connection_request';
-    case 'linkedin_nudge':
-      return 'linkedin_day_of_nudge';
-    case 'linkedin_day_of':
-      return 'linkedin_day_of_nudge';
-    case 'linkedin_followup':
-      return 'post_event_followup';
-    default:
-      return 'cold_email_first_touch';
-  }
+  return canonicalTouchType(briefLabel);
 }
 
 function wordsForLabel(text: string): string[] {
@@ -257,7 +238,15 @@ function validateTouch(
   const bodyLower = touch.body.toLowerCase();
 
   const subjectWordCount = countWords(touch.subject);
-  if (!isLinkedIn) {
+  if (isLinkedIn) {
+    if (touch.subject.trim().length > 0) {
+      errors.push({
+        rule: 'linkedinSubject',
+        message: 'LinkedIn touches must not include a subject.',
+        offendingValue: touch.subject,
+      });
+    }
+  } else {
     if (subjectWordCount === 0) {
       errors.push({ rule: 'emptySubject', message: 'Email subject is empty.' });
     } else if (subjectWordCount > rules.subject_line_rules.max_word_count) {
@@ -296,14 +285,20 @@ function validateTouch(
   }
 
   // ---- Channel-aware length rules (NEW) -----------------------------------
-  const ruleKey = touch.touch_type;
+  const ruleKey = canonicalTouchType(touch.touch_type);
   const lenRule: ChannelLengthRule | undefined =
     jbRules.channel_length_rules[ruleKey];
   const bodyWordCount = countWords(touch.body);
   const sentenceCount = countSentences(touch.body);
   const bodyCharCount = touch.body.length;
 
-  if (lenRule) {
+  if (!ruleKey || !lenRule) {
+    errors.push({
+      rule: 'unknownTouchType',
+      message: `Unknown touch_type '${touch.touch_type}'. Use a supported channel length rule key.`,
+      offendingValue: touch.touch_type,
+    });
+  } else {
     if (lenRule.min_words !== undefined && bodyWordCount < lenRule.min_words) {
       errors.push({
         rule: 'bodyWordCount',
@@ -332,25 +327,6 @@ function validateTouch(
       errors.push({
         rule: 'bodyCharCount',
         message: `Body has ${bodyCharCount} chars; expected max ${lenRule.max_chars} for ${ruleKey}.`,
-      });
-    }
-  } else {
-    if (
-      bodyWordCount < rules.email_body_targets.min_word_count ||
-      bodyWordCount > rules.email_body_targets.max_word_count
-    ) {
-      errors.push({
-        rule: 'bodyWordCount',
-        message: `Body length ${bodyWordCount} words; expected ${rules.email_body_targets.min_word_count}-${rules.email_body_targets.max_word_count}.`,
-      });
-    }
-    if (
-      sentenceCount < rules.email_body_targets.min_sentence_count ||
-      sentenceCount > rules.email_body_targets.max_sentence_count
-    ) {
-      errors.push({
-        rule: 'bodySentenceCount',
-        message: `Body has ${sentenceCount} sentences; expected ${rules.email_body_targets.min_sentence_count}-${rules.email_body_targets.max_sentence_count}.`,
       });
     }
   }
@@ -680,6 +656,8 @@ function validateTouch(
     specificityHits,
     permissionToSendHits,
     forcedEventPhrasingHits,
+    canonicalTouchType: ruleKey,
+    linkedinSubject: isLinkedIn ? touch.subject : undefined,
     missingMergeFields,
     assetPromiseHits,
     proofClaimHits,

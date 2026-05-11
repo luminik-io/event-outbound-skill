@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Live Claude matrix harness via `npm run e2e:claude:matrix` with lite no-tools blocking checks and validated one-touch checks.
+- Matrix case corpus covering thin inputs, cadence feasibility, LinkedIn subjects, asset gating, event logistics, proof gaps, current-date planning, and pain-angle reuse.
+
+### Changed
+- Skill instructions now treat the local validator as a hard gate. If the validator cannot run, the skill blocks drafting instead of producing unchecked copy.
+- Touch validation now canonicalizes documented timeline aliases while rejecting improvised `touch_type` values.
+- LinkedIn touches now fail validation when a subject is present.
+
 ## v0.2.5 (2026-05-10)
 
 Buyer-first quality-bar hardening for thin event-outbound inputs.
