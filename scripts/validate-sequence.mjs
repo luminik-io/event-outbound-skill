@@ -163,6 +163,59 @@ const bodySimilarity = (leftBody, rightBody) => {
   const union = new Set([...left, ...right]).size;
   return { score: union === 0 ? 0 : shared.length / union, shared };
 };
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const eventAliases = (inputValue, sequence) => {
+  const raw =
+    inputValue.eventName ||
+    inputValue.event?.name ||
+    inputValue.eventContext?.name ||
+    sequence.eventName ||
+    sequence.event?.name ||
+    '';
+  const name = lower(raw);
+  const aliases = new Set(['{{event_name}}']);
+  if (name.includes('rsa')) {
+    aliases.add('rsa');
+    aliases.add('rsa conference');
+  }
+  if (name.includes('money20/20') || name.includes('money2020')) {
+    aliases.add('money20/20');
+    aliases.add('money2020');
+    aliases.add('m20/20');
+  }
+  if (name.includes('black hat') || name.includes('blackhat')) {
+    aliases.add('black hat');
+    aliases.add('blackhat');
+  }
+  const stripped = name
+    .replace(/\b(20\d{2}|conference|europe|usa|us|global|summit|event)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (stripped.length >= 3) aliases.add(stripped);
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+};
+const findEventSpecificAskHits = (inputValue, sequence) => {
+  const aliases = eventAliases(inputValue, sequence).map(escapeRegex).join('|');
+  const hits = [];
+  const patterns = [
+    new RegExp(
+      `\\b(?:worth|open\\s+to)\\b[^?]{0,120}\\b(?:coffee|meet(?:ing)?|chat|conversation|walkthrough|walk\\s+through)\\b[^?]{0,120}\\b(?:at|during)\\s+(?:the\\s+)?(?:${aliases})\\b[^?]*\\?`,
+      'i',
+    ),
+    new RegExp(
+      `\\b(?:worth|open\\s+to)\\b[^?]{0,120}\\b(?:at|during)\\s+(?:the\\s+)?(?:${aliases})\\b[^?]{0,120}\\b(?:coffee|meet(?:ing)?|chat|conversation|walkthrough|walk\\s+through)\\b[^?]*\\?`,
+      'i',
+    ),
+  ];
+  for (const touch of sequence.touches || []) {
+    const body = touch.body || '';
+    for (const pattern of patterns) {
+      const match = body.match(pattern);
+      if (match?.[0]) hits.push({ touchSlot: touch.touch_slot, value: match[0] });
+    }
+  }
+  return hits;
+};
 
 const errors = [];
 const checks = {
@@ -179,6 +232,7 @@ for (const [personaId, sequence] of Object.entries(input.sequencesByPersona || {
     painAngleLabels: [],
     distinctPainAngleCount: 0,
     pairSimilarities,
+    eventSpecificAskHits: [],
   };
 
   for (let index = 0; index < touches.length; index++) {
@@ -271,6 +325,21 @@ for (const [personaId, sequence] of Object.entries(input.sequencesByPersona || {
       rule: 'distinctPainAngleCount',
       personaId,
       message: `Expected ${touches.length} distinct pain angles, got ${checks.sequences[personaId].distinctPainAngleCount}.`,
+    });
+  }
+
+  const eventSpecificAskRequired =
+    input.eventSpecificAskRequired === true ||
+    input.summary?.eventSpecificAskRequired === true ||
+    sequence.eventSpecificAskRequired === true;
+  const eventSpecificAskHits = findEventSpecificAskHits(input, sequence);
+  checks.sequences[personaId].eventSpecificAskHits = eventSpecificAskHits;
+  if (eventSpecificAskRequired && eventSpecificAskHits.length === 0) {
+    errors.push({
+      rule: 'eventSpecificAskMissing',
+      personaId,
+      message:
+        'Sequence is marked eventSpecificAskRequired but has no natural event-specific ask such as "Worth coffee at {{event_name}} if this is already on your list?".',
     });
   }
 }

@@ -449,3 +449,67 @@ test('validate-sequence CLI accepts distinct pain angles across a sequence', () 
   expect(parsed.isValid).toBe(true);
   expect(parsed.checks.sequences.payments_leader.distinctPainAngleCount).toBe(2);
 });
+
+test('validate-sequence CLI enforces event-specific ask when required', () => {
+  const payload = {
+    eventName: 'Money20/20 Europe 2026',
+    eventSpecificAskRequired: true,
+    sequencesByPersona: {
+      payments_leader: {
+        touches: [
+          {
+            touch_slot: 1,
+            channel: 'email',
+            body: '{{first_name}}, exception ownership at {{company}} is split across product and risk. Worth looking into?',
+            pain_angle: {
+              label: 'exception ownership',
+              sourcePain: 'ownership split across product and risk',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'eventSpecificAskMissing',
+  );
+});
+
+test('validate-sequence CLI accepts natural event-specific asks when required', () => {
+  const payload = {
+    eventName: 'Money20/20 Europe 2026',
+    eventSpecificAskRequired: true,
+    sequencesByPersona: {
+      payments_leader: {
+        touches: [
+          {
+            touch_slot: 1,
+            channel: 'email',
+            body: '{{first_name}}, exception ownership at {{company}} is split across product and risk. Worth coffee at Money20/20 if this is already on your audit list?',
+            pain_angle: {
+              label: 'exception ownership',
+              sourcePain: 'ownership split across product and risk',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(
+    parsed.checks.sequences.payments_leader.eventSpecificAskHits[0].value,
+  ).toContain('Worth coffee at Money20/20');
+});

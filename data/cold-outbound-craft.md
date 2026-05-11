@@ -248,6 +248,14 @@ canonical lean-back closers:
 - "Open to learning more?"
 - "Worth an exchange?"
 
+### Event-specific ask posture
+Event outbound should usually earn **one** event-route ask when the sender actually has presence or availability. Good:
+
+- "Worth coffee at Money20/20 if this is already on your audit list?"
+- "Worth a quick conversation at Black Hat if rule ownership is already on your SOC2 list?"
+
+This is different from forcing the event into every CTA. The buyer's reason to care is still their work, risk, or cost of inaction. The event is only the route. If attendance, sponsorship, booth/table, side-event, or coffee availability is unknown, do not use meetup CTAs. Use a buyer-timing CTA and say in the research brief that no event-specific meetup ask was used because logistics were not supplied.
+
 ### Soft opt-out language for negative-reply / opt-out paths
 the source doesn't use the literal "or tabled?" / "or ignore?" phrasing in the source materials I sampled, but the **principle** is identical: give the prospect an easy out so they don't feel cornered. CSV evidence: phrases like "feel free to ignore", "no big deal", "no rush" appear; "would you be open" appears 16x.
 

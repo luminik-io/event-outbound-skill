@@ -894,6 +894,12 @@ STRICT TRUTH RULES (hard requirement)
 - If the event agenda or dates are unknown, do not imply a real session, track conflict,
   Tuesday slot, or day-of location.
 - The event is only the occasion. The opener belongs to the buyer job, workaround, or hidden risk.
+- If sender event attendance, booth, side-event, or coffee availability is known, include exactly
+  one natural event-specific ask in the sequence, usually the last pre-event or day-of touch.
+  Pattern: "Worth coffee at {{event_name}} if this is already on your audit list?".
+- If sender event logistics are unknown, do not use a meetup, coffee, booth, or "I'll be there" CTA.
+- If useful assets or lead magnets are supplied, use at most one asset-backed CTA. If none are
+  supplied, ask for assets before drafting or write strict no-asset copy.
 
 ==========================================================================================
 HARD VALIDATOR RULES (auto-rejected)
@@ -933,6 +939,8 @@ HARD VALIDATOR RULES (auto-rejected)
   of the agenda", "I'll be at booth X", or fabricated session/track references
   unless the user supplied that fact. If sender availability is missing, use a
   buyer-timing CTA instead of a meetup CTA.
+- ONE event-specific ask is encouraged when true. Use it once, not every touch.
+  It must be tied to supplied sender presence, availability, booth, table, or hosted event.
 - NO recycled pain angles. Each touch in the sequence must illuminate a different
   buyer pain, consequence, or mechanism. Do not reuse the same pain across email
   and LinkedIn, even in different wording. Return the selected pain_angle metadata
