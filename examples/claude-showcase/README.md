@@ -1,11 +1,11 @@
-# Claude2 Showcase Runs
+# Claude Showcase Runs
 
-These fixtures are real `claude2` runs against the installed `event-outbound` skill. They are not golden copy to paste blindly. They are inspectable evidence for what Claude produced with the current skill instructions, plus deterministic checks for the quality invariants we care about.
+These fixtures are real Claude runs against the installed `event-outbound` skill. They are not golden copy to paste blindly. They are inspectable evidence for what Claude produced with the current skill instructions, plus deterministic checks for the quality invariants we care about.
 
 Generated on 2026-05-11 with:
 
 ```bash
-claude2 --plugin-dir /Users/batman/.claude-secondary/plugins/cache/luminik-plugins/event-outbound/0.2.5 \
+claude --plugin-dir /path/to/event-outbound \
   --permission-mode bypassPermissions \
   --no-session-persistence
 ```

@@ -115,7 +115,7 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 | [`examples/black-hat-usa-2026/`](examples/black-hat-usa-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude with no API key |
-| [`examples/claude2-showcase/`](examples/claude2-showcase/) | Real `claude2` runs | Positive + guardrail cases | Mixed | Checked-in outputs with deterministic showcase checks |
+| [`examples/claude-showcase/`](examples/claude-showcase/) | Real Claude runs | Positive + guardrail cases | Mixed | Checked-in outputs with deterministic showcase checks |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
@@ -168,12 +168,12 @@ The repo also includes real Claude-generated showcase outputs:
 npm run check:showcase
 ```
 
-This deterministic check reads [`examples/claude2-showcase/`](examples/claude2-showcase/), verifies cadence dates, validator-clean touches, strict no-invention output, and guardrail behavior for thin input, impossible cadence, and wrong-persona prompts. It does not call Claude, so it is safe for CI.
+This deterministic check reads [`examples/claude-showcase/`](examples/claude-showcase/), verifies cadence dates, validator-clean touches, strict no-invention output, and guardrail behavior for thin input, impossible cadence, and wrong-persona prompts. It does not call Claude, so it is safe for CI.
 
 To rerun the live Claude showcase locally:
 
 ```bash
-npm run e2e:claude2 -- --case rich-positive-availability-unknown
+npm run e2e:claude -- --case rich-positive-availability-unknown
 ```
 
 Add `--update-fixtures` only when you intentionally want to refresh the checked-in showcase outputs after human review.
