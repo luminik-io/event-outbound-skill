@@ -731,6 +731,10 @@ HARD VALIDATOR RULES (auto-rejected)
 - NO generic post-event pleasantries: "hope the event went well",
   "hope the event was productive", "hope the week in [city] went well".
   Start from the buyer's returned-to-desk work instead.
+- NO invented sender logistics: "I'm around", "I am around the [track] side
+  of the agenda", "I'll be at booth X", or fabricated session/track references
+  unless the user supplied that fact. If sender availability is missing, use a
+  buyer-timing CTA instead of a meetup CTA.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.

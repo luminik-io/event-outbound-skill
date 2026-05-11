@@ -217,7 +217,13 @@
     "compare playbooks",
     "swap playbooks",
     "swapping how",
-    "swap how"
+    "swap how",
+    "i am around",
+    "i'm around",
+    "i will be around",
+    "i'll be around",
+    "around the agenda",
+    "side of the agenda"
   ],
   "_additional_banned_phrases_source": "the corpus phrase-frequency analysis (data/cold-outbound-craft.md:380-401). Counts in 1998-post corpus: best-in-class 0, world-class 0, cutting-edge 0, industry-leading 0, robust 0, scalable 0, drive results 0, game-changer 0. the source materials ridicule leading questions such as \"if I could 10x your revenue\", \"if I told you something interesting\", \"do you want more sales\", and meeting-first asks such as \"quick intro call\".",
   "leading_question_pattern": {

@@ -105,3 +105,27 @@ test('validate-touch CLI rejects CTAs that use the event city as the buyer reaso
     'forcedEventPhrasing',
   );
 });
+
+test('validate-touch CLI rejects invented sender logistics', () => {
+  const payload = {
+    subject: 'amsterdam coffee',
+    body: '{{first_name}}, if the instant-rail exception ownership question is still open for {{company}}, the audit trail can stay split across risk, product, and payments ops. I am around the auth and operations side of the agenda today. Worth a coffee between sessions?',
+    channel: 'email',
+    touch_type: 'cold_email_followup_3plus',
+    eventName: 'Money20/20 Europe 2026',
+    eventLocation: 'Amsterdam',
+    personaPriorities: ['instant-payment exception ownership'],
+    personaPainPoints: ['audit trail can stay split across risk, product, and payments ops'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('bannedWords');
+  expect(parsed.checks.bannedWordsFound).toEqual(
+    expect.arrayContaining(['i am around', 'side of the agenda']),
+  );
+});

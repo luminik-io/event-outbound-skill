@@ -18,6 +18,7 @@ Buyer-first quality-bar hardening for thin event-outbound inputs.
 - `unsourcedAssetPromise` check when copy mentions attached/linked assets without `availableAssets`.
 - `unsourcedProofClaim` check when copy uses customer, peer, or before/after proof without `proofPoints`.
 - Generic post-event pleasantries such as "hope the week in [city] went well" are now blocked as sales-speak openers.
+- Invented sender logistics such as "I am around the [track] side of the agenda" are blocked unless supplied by the user.
 - Source-grounded craft evals covering role fluency, current workaround language, cost of inaction, neutral illumination questions, lean-back CTAs, and wrong-persona failures.
 - 100+ tests covering strict context helpers, date-aware cadence, CTA location misuse, and CLI rejection/acceptance paths.
 
