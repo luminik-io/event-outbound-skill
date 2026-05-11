@@ -1,0 +1,231 @@
+{
+  "event": {
+    "name": "Money20/20 Europe 2026",
+    "startDate": "2026-06-02",
+    "endDate": "2026-06-04",
+    "location": "Amsterdam"
+  },
+  "sender": {
+    "name": "Maya Rao",
+    "title": "VP Partnerships",
+    "company": "Northstar Ledger"
+  },
+  "generatedOn": "2026-05-11",
+  "strictTruth": true,
+  "summary": {
+    "totalTouches": 4,
+    "requestedTouchCount": 4,
+    "channels": ["email"],
+    "minGapDays": 4,
+    "actualGapsDays": [18, 4, 4],
+    "averageQuality": 4.0,
+    "scoreBandCounts": {
+      "top_tier_5": 0,
+      "ship_4": 4,
+      "review_3": 0,
+      "rewrite_1_5": 0
+    },
+    "ctaMix": {
+      "ownership_timing": 2,
+      "evidence_gap": 1,
+      "scope_question": 1
+    },
+    "illuminationQuestionCoverage": "2/4",
+    "distinctPainAngleCoverage": "4/4",
+    "validatorStatus": "all_passing",
+    "sequenceValidatorStatus": "all_passing",
+    "humanReviewStatus": "ready for human review"
+  },
+  "brief": {
+    "buyerJob": "Reconcile instant-payment authentication, exception handling, and audit evidence across product, risk, and compliance before the Q3 roadmap freeze.",
+    "currentWorkaround": "Separate spreadsheets, rail-specific dashboards, and manual Slack escalations.",
+    "hiddenRisk": "Unclear ownership when exceptions touch both SCA / step-up authentication and funds-flow operations.",
+    "trigger": "Situation trigger: Q3 roadmap freeze. Money20/20 Europe is the occasion, not the buyer's reason to care.",
+    "proofPoints": [],
+    "availableAssets": [],
+    "senderLogisticsKnown": false,
+    "notes": [
+      "No approved proof; strict no-invention mode in effect.",
+      "No assets; no attachments, links, one-pagers, or worksheets referenced.",
+      "Sender attendance, booth, agenda track, and availability unknown; no meetup CTAs, no track names, buyer-timing CTAs only."
+    ]
+  },
+  "sequencesByPersona": {
+    "vp_director_head_of_payments": {
+      "personaId": "vp_director_head_of_payments",
+      "personaLabel": "VP / Director / Head of Payments at fintechs and digital banks",
+      "leadTimeWeeks": 4,
+      "channels": ["email"],
+      "touches": [
+        {
+            "touch_slot": 1,
+          "offset_days": -22,
+          "send_date": "2026-05-11",
+          "channel": "email",
+          "touch_type": "cold_email_first_touch",
+          "subject": "step-up owner",
+          "body": "{{first_name}}, when a step-up decision at {{company}} changes the payment state, ownership can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns the handoff when SCA evidence and payment evidence disagree? The expensive part is the unresolved owner when roadmap tradeoffs start. Is that ownership question worth sorting now, or later?",
+          "pain_angle": {
+            "label": "step-up owner",
+            "sourcePain": "SCA step-up owner unclear when auth changes payment state",
+            "mechanism": "authentication changes the payment state and ownership blurs",
+            "costOfInaction": "Q3 roadmap tradeoffs start without a named owner"
+          },
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 2,
+            "allLowercase": true,
+            "bodyWordCount": 63,
+            "bodyCharCount": 419,
+            "bodySentenceCount": 4,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 9,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": [],
+            "painAngleLabel": "step-up owner",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0
+          }
+        },
+        {
+          "touch_slot": 2,
+          "offset_days": -4,
+          "send_date": "2026-05-29",
+          "channel": "email",
+          "touch_type": "cold_email_followup_2",
+          "subject": "evidence pack",
+          "body": "{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across instant rails and cards, is the gap worth looking into?",
+          "pain_angle": {
+            "label": "evidence pack latency",
+            "sourcePain": "audit evidence lives in rail dashboards and auth logs that do not line up",
+            "mechanism": "case notes, auth logs, and rail traces require manual stitching",
+            "costOfInaction": "the review takes longer than the exception itself"
+          },
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 2,
+            "allLowercase": true,
+            "bodyWordCount": 55,
+            "bodyCharCount": 348,
+            "bodySentenceCount": 3,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 5,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": [],
+            "painAngleLabel": "evidence pack latency",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.25
+          }
+        },
+        {
+          "touch_slot": 3,
+          "offset_days": 0,
+          "send_date": "2026-06-02",
+          "channel": "email",
+          "touch_type": "cold_email_followup_3plus",
+          "subject": "roadmap queue",
+          "body": "{{first_name}}, when payment-auth cleanup is framed as ops work at {{company}}, it can miss the product roadmap until the next rail change forces it back. Where is that sitting on your side now: product scope, risk cleanup, or still unnamed?",
+          "pain_angle": {
+            "label": "roadmap queue",
+            "sourcePain": "payments-auth work can miss Q3 roadmap when it is treated as ops cleanup",
+            "mechanism": "rail work gets classified as cleanup instead of product scope",
+            "costOfInaction": "another quarter passes before a named product owner exists"
+          },
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 2,
+            "allLowercase": true,
+            "bodyWordCount": 40,
+            "bodyCharCount": 241,
+            "bodySentenceCount": 2,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": false,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 3,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": [],
+            "painAngleLabel": "roadmap queue",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.13
+          }
+        },
+        {
+          "touch_slot": 4,
+          "offset_days": 4,
+          "send_date": "2026-06-06",
+          "channel": "email",
+          "touch_type": "post_event_followup",
+          "subject": "after the notes",
+          "body": "{{first_name}}, after the event, the hard part at {{company}} is turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your threshold for putting one owner on this now?",
+          "pain_angle": {
+            "label": "vendor-note translation",
+            "sourcePain": "vendor notes do not translate into ownership decisions",
+            "mechanism": "event takeaways need to become one owner and one roadmap decision",
+            "costOfInaction": "another quarter of reviews that nobody can confidently close"
+          },
+          "quality_band": "ship_4",
+          "validation_errors": [],
+          "checks": {
+            "subjectWordCount": 3,
+            "allLowercase": true,
+            "bodyWordCount": 54,
+            "bodyCharCount": 331,
+            "bodySentenceCount": 3,
+            "bannedWordsFound": [],
+            "llmClicheHardBans": {},
+            "llmClicheSoftWarnings": [],
+            "youVsWeRatio": 99,
+            "hasIlluminationQuestion": true,
+            "hasEmDash": false,
+            "hasExclamation": false,
+            "specificityHits": 5,
+            "permissionToSendHits": [],
+            "forcedEventPhrasingHits": [],
+            "missingMergeFields": [],
+            "assetPromiseHits": [],
+            "proofClaimHits": [],
+            "previewSellerHits": [],
+            "previewEventHits": [],
+            "painAngleLabel": "vendor-note translation",
+            "reusedPainAngleHits": [],
+            "painAngleBodyOverlap": 0.17
+          }
+        }
+      ]
+    }
+  }
+}

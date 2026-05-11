@@ -1,0 +1,10 @@
+The user declined to answer the follow-up questions, which means I cannot proceed with drafting. The skill's quality contract is explicit: thin inputs (event + persona + channel + sender name) are not enough, and proceeding anyway produces plausible vendor copy rather than buyer-first outbound.
+
+To build the sequence I need, at minimum:
+
+1. **Sender company URL + what it sells in plain English.** "Daniel Craig" alone gives me nothing to anchor the trigger, illumination question, or CTA on. I will not invent a value prop.
+2. **Proof posture.** Named customers with public numbers, logos only, or strict no-invention mode. The validator rejects unsourced proof, and I will not fabricate "three orgs" or peer benchmarks.
+3. **Assets that actually exist.** If none, the sequence runs in strict mode with no attached one-pager or worksheet promises.
+4. **Persona/event fit confirmation.** Identiverse is an identity conference. Head of Payments is only a clean fit if Daniel's company sells at the identity-payments seam (ATO/3DS/KYC/auth orchestration). If it does not, the sequence will read as forced before the validator even sees it.
+
+If you reply with the sender website (or a one-line description of what the company sells) and a proof/asset posture, I will fetch the site, build the Outbound Research Brief, run the cadence planner against the June 9-11, 2026 dates, and draft the 6-touch email sequence with validator-passing copy.

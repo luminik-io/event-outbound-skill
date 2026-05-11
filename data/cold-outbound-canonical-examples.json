@@ -1,14 +1,14 @@
 {
-  "_source": "data/cold-outbound-craft.md sections \"Canonical should pass examples\" + \"Canonical should fail examples\". the canon's voice is preserved verbatim (ASCII-only: em-dashes converted to commas/periods per workspace policy).",
+  "_source": "data/cold-outbound-craft.md sections \"Canonical should pass examples\" + \"Canonical should fail examples\". the canon's voice is preserved with CTA wording normalized to the current conversational rule set.",
   "pass_examples": [
     {
       "id": "warmbox_cold_first_touch",
       "channel": "email",
       "touch_type": "email_cold",
       "subject": "cold emails in spam?",
-      "body": "noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises your inbox reputation. open to a look?",
+      "body": "noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises your inbox reputation. open to taking a look?",
       "source": "4t-framework-archive.txt:175-240",
-      "annotation": "Canonical 4T cold email. Word count 60. Sentences 4. Pronouns: you/your=4, we/our=1. Trigger (hiring SDRs) -> Think (deliverability question) -> Third-party (Google/Salesforce + 94% vs 12%) -> Talk (open to a look)."
+      "annotation": "Canonical 4T cold email. Word count 61. Sentences 4. Pronouns: you/your=4, we/our=1. Trigger (hiring SDRs) -> Think (deliverability question) -> Third-party (Google/Salesforce + 94% vs 12%) -> Talk (open to taking a look)."
     },
     {
       "id": "captivateiq_cold_first_touch",
@@ -51,18 +51,18 @@
       "channel": "linkedin",
       "touch_type": "linkedin_connection_request",
       "subject": "",
-      "body": "Josh, looks like your podcast episodes are under five minutes. do you ever do long-form interviews? if so, any conditions you'd consider hiring an editor?",
-      "source": "LinkedIn-CSV:Sheet1",
-      "annotation": "Canonical gold-standard DM. 26 words / 158 chars. Compresses 4T into 3 sentences. Canonical gloss: \"No filler. No agenda. A gentle knock. They noticed something. Asked a question with humble curiosity. And left space for reflection.\""
+      "body": "Josh, looks like your podcast episodes are under five minutes, which made me wonder about the long-form interview workflow. Open to connecting?",
+      "source": "LinkedIn-CSV:Sheet1 pattern",
+      "annotation": "Canonical gold-standard DM adapted to connection-request format. 20 words / 128 chars. Trigger plus direct connection ask."
     },
     {
       "id": "fintech_li_connect",
       "channel": "linkedin",
       "touch_type": "linkedin_connection_request",
       "subject": "",
-      "body": "Avi, saw you're hiring 4 AEs for the SOC2 compliance vertical. curious how you're getting them ramped on the new pricing model. open to comparing notes?",
+      "body": "Avi, hiring AEs into a SOC2 vertical usually exposes the pricing-model ramp gap before the first renewal conversation. Open to connecting?",
       "source": "synthesis-doc:linkedin-pass-2",
-      "annotation": "27 words / ~165 chars. Trigger (hiring AEs) + neutral question + lean-back CTA."
+      "annotation": "21 words / ~120 chars. Buyer-specific trigger + direct connection ask."
     },
     {
       "id": "truebill_li_dm_post_connect",
@@ -78,18 +78,18 @@
       "channel": "linkedin",
       "touch_type": "linkedin_day_of_nudge",
       "subject": "",
-      "body": "Pete, running our identity-verification roundtable today at 4pm at the Marriott bar (a block from Moscone West). 8 CISOs already RSVP'd, room for 2 more. low-pressure, no slides, just a conversation. swing by?",
+      "body": "Pete, running our identity-verification roundtable today at 4pm at the Marriott bar (a block from Moscone West). Eight CISOs already RSVP'd, room for two more, and help-desk reset friction is the focus. Worth a seat?",
       "source": "synthesis-doc:linkedin-day-of-pass-1",
-      "annotation": "40 words. Concrete time + place. \"low-pressure\" used as descriptive adjective (allowed) not defensive opener."
+      "annotation": "36 words. Concrete time + place, only when those facts were supplied."
     },
     {
       "id": "blackhat_post_event_followup",
       "channel": "email",
       "touch_type": "post_event_followup",
       "subject": "mfa rollout",
-      "body": "Pete, appreciated your take on phishing-resistant MFA at the Friday breakfast. you mentioned the rollout to your help desk was the friction point. how are you keeping the help desk from defaulting back to SMS resets? we've seen Auth0 + a 30-second runbook get adoption from 40% to 92%. worth comparing notes?",
+      "body": "Pete, appreciated your take on phishing-resistant MFA at the Friday breakfast. you mentioned the rollout to your help desk was the friction point. how are you keeping the help desk from defaulting back to SMS resets? we've seen Auth0 plus a 30-second runbook get adoption from 40% to 92%. Worth looking into?",
       "source": "synthesis-doc:post-event-pass-1",
-      "annotation": "56 words. Post-event hook + illumination question + 3rd-party validation + soft CTA."
+      "annotation": "56 words. Post-event hook + illumination question + 3rd-party validation + clear lean-back CTA."
     }
   ],
   "fail_examples": [
@@ -190,7 +190,7 @@
       "channel": "email",
       "touch_type": "email_cold",
       "subject": "event roi",
-      "body": "Pete, most teams treat events like a gamble. how are you measuring booth-to-pipeline at Warmbox? Series B fintechs we worked with cut cost-per-opp by 38%. open to a look?",
+      "body": "Pete, most teams treat events like a gamble. how are you measuring booth-to-pipeline at Warmbox? Series B fintechs we worked with cut cost-per-opp by 38%. open to taking a look?",
       "source": "synthesis-doc:fail-9",
       "expected_failures": ["lazy_generalization_openers"],
       "annotation": "Opens with population-shape generalization that any vendor could send to any prospect. Auto-rejected."
@@ -210,7 +210,7 @@
       "channel": "email",
       "touch_type": "email_cold",
       "subject": "fintech reply rate",
-      "body": "Anna, almost nobody tracks reply rate in the 14 days after a fintech conference. how are you tracking that number at Plaid? Three demand-gen leads pushed it from 4% to 18%. open to a look?",
+      "body": "Anna, almost nobody tracks reply rate in the 14 days after a fintech conference. how are you tracking that number at Plaid? Three demand-gen leads pushed it from 4% to 18%. open to taking a look?",
       "source": "synthesis-doc:fail-11",
       "expected_failures": ["lazy_generalization_openers"],
       "annotation": "Opens with universal-negative claim impossible to verify. Auto-rejected."

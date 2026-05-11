@@ -1,6 +1,8 @@
 export type EventContext = {
   name: string;
   dates: string;
+  startDate?: string; // YYYY-MM-DD, used for date-aware cadence planning.
+  endDate?: string; // YYYY-MM-DD.
   location: string;
   agendaTitles: string[];
   speakers: string[];
@@ -10,6 +12,10 @@ export type EventContext = {
 export type CompanyICP = {
   industry: string;
   sizeRange: string;
+  website?: string;
+  productSummary?: string;
+  proofPoints?: string[];
+  availableAssets?: string[];
   personas: AttendeePersona[];
 };
 
@@ -26,9 +32,23 @@ export type AttendeePersona = {
     | 'other'
     | 'unknown';
   company?: string;
+  buyerJob?: string;
+  currentWorkaround?: string;
+  hiddenRisk?: string;
+  objections?: string[];
+  proofPoints?: string[];
+  availableAssets?: string[];
   priorities: string[];
   painPoints: string[];
   exampleTitles: string[];
+};
+
+export type PainAngle = {
+  label: string;
+  sourcePain?: string;
+  mechanism?: string;
+  costOfInaction?: string;
+  illuminationQuestion?: string;
 };
 
 export const CTA_TYPES = [
@@ -64,6 +84,7 @@ export type OutreachTouch = {
   touch_type: string;
   subject: string;
   body: string;
+  pain_angle?: PainAngle;
   word_count: number;
   cta_type: CTAType;
   checks: {
@@ -82,8 +103,17 @@ export type OutreachTouch = {
     specificityHits: number;
     permissionToSendHits?: string[];
     forcedEventPhrasingHits?: string[];
+    missingMergeFields?: string[];
+    assetPromiseHits?: string[];
+    proofClaimHits?: string[];
     previewSellerHits?: string[];
     previewEventHits?: string[];
+    clearCtaHits?: string[];
+    missingClearCta?: boolean;
+    commaSplicedCtaHits?: string[];
+    painAngleLabel?: string;
+    reusedPainAngleHits?: string[];
+    painAngleBodyOverlap?: number;
   };
   validation_errors?: ValidationError[];
   quality_flag?: 'rules_violated';
@@ -94,6 +124,9 @@ export type OutreachSequence = {
   touches: OutreachTouch[];
   leadTimeWeeks: number;
   channels: ('email' | 'linkedin')[];
+  touchCount?: number;
+  minGapDays?: number;
+  today?: string;
 };
 
 export type SequencerOutput = {
@@ -103,6 +136,12 @@ export type SequencerOutput = {
 export type SequenceParams = {
   leadTimeWeeks: number; // 1-8, default 4
   channels: ('email' | 'linkedin')[];
+  touchCount?: number;
+  minGapDays?: number; // Default 4. Adjacent steps should not be closer.
+  today?: string; // YYYY-MM-DD. Defaults to the active session date in skill usage.
+  includeDayOf?: boolean;
+  includePostEvent?: boolean;
+  preEventOnly?: boolean;
   sendingIdentity: {
     name: string;
     title: string;

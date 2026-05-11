@@ -11,6 +11,7 @@ import {
   ValidationResult,
   ValidationError,
   TimelineTouchpoint,
+  PainAngle,
 } from '../types/index.js';
 import {
   getValidationRules,
@@ -25,6 +26,15 @@ import {
   findForcedEventPhrasing,
   findSellerFirstPreviewPhrasing,
   findEventFirstPreviewPhrasing,
+  findMissingMergeFields,
+  findAssetPromisePhrasing,
+  findProofClaimPhrasing,
+  findClearCtaPhrasing,
+  requiresClearCta,
+  findCommaSplicedCtaPhrasing,
+  findReusedPainAngles,
+  painAngleLabel,
+  painAngleMatchesBody,
 } from '../lib/ruleService.js';
 import { generateTimeline } from '../lib/timeline.js';
 
@@ -36,6 +46,7 @@ type LLMTouch = {
   subject: string;
   body: string;
   cta_type: CTAType;
+  pain_angle?: PainAngle;
 };
 
 // ---------------------------------------------------------------------------
@@ -83,7 +94,12 @@ function resolveTouchTypeKey(briefLabel: string): string {
   switch (briefLabel) {
     case 'email_cold':
       return 'cold_email_first_touch';
-    case 'email_followup':
+    case 'email_followup_2':
+      return 'cold_email_followup_2';
+    case 'email_followup_3plus':
+    case 'email_day_of':
+      return 'cold_email_followup_3plus';
+    case 'email_post_event':
       return 'post_event_followup';
     case 'linkedin_connect':
       return 'linkedin_connection_request';
@@ -98,6 +114,116 @@ function resolveTouchTypeKey(briefLabel: string): string {
   }
 }
 
+function wordsForLabel(text: string): string[] {
+  const banned = new Set([
+    'across',
+    'after',
+    'before',
+    'being',
+    'between',
+    'current',
+    'doing',
+    'handling',
+    'their',
+    'there',
+    'these',
+    'those',
+    'through',
+    'using',
+    'where',
+    'which',
+    'while',
+    'without',
+  ]);
+  return Array.from(
+    new Set(
+      text
+        .toLowerCase()
+        .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g)
+        ?.map((word) => word.replace(/[-/]/g, ''))
+        .filter((word) => word.length >= 5 && !banned.has(word)) ?? [],
+    ),
+  );
+}
+
+function labelFromText(text: string, fallback: string): string {
+  const words = wordsForLabel(text).slice(0, 4);
+  return words.length > 0 ? words.join(' ') : fallback;
+}
+
+function pushUniqueAngle(angles: PainAngle[], candidate: PainAngle): void {
+  const label = candidate.label.trim();
+  if (!label) return;
+  const normalized = label.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  if (
+    angles.some(
+      (angle) =>
+        angle.label.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() === normalized,
+    )
+  ) {
+    return;
+  }
+  angles.push({ ...candidate, label });
+}
+
+function buildPainAngleLedger(persona: AttendeePersona, touchCount: number): PainAngle[] {
+  const angles: PainAngle[] = [];
+  for (const pain of persona.painPoints) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(pain, `pain ${angles.length + 1}`),
+      sourcePain: pain,
+      mechanism: persona.currentWorkaround
+        ? `Current workaround: ${persona.currentWorkaround}`
+        : undefined,
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  if (persona.hiddenRisk) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(persona.hiddenRisk, 'hidden risk'),
+      sourcePain: persona.hiddenRisk,
+      mechanism: 'Cost of inaction / hidden risk',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  if (persona.currentWorkaround) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(persona.currentWorkaround, 'workaround drag'),
+      sourcePain: persona.currentWorkaround,
+      mechanism: 'Current workaround',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  for (const priority of persona.priorities) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(priority, `priority ${angles.length + 1}`),
+      sourcePain: priority,
+      mechanism: 'Priority pressure',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  for (const objection of persona.objections ?? []) {
+    pushUniqueAngle(angles, {
+      label: labelFromText(objection, `objection ${angles.length + 1}`),
+      sourcePain: objection,
+      mechanism: 'Silent buyer objection',
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  while (angles.length < touchCount) {
+    pushUniqueAngle(angles, {
+      label: `angle ${angles.length + 1}`,
+      sourcePain:
+        persona.buyerJob ||
+        persona.priorities[angles.length % Math.max(1, persona.priorities.length)] ||
+        persona.role,
+      mechanism: `Different dimension for touch ${angles.length + 1}`,
+      costOfInaction: persona.hiddenRisk,
+    });
+  }
+  return angles.slice(0, touchCount);
+}
+
 // ---------------------------------------------------------------------------
 // Validation
 // ---------------------------------------------------------------------------
@@ -109,6 +235,13 @@ function validateTouch(
     cta_type: CTAType;
     channel: 'email' | 'linkedin';
     touch_type: string;
+    strictTruth?: boolean;
+    apolloMergeFieldsRequired?: boolean;
+    availableAssets?: string[];
+    proofPoints?: string[];
+    strictAngleDiversity?: boolean;
+    painAngle?: PainAngle;
+    usedPainAngles?: PainAngle[];
   },
   eventContext: EventContext,
   persona: AttendeePersona,
@@ -246,9 +379,38 @@ function validateTouch(
     });
   }
 
+  const clearCtaHits = findClearCtaPhrasing(
+    touch.body,
+    ruleKey,
+    touch.channel,
+    jbRules.specific_pass_phrases?.lean_back_ctas,
+  );
+  const missingClearCta =
+    requiresClearCta(ruleKey, touch.channel) && clearCtaHits.length === 0;
+  if (missingClearCta) {
+    errors.push({
+      rule: 'clearCta',
+      message:
+        ruleKey === 'linkedin_connection_request'
+          ? 'LinkedIn connection requests must close with an explicit connection ask such as "Open to connecting?" or "Worth connecting?".'
+          : 'Every touch must close with a clear lean-back CTA question such as "Worth looking into?", "Open to taking a look?", or "Does this belong in the roadmap conversation?".',
+    });
+  }
+
+  const commaSplicedCtaHits = findCommaSplicedCtaPhrasing(touch.body);
+  if (commaSplicedCtaHits.length > 0) {
+    errors.push({
+      rule: 'commaSplicedCta',
+      message:
+        'Do not comma-splice an asset statement into the CTA. Use a clean CTA sentence or rewrite the final sentence around the question.',
+      offendingValue: commaSplicedCtaHits.join(', '),
+    });
+  }
+
   const forcedEventPhrasingHits = findForcedEventPhrasing(
     combined,
     eventContext.name,
+    eventContext.location,
   );
   if (forcedEventPhrasingHits.length > 0) {
     errors.push({
@@ -256,6 +418,54 @@ function validateTouch(
       message:
         'Event reference feels forced. Use the buyer responsibility as the reason to write; use the event naturally only when it helps the ask.',
       offendingValue: forcedEventPhrasingHits.join(', '),
+    });
+  }
+
+  const strictContext = touch.strictTruth === true;
+  const mergeSpec = jbRules.strict_context_rules?.apollo_merge_fields;
+  const mergeApplies =
+    touch.apolloMergeFieldsRequired === true ||
+    (strictContext &&
+      Boolean(mergeSpec?.applies_to?.includes(ruleKey)));
+  const missingMergeFields = mergeApplies
+    ? findMissingMergeFields(
+        touch.body,
+        mergeSpec?.required_fields ?? ['{{first_name}}', '{{company}}'],
+      )
+    : [];
+  if (missingMergeFields.length > 0) {
+    errors.push({
+      rule: 'missingMergeFields',
+      message: `Body must include Apollo-ready merge fields: ${missingMergeFields.join(', ')}.`,
+      offendingValue: missingMergeFields.join(', '),
+    });
+  }
+
+  const assetPromiseHits = findAssetPromisePhrasing(combined);
+  if (
+    strictContext &&
+    assetPromiseHits.length > 0 &&
+    (touch.availableAssets ?? []).length === 0
+  ) {
+    errors.push({
+      rule: 'unsourcedAssetPromise',
+      message:
+        'Body promises or references an asset, but no availableAssets were supplied.',
+      offendingValue: assetPromiseHits.join(', '),
+    });
+  }
+
+  const proofClaimHits = findProofClaimPhrasing(combined);
+  if (
+    strictContext &&
+    proofClaimHits.length > 0 &&
+    (touch.proofPoints ?? []).length === 0
+  ) {
+    errors.push({
+      rule: 'unsourcedProofClaim',
+      message:
+        'Body makes a customer, peer, or before/after proof claim, but no proofPoints were supplied.',
+      offendingValue: proofClaimHits.join(', '),
     });
   }
 
@@ -292,6 +502,39 @@ function validateTouch(
       message:
         'First inbox-preview words are event-first. Use the buyer responsibility as the opener and the event as supporting context.',
       offendingValue: previewEventHits.join(', '),
+    });
+  }
+
+  const strictAngleDiversity = touch.strictAngleDiversity === true;
+  const painAngle = touch.painAngle;
+  const reusedPainAngle = findReusedPainAngles(
+    painAngle,
+    touch.usedPainAngles ?? [],
+    touch.body,
+  );
+  const painAngleBodyMatches =
+    !painAngle || painAngleMatchesBody(painAngle, touch.body);
+  if (strictAngleDiversity && !painAngle) {
+    errors.push({
+      rule: 'missingPainAngle',
+      message:
+        'Strict angle diversity requires a painAngle label for every touch.',
+    });
+  }
+  if (strictAngleDiversity && painAngle && !painAngleBodyMatches) {
+    errors.push({
+      rule: 'painAngleMismatch',
+      message:
+        'Touch declares a pain angle, but the body does not visibly use that angle. Rewrite so the metadata and copy match.',
+      offendingValue: painAngleLabel(painAngle),
+    });
+  }
+  if (strictAngleDiversity && reusedPainAngle.hits.length > 0) {
+    errors.push({
+      rule: 'painAngleReused',
+      message:
+        'Touch reuses a pain angle or angle vocabulary from an earlier sequence step. Pick a different buyer problem, consequence, or illumination route.',
+      offendingValue: reusedPainAngle.hits.join(', '),
     });
   }
 
@@ -437,8 +680,17 @@ function validateTouch(
     specificityHits,
     permissionToSendHits,
     forcedEventPhrasingHits,
+    missingMergeFields,
+    assetPromiseHits,
+    proofClaimHits,
     previewSellerHits,
     previewEventHits,
+    clearCtaHits,
+    missingClearCta,
+    commaSplicedCtaHits,
+    painAngleLabel: painAngle ? painAngleLabel(painAngle) : undefined,
+    reusedPainAngleHits: reusedPainAngle.hits,
+    painAngleBodyOverlap: reusedPainAngle.bodyOverlap,
   };
 
   return { result: { isValid: errors.length === 0, errors }, checks };
@@ -457,41 +709,62 @@ function touchBrief(
     return {
       label: 'linkedin_connect',
       instruction:
-        'LinkedIn connection request. 18-35 words / max 200 chars / 1-2 sentences. Mention the event by name + one specific observation. Subject empty. CTA type: none. NO illumination question required (compress 4T into 3 sentences max).',
+        'LinkedIn connection request. 18-35 words / max 200 chars / 1-2 sentences. Mention the event by name + one specific buyer observation. Subject empty. CTA type: ask_for_interest. Close with "Open to connecting?" or "Worth connecting?". NO illumination question required.',
     };
   }
   if (channel === 'linkedin' && offset_days < 0) {
     return {
       label: 'linkedin_nudge',
       instruction:
-        'Pre-event LinkedIn nudge. 30-60 words / 2-3 sentences. Reference the upcoming event + one specific pain point. Lean-back CTA. CTA type: ask_for_interest or make_offer.',
+        'Pre-event LinkedIn nudge. 30-60 words / 2-3 sentences. Reference the upcoming event + one specific pain point. Close with a clear lean-back CTA question, e.g. "Worth looking into?" or "Does this belong in the roadmap conversation?". CTA type: ask_for_interest or make_offer.',
     };
   }
   if (channel === 'linkedin' && offset_days === 0) {
     return {
       label: 'linkedin_day_of',
       instruction:
-        'Day-of LinkedIn message. 30-60 words / 2-3 sentences. Reference a concrete time + place. One CTA. CTA type: ask_for_interest.',
+        'Day-of LinkedIn message. 30-60 words / 2-3 sentences. Reference the event day without inventing sender location, time, booth, or track. Close with one clear buyer-timing CTA question. CTA type: ask_for_interest.',
     };
   }
   if (channel === 'linkedin' && offset_days > 0) {
     return {
       label: 'linkedin_followup',
       instruction:
-        'Post-event LinkedIn follow-up. 40-90 words / 2-4 sentences. Reference something specific from the event. Lean-back CTA. CTA type: make_offer.',
+        'Post-event LinkedIn follow-up. 40-90 words / 2-4 sentences. Reference the returned-to-desk work after the event, without fake pleasantries or invented sessions. Close with a clear lean-back CTA question. CTA type: make_offer.',
     };
   }
   if (channel === 'email' && offset_days < 0) {
+    if (touchpoint.touch_slot === 1) {
+      return {
+        label: 'email_cold',
+        instruction:
+          'Pre-event cold email. 50-100 words / 3-5 sentences. Subject all lowercase, max 4 words, no colons, no digits. Follow the 4T framework: Trigger (specific observation) -> Think (neutral how/what/why-are-you illumination question) -> Third-party validation if real proof exists -> Talk? (lean-back CTA). CTA type: make_offer.',
+      };
+    }
+    if (touchpoint.touch_slot === 2) {
+      return {
+        label: 'email_followup_2',
+        instruction:
+          'Second pre-event email. 40-90 words / 3-4 sentences. Open on the assigned fresh buyer angle. Do not label the email as a follow-up, previous note, earlier note, or separate thread. Use one neutral question and one lean-back CTA. CTA type: ask_for_interest.',
+      };
+    }
     return {
-      label: 'email_cold',
+      label: 'email_followup_3plus',
       instruction:
-        'Pre-event cold email. 50-100 words / 3-5 sentences. Subject all lowercase, max 4 words, no colons, no digits. Follow the 4T framework: Trigger (specific observation) -> Think (neutral how/what/why-are-you illumination question) -> Third-party validation (peer/customer + contrast number) -> Talk? (lean-back CTA). CTA type: make_offer.',
+        'Later pre-event email. 25-60 words / 2-3 sentences. Open on the assigned fresh buyer angle. No sequence mechanics, no "following up", no "earlier note", no fake familiarity, no meeting-first ask. CTA type: ask_for_interest.',
+    };
+  }
+  if (channel === 'email' && offset_days === 0) {
+    return {
+      label: 'email_day_of',
+      instruction:
+        'Day-of email. 25-60 words / 2-3 sentences. Reference the event day without inventing a location, session, or attendee behavior. CTA type: ask_for_interest.',
     };
   }
   return {
-    label: 'email_followup',
+    label: 'email_post_event',
     instruction:
-      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive". Trigger from a session/topic, neutral question, third-party validation, lean-back CTA. CTA type: make_offer.',
+      'Post-event follow-up email. 40-90 words / 2-4 sentences. Reference the event in past tense WITHOUT cliches like "hope the event was productive" or "hope the week in [city] went well". Use a neutral question and no fabricated session, location, or peer proof. CTA type: ask_for_interest.',
   };
 }
 
@@ -540,11 +813,13 @@ loosely; LinkedIn connection requests compress it to 2-3 sentences)
    "industry-leading", "world-class".
 4. **Talk?** - direct CTA, with a question mark. Lean-back energy, but no permission theatre.
    If you have a useful asset, attach or link it. Do not ask permission to send it. Approved closers:
-     "Worth a look?" / "Worth a peek sometime?" / "Worth a skim?" / "Worth an exchange?"
-     "Open to learning more?" / "Worth a conversation?" / "Worth coffee at {{event_name}}?"
+     "Worth looking into?" / "Open to taking a look?" / "Worth a closer look?"
+     "Is this on your roadmap, or parked for later?" / "Does this belong in the roadmap conversation?"
+     "Worth coffee at {{event_name}} if this is already on your list?"
    BANNED closers: "Do you have 15 minutes?", "Would you be open to a 30-minute call?",
    "Can we book time on your calendar?", "schedule a meeting", "Should I send it?",
-   "Can I send it?", "Want me to send it?", "Want the one-pager?"
+   "Can I send it?", "Want me to send it?", "Want the one-pager?", "Open to a look?",
+   "Is this worth pressure-testing before {{event_location}}?", "Is this useful for {{event_location}} prep?"
 
 ==========================================================================================
 CHANNEL-SPECIFIC LENGTH TABLE (HARD RULES)
@@ -557,18 +832,18 @@ TWO CANONICAL PASS EXAMPLES (study the SHAPE, not the literal copy)
 Pass A - Warmbox cold email (4T canonical):
 > Subject: cold emails in spam?
 >
-> noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are
-> you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver
-> 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises
-> your inbox reputation. open to a look?
+> {{first_name}}, noticed {{company}} is hiring SDRs, which suggests your team might be sending
+> more cold email this quarter. How are you ensuring those emails do not land in spam? Google
+> and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before.
+> It involves a warm-up tool that raises inbox reputation. Open to taking a look?
 
 Pass B - TitanX cold email (canonical LinkedIn 4T post):
 > Subject: more at bats
 >
-> Pete, looks like you have 9 SDRs cold calling Directors of Benefits and CHROs. how are you
-> giving your reps more at bats? SDRs using TitanX have 6-8 conversations every 50 dials,
-> compared to 1-2 before. we identify the people most likely to answer. no long-term contracts
-> or new tech to implement. open to learning more?
+> {{first_name}}, looks like {{company}} has SDRs cold calling Directors of Benefits and CHROs.
+> How are you giving your reps more at bats? SDRs using TitanX have 6-8 conversations every
+> 50 dials, compared to 1-2 before. We identify the people most likely to answer. Open to
+> learning more?
 
 ==========================================================================================
 ONE CANONICAL FAIL EXAMPLE (do NOT regress to this)
@@ -608,23 +883,80 @@ company ("Klarna"), or a titled cohort. REQUIRED:
 NEVER write [Name] / [Company] / <first_name> placeholders.
 
 ==========================================================================================
+STRICT TRUTH RULES (hard requirement)
+==========================================================================================
+- Do not invent assets. If available assets are empty, never mention "attached", "linked",
+  "matrix", "brief", "worksheet", "one-pager", "report", "audit", "recap", "doc", or "map".
+- Do not invent proof. If proof points are empty, never write named customers, "three orgs",
+  "two teams", public-sounding before/after numbers, or peer benchmarks.
+- If proof is missing, write a mechanism sentence or buyer-risk sentence instead. Better:
+  ask for proof before drafting.
+- If the event agenda or dates are unknown, do not imply a real session, track conflict,
+  Tuesday slot, or day-of location.
+- The event is only the occasion. The opener belongs to the buyer job, workaround, or hidden risk.
+- If sender event attendance, booth, side-event, or coffee availability is known, include exactly
+  one natural event-specific ask in the sequence, usually the last pre-event or day-of touch.
+  Pattern: "Worth coffee at {{event_name}} if this is already on your audit list?".
+- If sender event logistics are unknown, do not use a meetup, coffee, booth, or "I'll be there" CTA.
+- If useful assets or lead magnets are supplied, use at most one asset-backed CTA. If none are
+  supplied, ask for assets before drafting or write strict no-asset copy.
+
+==========================================================================================
 HARD VALIDATOR RULES (auto-rejected)
 ==========================================================================================
 - Subject: all lowercase, max ${rules.subject_line_rules.max_word_count} words, no colons, no
   digits, no buzzwords. Subject is static text - do NOT put merge fields in the subject.
 - Body length: per the channel table above.
+- Body grammar: first letter of each sentence capitalized. Subject stays lowercase.
 - Cold first touches and post-connect DMs: the first 18 words must be buyer-first. Do not put
   seller pronouns ("I", "we", "our", "us") or the event name at the front of the inbox preview.
 - Cold emails AND post-connect DMs MUST contain a "how/what/why ARE/DO/IS you/your"
   illumination question. (Connection requests are exempt.)
+- Every generated touch MUST close with a clear lean-back CTA question. Do not end
+  with an asset statement, a clever observation, or an implied next step.
+- NO comma-spliced asset CTAs. Do not write "I attached X, worth looking into?".
+  Use "I attached X. Worth looking into?" only when the channel sentence count allows it,
+  otherwise rewrite the CTA around the buyer question.
+- LinkedIn connection requests MUST close with an explicit connection ask:
+  "Open to connecting?" or "Worth connecting?". CTA type must be ask_for_interest.
+- LinkedIn DMs and nudges MUST close with a clear lean-back CTA question:
+  "Worth looking into?", "Open to taking a look?", "Does this belong in the roadmap conversation?",
+  or a similarly clear buyer-timing ask. Do not end LinkedIn copy as a standalone observation.
 - NO leading / moon-and-stars patterns: "if I could...", "would you be interested?",
   "wouldn't you agree?", "would you agree...", "don't you think..." - AUTO-REJECTED.
 - NO permission-to-send CTAs. Auto-rejected: "should I send", "can I send",
   "want me to send/share/walk", "want the one-pager", "happy to send/share".
   Send or attach the asset, then ask a real question.
 - NO forced event phrasing. Auto-rejected: "keeps coming up before RSA",
-  "week of Money20/20", "today at RSA", "into m2020", and any illumination question
-  that bolts "before [event]" onto the end. The event is the occasion, not the point.
+  "week of Money20/20", "today at RSA", "into m2020", any illumination question
+  that bolts "before [event]" onto the end, and CTAs like
+  "worth pressure-testing before Amsterdam" or "useful for Amsterdam prep".
+  The event is the occasion and route to the conversation, not the buyer's reason to care.
+- NO generic post-event pleasantries: "hope the event went well",
+  "hope the event was productive", "hope the week in [city] went well".
+  Start from the buyer's returned-to-desk work instead.
+- NO invented sender logistics: "I'm around", "I am around the [track] side
+  of the agenda", "I'll be at booth X", or fabricated session/track references
+  unless the user supplied that fact. If sender availability is missing, use a
+  buyer-timing CTA instead of a meetup CTA.
+- ONE event-specific ask is encouraged when true. Use it once, not every touch.
+  It must be tied to supplied sender presence, availability, booth, table, or hosted event.
+- NO recycled pain angles. Each touch in the sequence must illuminate a different
+  buyer pain, consequence, or mechanism. Do not reuse the same pain across email
+  and LinkedIn, even in different wording. Return the selected pain_angle metadata
+  with every touch and make the body visibly match it.
+- NO sequence-mechanics openers. Do not write "separate thread", "sent a note",
+  "earlier note", "previous note", or "following up on my..." in generated copy.
+  Each step should stand on its own buyer-relevant angle.
+- NO vague calendar-trigger openers. Do not write "this is usually the week...",
+  "new rails get attention", or similar timing filler. Name the buyer-side job
+  or consequence directly.
+- NO invented event logistics. Do not invent hosting, roundtables, coffee times,
+  speaker-lounge locations, Business Hall locations, or prior conversations.
+  Only use those when supplied by the user.
+- NO invented buyer state. Do not write as if the buyer's auditor flagged
+  something, the buyer is carrying a named gap, or the buyer discussed
+  something with the sender unless that fact was supplied.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.
@@ -661,6 +993,8 @@ function buildUserPrompt(
   touchpoint: TimelineTouchpoint,
   brief: ReturnType<typeof touchBrief>,
   previousErrors: ValidationError[],
+  assignedPainAngle: PainAngle,
+  usedPainAngles: PainAngle[],
 ): string {
   const retryNote = previousErrors.length
     ? `\n\nPREVIOUS ATTEMPT FAILED these rules - fix them: ${previousErrors.map((e) => e.rule + ': ' + e.message).join(' | ')}`
@@ -671,6 +1005,10 @@ Agenda: ${eventContext.agendaTitles.slice(0, 6).join('; ') || 'n/a'}.
 Target persona: ${persona.role} (${persona.seniority}).
 Priorities: ${persona.priorities.join('; ')}.
 Pain points: ${persona.painPoints.join('; ')}.
+Assigned pain angle for this touch: ${JSON.stringify(assignedPainAngle)}.
+Pain angles already used in this sequence: ${
+    usedPainAngles.length > 0 ? usedPainAngles.map((angle) => angle.label).join('; ') : 'none'
+  }.
 
 Sender: ${sequenceParams.sendingIdentity.name}, ${sequenceParams.sendingIdentity.title} at ${sequenceParams.sendingIdentity.company}.
 
@@ -679,10 +1017,15 @@ ${brief.instruction}${retryNote}
 
 Apply the 4T framework. Map the persona's pain points to the Trigger and Think question. Use a
 specific peer + contrast number for the Third-party slot. Close with a lean-back CTA.
+Do not reuse any pain angle already used. If the assigned angle is too close to a used angle,
+pick a distinct dimension from the buyer job and name it in pain_angle.
 
 Address the recipient with {{first_name}} and reference their company as {{company}}. NEVER
 hard-code a specific company name or persona cohort. Write only the subject and body - no
-signature block, no greeting with "Hey".`;
+signature block, no greeting with "Hey".
+
+Return JSON with subject, body, cta_type, and pain_angle. pain_angle must include label,
+sourcePain, mechanism, and costOfInaction.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -754,16 +1097,33 @@ export async function generateSequence(
       touches: [],
       leadTimeWeeks: sequenceParams.leadTimeWeeks,
       channels: sequenceParams.channels,
+      touchCount: sequenceParams.touchCount,
+      minGapDays: sequenceParams.minGapDays ?? 4,
+      today: sequenceParams.today,
     };
 
     const timeline = generateTimeline(
       sequenceParams.leadTimeWeeks,
       sequenceParams.channels,
+      {
+        touchCount: sequenceParams.touchCount,
+        minGapDays: sequenceParams.minGapDays,
+        today: sequenceParams.today,
+        eventStartDate: eventContext.startDate,
+        eventDates: eventContext.dates,
+        includeDayOf: sequenceParams.includeDayOf,
+        includePostEvent: sequenceParams.includePostEvent,
+        preEventOnly: sequenceParams.preEventOnly,
+      },
     );
+    const painAngleLedger = buildPainAngleLedger(persona, timeline.length);
+    const usedPainAngles: PainAngle[] = [];
 
-    for (const touchpoint of timeline) {
+    for (let index = 0; index < timeline.length; index++) {
+      const touchpoint = timeline[index];
       const brief = touchBrief(touchpoint, sequenceParams.leadTimeWeeks);
       const touchTypeKey = resolveTouchTypeKey(brief.label);
+      const assignedPainAngle = painAngleLedger[index];
       const maxAttempts = 3;
       let previousErrors: ValidationError[] = [];
       let finalTouch: OutreachTouch | null = null;
@@ -779,6 +1139,8 @@ export async function generateSequence(
           touchpoint,
           brief,
           previousErrors,
+          assignedPainAngle,
+          usedPainAngles,
         );
 
         let llmTouch: LLMTouch;
@@ -809,6 +1171,9 @@ export async function generateSequence(
             cta_type: llmTouch.cta_type,
             channel: touchpoint.channel,
             touch_type: touchTypeKey,
+            strictAngleDiversity: true,
+            painAngle: llmTouch.pain_angle ?? assignedPainAngle,
+            usedPainAngles,
           },
           eventContext,
           persona,
@@ -822,6 +1187,7 @@ export async function generateSequence(
           touch_type: brief.label,
           subject: llmTouch.subject,
           body: llmTouch.body,
+          pain_angle: llmTouch.pain_angle ?? assignedPainAngle,
           word_count: countWords(llmTouch.body),
           cta_type: llmTouch.cta_type,
           checks,
@@ -853,6 +1219,9 @@ export async function generateSequence(
 
       if (finalTouch) {
         outreachSequence.touches.push(finalTouch);
+        if (finalTouch.pain_angle) {
+          usedPainAngles.push(finalTouch.pain_angle);
+        }
       }
     }
 

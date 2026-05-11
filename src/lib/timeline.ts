@@ -1,5 +1,16 @@
 import type { TimelineTouchpoint } from '../types/index.js';
 
+export type TimelineOptions = {
+  touchCount?: number;
+  minGapDays?: number;
+  eventStartDate?: string;
+  eventDates?: string;
+  today?: string;
+  includeDayOf?: boolean;
+  includePostEvent?: boolean;
+  preEventOnly?: boolean;
+};
+
 /**
  * Pure timing logic for an event-driven outreach sequence.
  *
@@ -27,6 +38,7 @@ import type { TimelineTouchpoint } from '../types/index.js';
 export function generateTimeline(
   leadTimeWeeks: number,
   channels: ('email' | 'linkedin')[],
+  options: TimelineOptions = {},
 ): TimelineTouchpoint[] {
   if (!Number.isFinite(leadTimeWeeks) || leadTimeWeeks < 1) {
     throw new Error(`leadTimeWeeks must be >= 1, got ${leadTimeWeeks}`);
@@ -39,6 +51,18 @@ export function generateTimeline(
   }
 
   type Draft = Omit<TimelineTouchpoint, 'touch_slot'>;
+  const enabled = new Set(channels);
+  const minGapDays = options.minGapDays ?? 4;
+  if (!Number.isFinite(minGapDays) || minGapDays < 1) {
+    throw new Error(`minGapDays must be >= 1, got ${minGapDays}`);
+  }
+  const leadWindowDays = resolveLeadWindowDays(leadTimeWeeks, options);
+
+  if (enabled.size === 1 && enabled.has('email')) {
+    return withSlots(
+      buildEmailOnlyTimeline(leadTimeWeeks, leadWindowDays, minGapDays, options),
+    );
+  }
 
   // Canonical 4-week plan. Other lead times are derived from this.
   const base: Draft[] = [
@@ -46,8 +70,8 @@ export function generateTimeline(
     { offset_days: -14, channel: 'email' }, // cold email
     { offset_days: -7, channel: 'linkedin' }, // nudge
     { offset_days: 0, channel: 'linkedin' }, // day-of
-    { offset_days: 2, channel: 'email' }, // post-event follow-up
-    { offset_days: 7, channel: 'linkedin' }, // post-event nudge
+    { offset_days: minGapDays, channel: 'email' }, // post-event follow-up
+    { offset_days: minGapDays * 2, channel: 'linkedin' }, // post-event nudge
   ];
 
   let plan: Draft[];
@@ -94,17 +118,223 @@ export function generateTimeline(
       { offset_days: -5, channel: 'linkedin' },
       { offset_days: -2, channel: 'email' },
       { offset_days: 0, channel: 'linkedin' },
-      { offset_days: 2, channel: 'email' },
+      { offset_days: minGapDays, channel: 'email' },
     ];
   }
 
   // Filter by enabled channels.
-  const enabled = new Set(channels);
   plan = plan.filter((t) => enabled.has(t.channel));
+  plan = plan.filter((t) => t.offset_days >= 0 || t.offset_days >= -leadWindowDays);
 
   // Sort chronologically and assign touch_slot 1..N.
   plan.sort((a, b) => a.offset_days - b.offset_days);
+  plan = enforceMinGap(plan, minGapDays);
 
+  if (options.touchCount !== undefined) {
+    if (!Number.isInteger(options.touchCount) || options.touchCount < 1) {
+      throw new Error(`touchCount must be a positive integer, got ${options.touchCount}`);
+    }
+    if (options.touchCount > plan.length) {
+      throw new Error(
+        `touchCount ${options.touchCount} cannot fit the ${leadTimeWeeks}-week ${channels.join(
+          '+',
+        )} cadence with minGapDays ${minGapDays}`,
+      );
+    }
+    plan = selectEvenly(plan, options.touchCount);
+  }
+
+  return withSlots(plan);
+}
+
+function resolveLeadWindowDays(
+  leadTimeWeeks: number,
+  options: TimelineOptions,
+): number {
+  const requestedLeadDays = leadTimeWeeks * 7;
+  const eventStartDate = options.eventStartDate ?? parseStartDateFromText(options.eventDates);
+  if (!eventStartDate) return requestedLeadDays;
+
+  const eventStart = parseDateOnly(eventStartDate, 'eventStartDate');
+  const todayString = options.today ?? currentLocalDate();
+  const today = parseDateOnly(todayString, 'today');
+  const daysUntilEvent = Math.floor(
+    (eventStart.getTime() - today.getTime()) / 86_400_000,
+  );
+  if (daysUntilEvent < 0) {
+    throw new Error(
+      `today (${todayString}) is after eventStartDate (${eventStartDate})`,
+    );
+  }
+  return Math.min(requestedLeadDays, daysUntilEvent);
+}
+
+function currentLocalDate(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function parseDateOnly(value: string, label: string): Date {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) throw new Error(`${label} must be YYYY-MM-DD, got ${value}`);
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`${label} must be a valid date, got ${value}`);
+  }
+  return date;
+}
+
+function parseStartDateFromText(value?: string): string | undefined {
+  if (!value) return undefined;
+  const iso = /\b(\d{4}-\d{2}-\d{2})\b/.exec(value);
+  if (iso) return iso[1];
+
+  const monthNames: Record<string, string> = {
+    jan: '01',
+    january: '01',
+    feb: '02',
+    february: '02',
+    mar: '03',
+    march: '03',
+    apr: '04',
+    april: '04',
+    may: '05',
+    jun: '06',
+    june: '06',
+    jul: '07',
+    july: '07',
+    aug: '08',
+    august: '08',
+    sep: '09',
+    sept: '09',
+    september: '09',
+    oct: '10',
+    october: '10',
+    nov: '11',
+    november: '11',
+    dec: '12',
+    december: '12',
+  };
+  const named = /\b(January|February|March|April|May|June|July|August|September|Sept|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*[-–]\s*\d{1,2}(?:st|nd|rd|th)?)?,?\s+(\d{4})\b/i.exec(
+    value,
+  );
+  if (!named) return undefined;
+  const month = monthNames[named[1].toLowerCase().replace('.', '')];
+  const day = named[2].padStart(2, '0');
+  return `${named[3]}-${month}-${day}`;
+}
+
+function buildEmailOnlyTimeline(
+  leadTimeWeeks: number,
+  leadWindowDays: number,
+  minGapDays: number,
+  options: TimelineOptions,
+): Omit<TimelineTouchpoint, 'touch_slot'>[] {
+  const includeDayOf = options.preEventOnly ? false : options.includeDayOf !== false;
+  const includePostEvent = options.preEventOnly ? false : options.includePostEvent !== false;
+  const reserved = Number(includeDayOf) + Number(includePostEvent);
+  const defaultTouchCount = Math.min(
+    8,
+    Math.max(3, Math.min(leadTimeWeeks, 6) + reserved),
+  );
+  const touchCount = options.touchCount ?? defaultTouchCount;
+  if (!Number.isInteger(touchCount) || touchCount < 1) {
+    throw new Error(`touchCount must be a positive integer, got ${touchCount}`);
+  }
+  if (touchCount <= reserved) {
+    throw new Error(
+      `touchCount ${touchCount} leaves no room for pre-event email touches`,
+    );
+  }
+
+  const preEventCount = touchCount - reserved;
+  const preEvent = spreadPreEventOffsets(
+    leadTimeWeeks,
+    leadWindowDays,
+    preEventCount,
+    minGapDays,
+  ).map((offset_days) => ({ offset_days, channel: 'email' as const }));
+  const plan: Omit<TimelineTouchpoint, 'touch_slot'>[] = [...preEvent];
+  if (includeDayOf) plan.push({ offset_days: 0, channel: 'email' });
+  if (includePostEvent) plan.push({ offset_days: minGapDays, channel: 'email' });
+  return plan;
+}
+
+function spreadPreEventOffsets(
+  leadTimeWeeks: number,
+  leadWindowDays: number,
+  count: number,
+  minGapDays: number,
+): number[] {
+  if (count <= 0) return [];
+  const earliest = -leadWindowDays;
+  const latest = -minGapDays;
+  if (earliest > latest) {
+    throw new Error(
+      `Not enough lead time to schedule a pre-event touch with minGapDays ${minGapDays}`,
+    );
+  }
+  const capacity = Math.floor((latest - earliest) / minGapDays) + 1;
+  if (count > capacity) {
+    throw new Error(
+      `touchCount requires ${count} pre-event touches, but only ${capacity} fit before the event with minGapDays ${minGapDays}`,
+    );
+  }
+
+  if (leadWindowDays === leadTimeWeeks * 7 && count === leadTimeWeeks) {
+    return Array.from({ length: count }, (_, i) => -(leadTimeWeeks - i) * 7);
+  }
+  if (count === 1) return [earliest];
+
+  const step = (latest - earliest) / (count - 1);
+  const offsets = Array.from({ length: count }, (_, i) =>
+    Math.round(earliest + step * i),
+  );
+  offsets[0] = earliest;
+  offsets[offsets.length - 1] = latest;
+  return normalizeMinGap(offsets, minGapDays);
+}
+
+function normalizeMinGap(offsets: number[], minGapDays: number): number[] {
+  const normalized = [...offsets].sort((a, b) => a - b);
+  for (let i = 1; i < normalized.length; i++) {
+    if (normalized[i] - normalized[i - 1] < minGapDays) {
+      normalized[i] = normalized[i - 1] + minGapDays;
+    }
+  }
+  return normalized;
+}
+
+function enforceMinGap<T extends { offset_days: number }>(
+  plan: T[],
+  minGapDays: number,
+): T[] {
+  const out: T[] = [];
+  for (const touch of plan) {
+    const last = out.at(-1);
+    if (!last || touch.offset_days - last.offset_days >= minGapDays) {
+      out.push(touch);
+    }
+  }
+  return out;
+}
+
+function selectEvenly<T>(items: T[], count: number): T[] {
+  if (count >= items.length) return items;
+  if (count === 1) return [items[0]];
+  const selected: T[] = [];
+  const step = (items.length - 1) / (count - 1);
+  for (let i = 0; i < count; i++) {
+    selected.push(items[Math.round(i * step)]);
+  }
+  return selected;
+}
+
+function withSlots(
+  plan: Omit<TimelineTouchpoint, 'touch_slot'>[],
+): TimelineTouchpoint[] {
   return plan.map((t, i) => ({
     offset_days: t.offset_days,
     channel: t.channel,

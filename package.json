@@ -1,15 +1,30 @@
 {
   "name": "event-outbound-skill",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Claude skill for generating event-driven outbound sequences.",
   "main": "dist/index.js",
   "type": "module",
+  "files": [
+    ".claude-plugin/",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+    "data/",
+    "dist/",
+    "examples/",
+    "marketplace/",
+    "scripts/",
+    "skills/"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest",
     "lint": "eslint . --ext .ts",
     "scan": "tsx scripts/scan-deliverables.ts",
-    "verify": "npm run build && npm run test -- --run && npm run scan"
+    "validate:sequence": "node scripts/validate-sequence.mjs",
+    "check:showcase": "node scripts/check-claude-showcase.mjs",
+    "e2e:claude": "node scripts/run-claude-showcase.mjs",
+    "verify": "npm run build && npm run test -- --run && npm run scan && npm run check:showcase"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",

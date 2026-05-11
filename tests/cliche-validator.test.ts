@@ -9,9 +9,12 @@ import { describe, expect, it, beforeAll } from 'vitest';
 
 import {
   findForcedEventPhrasing,
+  findAssetPromisePhrasing,
   findEventFirstPreviewPhrasing,
   findLlmCliches,
+  findMissingMergeFields,
   findPermissionToSendPhrasing,
+  findProofClaimPhrasing,
   findSellerFirstPreviewPhrasing,
   type ColdOutboundRules,
 } from '../src/lib/ruleService.js';
@@ -201,6 +204,12 @@ describe('findLlmCliches: existing categories still fire (regression coverage)',
     expect(result.hardBans.sales_speak_openers).toBeDefined();
   });
 
+  it('flags generic post-event pleasantries under sales_speak_openers', () => {
+    const text = '{{first_name}}, hope the week in Amsterdam went well.';
+    const result = findLlmCliches(text, blocklist);
+    expect(result.hardBans.sales_speak_openers).toContain('hope the week in');
+  });
+
   it('flags "Moreover," under llm_transition_tics', () => {
     const text = 'Moreover, the data shows reply rates spike post-event.';
     const result = findLlmCliches(text, blocklist);
@@ -291,6 +300,50 @@ describe('permission-to-send and direct-asset CTA validator', () => {
   });
 });
 
+describe('strict-context validator helpers', () => {
+  it('detects missing Apollo merge fields', () => {
+    const missing = findMissingMergeFields(
+      'Daniel, payment teams are reconciling PSD3 and FedNow on separate spreadsheets.',
+    );
+    expect(missing).toEqual(['{{first_name}}', '{{company}}']);
+  });
+
+  it('passes required Apollo merge fields', () => {
+    const missing = findMissingMergeFields(
+      '{{first_name}}, payment teams at {{company}} are reconciling PSD3 and FedNow on separate spreadsheets.',
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it('detects promised assets that need a supplied availableAssets list', () => {
+    const hits = findAssetPromisePhrasing(
+      'I attached the PSD3 and FedNow matrix for the audit review.',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('does not treat normal asset nouns as invented asset promises', () => {
+    const hits = findAssetPromisePhrasing(
+      '{{first_name}}, when the audit timeline at {{company}} gets compressed, how are you deciding which control owners need the first look?',
+    );
+    expect(hits).toEqual([]);
+  });
+
+  it('detects invented peer proof claims that need supplied proofPoints', () => {
+    const hits = findProofClaimPhrasing(
+      'Three payments orgs cut false positives from 18% to 9% using the same review.',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('does not treat "using your API to" as a proof claim', () => {
+    const hits = findProofClaimPhrasing(
+      '{{first_name}}, how are your customers using your API to reconcile FedNow exceptions when SCA rules disagree?',
+    );
+    expect(hits).toEqual([]);
+  });
+});
+
 describe('forced event phrasing validator', () => {
   it('catches "keeps coming up before RSA"', () => {
     const hits = findForcedEventPhrasing(
@@ -311,6 +364,33 @@ describe('forced event phrasing validator', () => {
   it('catches vague shorthand like m2020', () => {
     const hits = findForcedEventPhrasing('Worth a conversation before m2020?', 'Money20/20 Europe 2026');
     expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches CTAs that use the event location as the buyer reason', () => {
+    const hits = findForcedEventPhrasing(
+      'How are you deciding who owns the payment exception? Is this worth pressure-testing before Amsterdam?',
+      'Money20/20 Europe 2026',
+      'Amsterdam',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('catches event prep CTAs that sound detached from the buyer job', () => {
+    const hits = findForcedEventPhrasing(
+      'I attached the handoff checklist. Is this useful for the Amsterdam prep?',
+      'Money20/20 Europe 2026',
+      'Amsterdam, Netherlands',
+    );
+    expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('passes a buyer-timing CTA that is not using the city as the reason', () => {
+    const hits = findForcedEventPhrasing(
+      'How are you deciding who owns the payment exception? Is this worth looking into before roadmap freeze?',
+      'Money20/20 Europe 2026',
+      'Amsterdam',
+    );
+    expect(hits).toEqual([]);
   });
 
   it('passes a natural event CTA after buyer context', () => {

@@ -2,8 +2,8 @@
 name: event-outbound
 description: Create validated email and LinkedIn outreach sequences for B2B events, from pre-event to post-event, grounded in buyer priorities and checked by a local validator.
 when_to_use: Use when the user asks to create an outreach sequence for a conference, write cold emails for an event, build a LinkedIn cadence for attendees, invite people to a side event or dinner, or turn an event plus ICP into booked meetings.
-allowed-tools: Read, Write, Bash(node *)
-version: 0.2.4
+allowed-tools: Read, Write, WebFetch, WebSearch, Bash(node *)
+version: 0.2.5
 ---
 
 # Event Outbound Skill
@@ -21,19 +21,77 @@ Use this skill when the user wants:
 
 Do **not** use this skill for: lifecycle/nurture email, transactional email, content marketing, generic always-on outbound. The generator is tuned for event-shaped triggers and will produce weak copy when forced into general use.
 
+## Non-Negotiable Quality Contract
+
+Do **not** generate a sequence from thin inputs like event + persona + channel + sender name. That produces plausible vendor copy, not buyer-first cold outbound.
+
+Before drafting, build a short **Outbound Research Brief**. If the user gives a company website or event URL, fetch it. If the user only gives a company name, use web search to find the official site before asking. If web tools are unavailable, say that and ask for the missing facts.
+
+The brief must contain:
+
+1. **Buyer job**, the progress this persona is trying to make.
+2. **Current workaround**, how they probably handle the job today.
+3. **Hidden risk / cost of doing nothing**, the expensive, awkward, or audit-facing thing they may not be seeing.
+4. **Customer-language pain**, concrete words from case studies, customer quotes, docs, or the user's notes. Avoid marketing nouns.
+5. **Trigger**, either a real observed signal or a truthful situation trigger. Never fake a post, session, hire, or customer.
+6. **Proof points**, named customers, public numbers, case-study facts, or a clear statement that no proof was supplied.
+7. **Available lead magnets / useful assets**, actual links/files/attachments the sender can truthfully include: tools, calculators, benchmark reports, checklists, field guides, audit worksheets, teardown templates, relevant blog posts, or event-specific prep notes. If none are supplied, do not promise a matrix, brief, worksheet, one-pager, report, recap, audit, or doc.
+8. **Event-specific ask feasibility**, whether the sender is attending, sponsoring, hosting, has a booth/table, has coffee availability, or wants one event-route ask. If unknown, do not use meetup or coffee CTAs.
+9. **Likely objection/anxiety**, the thing the buyer would silently think before replying.
+10. **Cadence feasibility**, event start date, event end date if known, today's date, requested touch count, minimum gap, and whether any requested touch would fall in the past.
+11. **Pain-angle ledger**, one distinct angle per planned touch. Each angle needs a 2-5 word label, source pain, illumination mechanism, and cost of inaction. Do not reuse an angle across email and LinkedIn.
+
+If any of buyer job, current workaround, hidden risk, proof points, or available assets are unknown, ask targeted follow-up questions before drafting. If the user explicitly says to proceed without proof or assets, write in **strict no-invention mode** and say the sequence will avoid asset promises and customer proof.
+
 ## Inputs
 
 The user (or upstream agent) provides three things:
 
-1. **Event context**, name, dates, location, optionally agenda titles, speakers, exhibitors, venue. Either inline or as a JSON file. If the user provides an event URL only, fetch it first; if you can't fetch it, ask the user for the basics.
-2. **Company ICP + personas**, for each target persona, supply: `role`, `seniority`, `priorities` (3-5 outcomes the persona owns this quarter), `painPoints` (3-5 specific operational scars in their own language). Sample fixtures live at `examples/*/company-icp.json`.
-3. **Sequence parameters**, `leadTimeWeeks` (1-8, default 4), `channels` (`email`, `linkedin`, or both), and `sendingIdentity` (sender name, title, company).
+1. **Event context**, name, `startDate` (`YYYY-MM-DD`), `endDate` (`YYYY-MM-DD` if multi-day), location, optionally agenda titles, speakers, exhibitors, venue. Either inline or as a JSON file. If the user provides an event URL only, fetch it first; if you can't fetch it, ask the user for the basics.
+2. **Company ICP + personas**, for each target persona, supply: `role`, `seniority`, `buyerJob`, `currentWorkaround`, `priorities` (3-5 outcomes the persona owns this quarter), `painPoints` (3-5 specific operational scars in their own language), `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`. Sample fixtures live at `examples/*/company-icp.json`.
+3. **Sequence parameters**, `leadTimeWeeks` (1-8, default 4), `channels` (`email`, `linkedin`, or both), optional `touchCount`, optional `minGapDays` (default 4), optional `preEventOnly`, and `sendingIdentity` (sender name, title, company).
 
-If any of these are missing or vague, ask the user for them before generating. Vague inputs produce vague output and the validator will reject most touches.
+If any of these are missing or vague, ask the user for them before generating. Vague inputs produce vague output and, now, strict validation must reject the touches rather than letting Claude invent substance.
+
+### Minimum follow-up questions
+
+Use these when the user gives a thin request:
+
+1. What is the sender company website, and what does it sell in plain English?
+2. Who buys it, and what job are they trying to get done this quarter?
+3. What are they using today or manually stitching together?
+4. What goes wrong if they do nothing for 30-90 days?
+5. What proof can we truthfully use, named customers, public data, customer quotes, or before/after numbers?
+6. What lead magnets, tools, reports, checklists, calculators, templates, useful posts, or event-specific prep materials can we truthfully attach or link?
+7. Will the sender attend, sponsor, host, have a booth/table, or have real coffee availability at the event? If yes, what exact logistics can we use?
+8. What is the event URL or agenda page, and which track/session makes this outreach timely?
+9. How many steps do you want? If unsure, say "default" and use the cadence planner.
+
+For event-led outbound, it is acceptable to ask for the sender's website first and research the ICP yourself. Prefer researching before asking the user to explain basics that the website can answer.
 
 ## How Claude executes this skill
 
-For each persona, build one outreach sequence with 5-8 touches distributed across the lead-time window. Each touch is a separate generation step.
+For each persona, build one outreach sequence with a user-configurable number of touches distributed across the lead-time window. The standard gap is **at least 4 days between adjacent steps**. Determine today's date yourself by omitting `today` from the planner input unless the user gives an explicit date. Determine event dates from the user, the fetched event page, JSON-LD, or the visible event date text. A 4-week email-only sequence defaults to 6 touches, but if today is already inside the lead window, the first touch starts no earlier than today. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
+
+Before drafting, run the deterministic cadence planner:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/plan-timeline.mjs"
+```
+
+Pass JSON on stdin:
+
+```json
+{
+  "leadTimeWeeks": 4,
+  "channels": ["email"],
+  "touchCount": 6,
+  "minGapDays": 4,
+  "eventDates": "June 2-4, 2026"
+}
+```
+
+The planner uses the runtime's local date when `today` is omitted. Prefer passing `eventStartDate` when available; otherwise pass the human-readable `eventDates` string and let the planner infer the start date. When the planner returns `send_date`, copy that exact date into the final files. Do not calculate calendar dates in your head. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, adjust channels, change `minGapDays`, switch to pre/post-event mix, or accept fewer steps. Preserve the 4-day gap as the recommended default unless the user explicitly overrides it.
 
 Use this validator path. Do not assume the current working directory is the plugin root:
 
@@ -41,15 +99,29 @@ Use this validator path. Do not assume the current working directory is the plug
 node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
 ```
 
-1. **Pick the channel + offset** for this touch from the timeline (see "Timeline" below).
-2. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-3. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
-4. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
-5. **Append** to the sequence; move to the next touch.
+1. **Pick the channel, offset, and send date** from the planner output. Do not invent dates by hand.
+2. **Assign a fresh pain angle** from the ledger. The touch must use that angle and no previous angle. Across the whole sequence, including mixed email + LinkedIn runs, no pain angle may repeat. If you do not have enough angles, split the buyer problem into different dimensions (current workaround, ownership, timing, audit evidence, stakeholder conflict, cost of inaction, objection) or ask the user for more customer-language pains.
+3. **Choose CTA posture**. If the sender supplied real event presence or availability, include exactly one natural event-specific ask in the sequence, usually the last pre-event or day-of touch: `"Worth coffee at {{event_name}} if this is already on your list?"` or `"Worth a quick conversation at {{event_name}} if this is already on the roadmap?"`. Do not use this if attendance, booth, side-event, or availability is unknown. If relevant assets exist, include at most one asset-backed CTA in the best-fit touch. If no assets exist, do not mention assets.
+4. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
+5. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+6. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
+7. **Append** to the sequence; move to the next touch.
 
-After all touches generate, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, average quality, score-band counts, CTA mix, illumination-question coverage.
+After all touches generate, run the sequence-level validator:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-sequence.mjs"
+```
+
+Pass the full `sequencer-output.json` on stdin or with `--sequence`. This catches pain-angle recycling across all channels. The sequence is not validator-clean unless both every touch validator and the sequence validator return `"isValid": true`.
+
+If the user supplied confirmed sender attendance, booth, table, side-event, or coffee availability, set `eventSpecificAskRequired: true` on the top-level `sequencer-output.json` or per sequence before running `validate-sequence.mjs`. The validator will then require at least one natural event-specific ask. If sender event presence is unknown, leave this false and include a note: no meetup CTA because event logistics were not supplied.
+
+After all validators pass or are explicitly flagged, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
+
+Before the sequence, include the Outbound Research Brief in the response so the user can see the buyer job, hidden risk, proof, assets, and assumptions. The brief is part of quality control, not extra decoration.
 
 ## Voice (read this before drafting anything)
 
@@ -57,19 +129,22 @@ The bar is **authentic, honest, empathetic, no theatrics**. Not slang. Not cooln
 
 Concrete rules that follow from that:
 
-- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the Q4 chargeback target is about to land in the CFO review"). The situation is honest; the fake signal isn't.
+- **Don't fabricate a personalization signal.** If you didn't actually see the prospect's panel, post, hire, customer quote, or session, don't write "saw your X" or "noticed you're Y" or "caught my eye". Forced personalization reads as fake the moment the recipient checks. When you have no real signal, use a **situation trigger** sized to the role ("end of Q3 and the CFO is locking the FY27 plan", "the Q4 chargeback target is about to land in the CFO review"). The situation is honest; the fake signal isn't.
 - **Poke the bear via pain illumination + cost of inaction, not theatrics.** Name the specific tradeoff the persona is managing this quarter, then quietly draw the line to what happens if it goes unaddressed (Q4 board deck, regulator audit, CFO QBR). No drama. No "this is wild." No "honestly?". Just the operational reality the persona is already living.
 - **Empathy over swagger.** When the persona is dealing with a hard tradeoff, name it honestly. "Tightening the rules drops approval rates 4-7 points and Sales escalates inside 48 hours" is honest empathy. "Most VPs walk in already knowing the pitch" is performative.
 - **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
 - **Bodies use proper grammar.** Capitalize the first letter of every sentence. Use full punctuation. The "all-lowercase" convention applies only to subject lines (per the cold-email-subject canon). Body copy is not a Slack message.
 - **Protect the first 18 words.** The inbox preview is where the recipient decides whether to keep reading. For cold first touches and post-connect DMs, the opener must be buyer-first: no `I/we/us/our` in the first 18 words, and no event-first opener like `"Black Hat is coming up..."`.
-- **Don't force the event into the body opener.** The event is the *occasion* for outreach; it doesn't have to be the *subject*. The strongest touches anchor on a persona responsibility first, then use the event only when it makes the ask more natural ("Worth a coffee at Black Hat if this is on your audit list?"). Forcing "before RSA" / "week of Money20/20" / "into m2020" into every sentence reads like a sequence template.
+- **Don't force the event into the body opener or CTA.** The event is the *occasion* for outreach; it is not the buyer's reason to care. The strongest touches anchor on a persona responsibility first, then use the event only when it makes the ask more natural ("Worth a coffee at Black Hat if this is already on your audit list?"). Forcing "before RSA" / "week of Money20/20" / "into m2020" into every sentence reads like a sequence template. Forcing "before Amsterdam" or "for Amsterdam prep" into the CTA is worse: it makes the city pretend to be the buyer priority.
+- **One event-specific ask is good when it is true.** If the sender is actually attending, sponsoring, hosting, or available for coffee, one touch should usually make the event route explicit: `"Worth coffee at Money20/20 if this is already on your audit list?"`. Do not sprinkle event CTAs across the sequence. One is enough.
 - **Use human shorthand for proof references.** Stiff: "Adyen and Marqeta wrote up a same-week false-positive cohort review that compresses the loop. There is a write-up if useful." Better, the way someone would actually say it: "Attached a one-pager from our work with Adyen and Marqeta on this. Is the false-positive review on your roadmap this quarter?" Shorthand reads as a peer talking, not a vendor reading from a script. Patterns that work:
   - `"Attached a one-pager from our work with [A] and [B] on [topic]."`
   - `"I attached the writeup from [A]'s review last quarter."`
   - `"[A] and [B] hit [number]. I attached the short version."`
-- **Do not ask permission to send the useful thing.** If the asset is useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"`
-- **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Stronger when grounded: `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} right now, or queued for Q3?"`. Banned because every cold-email guide overuses it: `"comparing notes"`, `"compare notes"`, `"swap notes"`.
+- **Do not ask permission to send the useful thing.** If the asset is real and useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"` If the asset does not exist, do not mention it.
+- **Proof is sacred.** Never invent "three orgs", named customers, before/after numbers, or "peer teams" because the framework wants third-party validation. If proof is missing, ask for it. If the user says none exists, use a mechanism or buyer-risk sentence instead and mark the proof gap in the brief.
+- **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Prefer natural buyer-timing asks: `"Worth looking into?"`, `"Open to taking a look?"`, `"Worth a closer look?"`, `"Is this on your roadmap, or parked for later?"`, `"Does this belong in the roadmap conversation?"`. Do not close with `"Open to a look?"`; it sounds clipped and unnatural. Do not bolt a location onto the ask unless the ask is literally about meeting there.
+- **LinkedIn is not exempt from CTAs.** Connection requests still need a direct connection ask: `"Open to connecting?"` or `"Worth connecting?"`. DMs and nudges need a clear lean-back question at the end. Do not end with a clever observation or an `"I attached..."` statement and make the reader guess how to respond.
 - **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
 
 ## The 4T framework
@@ -78,8 +153,8 @@ Every cold email and post-event email follows this shape. LinkedIn DMs follow it
 
 1. **Trigger**, why this person, why now? A specific observation or situation. Patterns: `"noticed [observable thing] which suggests [deduction]"`, `"saw you're [doing X] at [event]"`. If you have no signal, use a situation trigger sized to the role (e.g. "end of Q3 and the CFO is locking the FY27 plan"). **Never open with a population claim** ("Most teams…", "Most VPs…", "In our experience…", "Many fintechs…"). Auto-rejected.
 2. **Think**, the **illumination question**. A neutral how/what/why-are-you question that shines a light on a problem the persona owns. Not a leading question. Auto-rejected: `"if I could…"`, `"would you be interested?"`, `"wouldn't you agree?"`, `"don't you think?"`. Required for cold emails and post-connect DMs.
-3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references when possible; if not, frame as "we wrote up the workflow used by two payments teams" rather than fabricating named customers. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
-4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth a look?"`, `"Worth a skim?"`, `"What do you think?"`, `"Is this on your roadmap this quarter?"`, `"Is this a priority for {{company}} this quarter?"`. Banned: `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
+3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references, customer-approved proof, or supplied case-study facts. If no proof exists, stop and ask for proof before drafting; if the user explicitly says to proceed, omit third-party validation rather than fabricating it. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
+4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth looking into?"`, `"Open to taking a look?"`, `"Worth a closer look?"`, `"Is this on your roadmap, or parked for later?"`, `"Does this belong in the roadmap conversation?"`, `"What do you think?"`. For connection requests, use `"Open to connecting?"` or `"Worth connecting?"`. Banned: `"Open to a look?"`, `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, `"worth pressure-testing before [city]"`, `"useful for [city] prep"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
 
 ## Channel-specific length rules (hard)
 
@@ -90,7 +165,7 @@ These are enforced by [scripts/validate-touch.mjs](../../scripts/validate-touch.
 | `cold_email_first_touch` | 50 | 100 | 3-5 | needs illumination Q |
 | `cold_email_followup_2` | 40 | 90 | 3-4 | |
 | `cold_email_followup_3plus` | 25 | 60 | 2-3 | |
-| `linkedin_connection_request` | 18 | 35 | 1-2 | max 200 chars, no subject |
+| `linkedin_connection_request` | 18 | 35 | 1-2 | max 200 chars, no subject, explicit connection CTA |
 | `linkedin_dm_post_connect` | 50 | 120 | 3-5 | needs illumination Q |
 | `linkedin_day_of_nudge` | 30 | 60 | 2-3 | |
 | `post_event_followup` | 40 | 90 | 2-4 | |
@@ -98,6 +173,8 @@ These are enforced by [scripts/validate-touch.mjs](../../scripts/validate-touch.
 Subject lines: ≤ 4 words, all lowercase, no digits-only buzzwords, no banned subject buzzwords (`AI`, `platform`, `leverage`, `transform`, `unlock`, …). Email subjects are static text, do not put merge fields inside them.
 
 ## Timeline (default 4-week lead time, both channels)
+
+### Both-channel default
 
 | offset | channel | touch type |
 |---|---|---|
@@ -110,7 +187,20 @@ Subject lines: ≤ 4 words, all lowercase, no digits-only buzzwords, no banned s
 | T+7d | linkedin | `linkedin_day_of_nudge` (post follow-up) |
 | T+14d | email | `cold_email_followup_2` (final) |
 
-For other lead times or single-channel cadences, adjust proportionally; the generator at `src/lib/timeline.ts` can be invoked directly if needed (`node -e "import('./src/lib/timeline.ts').then(m => console.log(m.generateTimeline(2, ['email'])))"`).
+### Email-only default
+
+| offset | channel | touch type |
+|---|---|---|
+| T-28d | email | `cold_email_first_touch` |
+| T-21d | email | `cold_email_followup_2` |
+| T-14d | email | `cold_email_followup_3plus` |
+| T-7d | email | `cold_email_followup_3plus` |
+| T0 | email | `cold_email_followup_3plus` |
+| T+4d | email | `post_event_followup` |
+
+If the user says "pre-event only", use T-28, T-21, T-14, and T-7 only. Otherwise event-led outreach includes day-of and post-event touches by default.
+
+For other lead times, touch counts, dates, or single-channel cadences, use `scripts/plan-timeline.mjs`; do not adjust proportionally in your head.
 
 ## Hard validator rules (auto-rejected)
 
@@ -118,6 +208,10 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 
 - Subject ≤ 4 lowercase words, no digits in cold-email subjects, no banned subject buzzwords.
 - Body within the channel length rule (above).
+- Every generated touch must close with a clear lean-back CTA question. Do not end with an asset statement, clever observation, or implied next step.
+- No comma-spliced asset CTAs like `"I attached the review, worth looking into?"`. Use a clean CTA sentence when sentence count allows it, or rewrite the final question around the buyer's decision.
+- LinkedIn connection requests must close with a direct connection ask such as `"Open to connecting?"` or `"Worth connecting?"`.
+- LinkedIn DMs and nudges must close with a clear lean-back CTA question such as `"Worth looking into?"`, `"Open to taking a look?"`, or `"Does this belong in the roadmap conversation?"`.
 - Cold first touches + post-connect DMs must keep the first 18 words buyer-first: no seller pronouns (`I/me/my/we/us/our`) and no event-first opener.
 - Cold emails + post-connect DMs must contain a `how/what/why-are/do/is-you/your` illumination question.
 - No leading questions: `if I could…`, `would you be interested`, `wouldn't you agree`, `don't you think`.
@@ -125,12 +219,21 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - No exclamation marks. No emoji.
 - "you/your" must outnumber "we/our" in the body.
 - No banned phrases, see `additional_banned_phrases` in `data/cold-outbound-rules.json`. Includes `happy to send`, `should I send`, `can I send`, `want me to send`, `want the one-pager`, `15 minutes`, `30 minutes`, `calendar link`, `book a call`, `schedule a meeting`, `cutting-edge`, `industry-leading`, `world-class`, etc.
-- No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, or a question that bolts `"before [event]"` onto the end. Use buyer responsibility as the reason to write and the event as the route to a clear ask.
+- No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, a question that bolts `"before [event]"` onto the end, or a CTA that makes the location do the buyer-priority work (`"worth pressure-testing before Amsterdam"`, `"useful for Amsterdam prep"`). Use buyer responsibility as the reason to write and the event as the route to a clear ask.
+- No generic post-event pleasantries: `"hope the event went well"`, `"hope the event was productive"`, `"hope the week in [city] went well"`. Start from the buyer's returned-to-desk work instead.
+- No invented sender logistics: do not say `"I'm around"`, `"I am around the [track] side of the agenda"`, `"I'll be at booth X"`, or name a session/track unless the user supplied that fact. If sender availability is missing, use a buyer-timing CTA instead of a meetup CTA.
+- No pain-angle recycling. Every touch needs `painAngle` metadata and must use a different buyer problem, consequence, or illumination route than all previous touches. This applies across email and LinkedIn in the same sequence. Rewording the same pain is still a failure.
+- No sequence-mechanics openers. Do not write `"separate thread"`, `"sent a note"`, `"earlier note"`, `"previous note"`, or `"following up on my..."`. Follow-up steps should stand alone with a fresh buyer-relevant angle, not announce how the sequence is organized.
+- No vague calendar-trigger openers. Do not write `"this is usually the week..."`, `"new rails get attention"`, or any filler that explains the send date instead of the buyer's job. Name the buyer-side consequence directly.
+- No invented event logistics. Do not invent hosted roundtables, coffee times, speaker-lounge locations, Business Hall locations, or prior conversations. Only use those when the user supplied them.
+- No invented buyer state. Do not write as if the buyer's auditor flagged something, the buyer is carrying a named gap, or the buyer discussed something with the sender unless that fact was supplied.
+- In strict mode, no unsourced assets or proof. If the touch mentions an attached/linked/pulled-together asset, pass `availableAssets`. If it uses named customers, peer teams, or before/after numbers, pass `proofPoints`. Otherwise the validator must reject it.
 - No LLM-cliché phrases, 200+ phrases across 10 categories. See `llm_cliche_blocklist` in the same file. Categories: `performative_empathy`, `generic_compliments`, `sales_speak_openers`, `manufactured_intimacy`, `marketing_buzzwords`, `cold_email_overused`, `lazy_generalization_openers`, `llm_transition_tics`, `gpt_vocabulary`. (`hedge_softener_warnings` is soft, does not fail.)
 - No anti-flex selling tics: `"no deck"`, `"no demo"`, `"no calendar invite"`, `"no follow-up deck"`, `"reply yes and i'll send"`. These read as soulless-selling-with-extra-steps. If you'd write one, just don't include the assurance, write copy that doesn't need it.
 - No floor/booth-shopping framing in cold copy. Don't talk about "47 fraud-platform vendors", "five vendors with real numbers", "which booths can answer X". The recipient cares about the risk they manage, not your vendor census.
 - One problem per email. Don't mash multiple value props.
 - Address the recipient with `{{first_name}}` and reference their company as `{{company}}` at least once. Never hard-code real names or companies in the output, those are merge-field substitutions that happen at send time.
+- Never say the sequence is ready to send, cleared for deployment, or approved for outreach. This skill produces drafts for human review.
 
 ## Validating a touch from inside this skill
 
@@ -143,7 +246,18 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --touch <(cat <<'JSON'
   "touch_type": "cold_email_first_touch",
   "eventName": "Money20/20 USA 2026",
   "personaPriorities": ["ship a measurable reduction in chargeback rate to the CFO before Q4 close"],
-  "personaPainPoints": ["rules-vs-models false-positive tradeoff..."]
+  "personaPainPoints": ["rules-vs-models false-positive tradeoff..."],
+  "strictTruth": true,
+  "availableAssets": ["field-level worksheet approved for this campaign"],
+  "proofPoints": ["Adyen and Marqeta public case-study comparison, 94% vs 12% inbox placement"],
+  "strictAngleDiversity": true,
+  "painAngle": {
+    "label": "stale rule ownership",
+    "sourcePain": "stale rules keep tier-1 closing the same detection",
+    "mechanism": "rules ownership drifts between product and risk",
+    "costOfInaction": "audit answer gets harder to defend"
+  },
+  "usedPainAngles": []
 }
 JSON
 )

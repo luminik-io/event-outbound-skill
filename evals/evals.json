@@ -1,0 +1,51 @@
+{
+  "skill_name": "event-outbound",
+  "evals": [
+    {
+      "id": "rich-payments-no-proof-no-assets",
+      "prompt": "Create an email-only sequence for Money20/20 Europe 2026. Event dates: June 2-4, 2026. Today is May 11, 2026. Use 6 touches with at least 4 days between touches. Persona: VP / Director / Head of Payments at fintechs and digital banks. Sender: Maya Rao, VP Partnerships at Northstar Ledger. Northstar Ledger helps fintech payments teams route, monitor, and audit instant-payment flows across FedNow, RTP, SEPA Instant, and card rails from one control layer. Buyer job: reconcile instant-payment authentication, exception handling, and audit evidence across product, risk, and compliance before Q3 roadmap freeze. Current workaround: separate spreadsheets, rail-specific dashboards, and manual Slack escalations. Hidden risk: unclear ownership when exceptions touch both SCA / step-up authentication and funds-flow operations. Proof: none approved. Assets: none.",
+      "expected_output": "A 6-touch email sequence ready for human review, using the planner offsets T-22, T-16, T-10, T-4, T0, T+4; no proof or asset promises; every touch validated with strictTruth true.",
+      "assertions": [
+        "The output includes a cadence plan with 6 touches and no adjacent steps closer than 4 days.",
+        "The first send date is May 11, 2026 or T-22, not a date in the past.",
+        "Every touch contains {{first_name}} and {{company}}.",
+        "No touch invents named customers, before/after metrics, matrices, worksheets, reports, or other assets.",
+        "No touch invents sender availability, booth location, or agenda-track logistics that were not supplied.",
+        "The first touch illuminates payment-exception ownership across SCA, funds flow, and audit evidence.",
+        "No CTA uses the event location as the buyer reason, such as before Amsterdam or for Amsterdam prep.",
+        "The CTA is curiosity-based and not a generic meeting or demo ask.",
+        "The final line says the sequence is ready for human review, not ready to send."
+      ]
+    },
+    {
+      "id": "thin-input-should-probe",
+      "prompt": "Build me a sequence for Identiverse 2026. Persona: Head of Payments. Sender: Daniel Craig. Email only.",
+      "expected_output": "The skill should not draft. It should ask targeted questions or research the sender/event context first.",
+      "assertions": [
+        "The output does not include a finished sequence.",
+        "The output asks for or researches the sender company, product, buyer job, current workaround, hidden risk, proof, assets, and event date/URL.",
+        "The output explains that thin inputs would produce generic copy."
+      ]
+    },
+    {
+      "id": "impossible-cadence",
+      "prompt": "Create 6 pre-event emails for an event that starts in 7 days. Keep at least 4 days between each step.",
+      "expected_output": "The skill should not squeeze the cadence. It should explain that 6 pre-event touches cannot fit and offer alternatives.",
+      "assertions": [
+        "The output does not draft six pre-event emails.",
+        "The output identifies the 4-day gap constraint as the blocker.",
+        "The output proposes reducing touch count, adding post-event touches, or changing the minimum gap only with user approval."
+      ]
+    },
+    {
+      "id": "wrong-persona-guard",
+      "prompt": "Create a Head of Payments sequence for Money20/20 Europe 2026, but make the angle about proving booth pipeline attribution after the event.",
+      "expected_output": "The skill should flag that booth-pipeline attribution is a marketing/revops pain, not a Head of Payments pain, and ask whether to change persona or angle.",
+      "assertions": [
+        "The output does not blindly write Head of Payments copy about booth attribution.",
+        "The output explains the persona/angle mismatch.",
+        "The output offers a payments-native angle such as instant-payment exception ownership, SCA handoffs, audit evidence, or funds-flow operations."
+      ]
+    }
+  ]
+}

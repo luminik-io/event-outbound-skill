@@ -1,0 +1,3 @@
+/event-outbound:event-outbound
+
+Create 6 pre-event emails for an event that starts in 7 days. Keep at least 4 days between each step.

@@ -17,8 +17,15 @@
 //     "channel": "email" | "linkedin",
 //     "touch_type": "cold_email_first_touch" | "cold_email_followup_2" | ...,
 //     "eventName": "Money20/20 USA 2026",
+//     "eventLocation": "Las Vegas",  // optional; catches CTAs that bolt on the city
 //     "personaPriorities": ["..."],   // 0-N strings
 //     "personaPainPoints":  ["..."]   // 0-N strings
+//     "strictTruth": true,             // optional; rejects invented assets/proof
+//     "availableAssets": ["..."],      // optional; real assets sender can attach/link
+//     "proofPoints": ["..."]           // optional; real customer/public proof
+//     "strictAngleDiversity": true,     // optional; rejects recycled sequence angles
+//     "painAngle": { "label": "...", "sourcePain": "...", ... },
+//     "usedPainAngles": [{ "label": "..." }] // prior touches across all channels
 //   }
 //
 // Output shape (always exit 0; errors are part of the contract):
@@ -172,6 +179,50 @@ const eventAliases = (eventName) => {
   }
   return Array.from(aliases).sort((a, b) => b.length - a.length);
 };
+const locationAliases = (eventLocation) => {
+  const name = lower(eventLocation);
+  const aliases = new Set();
+  const knownCities = [
+    'amsterdam',
+    'las vegas',
+    'new york',
+    'san francisco',
+    'london',
+    'paris',
+    'berlin',
+    'singapore',
+    'barcelona',
+    'miami',
+    'boston',
+    'chicago',
+    'austin',
+    'seattle',
+    'orlando',
+    'toronto',
+    'dubai',
+    'oslo',
+  ];
+  const cleaned = name
+    .replace(/[()[\]]/g, ' ')
+    .replace(/\b(online|virtual|hybrid|conference|venue|center|centre|hall)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!cleaned) return [];
+  for (const city of knownCities) {
+    if (cleaned.includes(city)) aliases.add(city);
+  }
+  for (const segment of cleaned.split(/[,|/]+/)) {
+    const stripped = segment
+      .replace(
+        /\b(netherlands|united states|usa|us|uk|united kingdom|germany|france|spain|italy|canada|norway|ca|ny|tx|nv|il|ma|dc)\b/g,
+        ' ',
+      )
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (stripped.length >= 3) aliases.add(stripped);
+  }
+  return Array.from(aliases).sort((a, b) => b.length - a.length);
+};
 const findPermissionToSendPhrasing = (text) =>
   patternHits(text, [
     {
@@ -196,9 +247,102 @@ const findPermissionToSendPhrasing = (text) =>
       regex: /\b(?:free for|worth)\s+(?:ten|fifteen|twenty|thirty|\d+)\s+minutes?\b/i,
     },
   ]);
-const findForcedEventPhrasing = (text, eventName) => {
+const LINKEDIN_CONNECTION_CTA_PATTERNS = [
+  { regex: /\bopen\s+to\s+connect(?:ing)?(?:\s+here)?\?/i },
+  { regex: /\bworth\s+connect(?:ing)?(?:\s+here)?\?/i },
+];
+const LEAN_BACK_CTA_PATTERNS = [
+  {
+    regex:
+      /\bworth\s+(?:a\s+)?(?:look|closer\s+look|peek|skim|read|conversation|exchange|coffee|seat|review|look\s+into|looking\s+into|taking\s+a\s+look|checking)\b[^.!?]{0,80}\?/i,
+  },
+  {
+    regex:
+      /\bopen\s+to\s+(?:taking\s+a\s+look|looking\s+into|learning\s+more|connect(?:ing)?|checking|reviewing)\b[^.!?]{0,80}\?/i,
+  },
+  { regex: /\bdoes\s+this\s+belong\b[^?]{0,100}\?/i },
+  { regex: /\bis\s+this\s+(?:on|a|worth)\b[^?]{0,100}\?/i },
+  { regex: /\bwhat\s+do\s+you\s+think\?/i },
+  {
+    regex:
+      /\bor\s+(?:parked|tabled|table\s+for\s+now|ignore|not\s+worth\s+it|too\s+early|later)\b[^?]{0,80}\?/i,
+  },
+];
+const CLEAR_CTA_TOUCH_TYPES = new Set([
+  'cold_email_first_touch',
+  'cold_email_followup_2',
+  'cold_email_followup_3plus',
+  'email_cold',
+  'linkedin_connection_request',
+  'linkedin_dm_post_connect',
+  'linkedin_day_of_nudge',
+  'post_event_followup',
+]);
+const COMMA_SPLICED_CTA_PATTERNS = [
+  {
+    regex:
+      /\b(?:i\s+)?attached\b[^.!?]{0,160},\s*(?:worth|open\s+to|does\s+this\s+belong|is\s+this\s+on|what\s+do\s+you\s+think)\b[^?]{0,100}\?/i,
+  },
+];
+const requiresClearCta = (candidateTouchType, candidateChannel) =>
+  candidateChannel === 'linkedin' ||
+  String(candidateTouchType || '').startsWith('linkedin_') ||
+  CLEAR_CTA_TOUCH_TYPES.has(String(candidateTouchType || ''));
+const findClearCtaPhrasing = (
+  text,
+  candidateTouchType,
+  candidateChannel,
+  approvedPhrases = [],
+) => {
+  if (!requiresClearCta(candidateTouchType, candidateChannel)) return [];
+  if (candidateTouchType === 'linkedin_connection_request') {
+    return patternHits(text, LINKEDIN_CONNECTION_CTA_PATTERNS);
+  }
+  const tail = String(text || '').slice(-240);
+  const hits = new Set(patternHits(tail, LEAN_BACK_CTA_PATTERNS));
+  for (const phrase of approvedPhrases) {
+    if (!phrase) continue;
+    const phraseCta = new RegExp(`${escapeRegex(phrase)}[^.!?]{0,80}\\?`, 'i');
+    if (phraseCta.test(tail)) hits.add(phrase);
+  }
+  return Array.from(hits);
+};
+const findCommaSplicedCtaPhrasing = (text) =>
+  patternHits(text, COMMA_SPLICED_CTA_PATTERNS);
+const findMissingMergeFields = (text, requiredFields = ['{{first_name}}', '{{company}}']) => {
+  const hay = lower(text);
+  return requiredFields.filter((field) => !hay.includes(lower(field)));
+};
+const findAssetPromisePhrasing = (text) =>
+  patternHits(text, [
+    {
+      regex: /\b(?:attached|linked|enclosed|included)\b[^.!?]{0,80}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      regex: /\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b[^.!?]{0,50}\b(?:attached|linked|enclosed|included)\b/i,
+    },
+    {
+      regex: /\b(?:i\s+)?(?:put together|wrote up|pulled together|built|made)\b[^.!?]{0,100}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+    {
+      regex: /\b(?:here(?:'s| is)|below is|below are)\b[^.!?]{0,80}\b(?:1[-\s]?pager|one[-\s]?pager|one[-\s]?page|worksheet|checklist|matrix|brief|recap|report|audit|doc|write[-\s]?up|map|notes?)\b/i,
+    },
+  ]);
+const findProofClaimPhrasing = (text) =>
+  patternHits(text, [
+    {
+      regex: /\b(?:using|used by|worked with|helped|seen|customer|customers|client|clients)\b[^.!?]{0,120}\b(?:compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit|kept|killed)\b/i,
+    },
+    {
+      regex: /\b(?:two|three|four|five|\d+)\s+(?:payments?|fintech|security|cybersecurity|saas|identity|compliance|risk|fraud)?\s*(?:orgs?|teams?|companies|customers|clients|leaders|operators)\b[^.!?]{0,120}\b(?:compared to|instead of|cut|reduced|lifted|increased|saved|caught|shipped|booked|hit|kept|killed)\b/i,
+    },
+    {
+      regex: /\b(?:from\s+\d+(?:\.\d+)?%?\s+to\s+\d+(?:\.\d+)?%?|compared to\s+\d+(?:\.\d+)?%?\s+before|\d+(?:\.\d+)?%?\s+instead of\s+\d+(?:\.\d+)?%?)\b/i,
+    },
+  ]);
+const findForcedEventPhrasing = (text, eventName, eventLocation) => {
   const aliases = eventAliases(eventName).map(escapeRegex).join('|');
-  return patternHits(text, [
+  const patterns = [
     {
       regex: new RegExp(
         `\\b(?:keeps?\\s+coming\\s+up|comes\\s+up|keep\\s+hearing|hearing)\\b[^.!?]{0,100}\\b(?:before|into)\\s+(?:${aliases})\\b`,
@@ -219,8 +363,24 @@ const findForcedEventPhrasing = (text, eventName) => {
         'i',
       ),
     },
+    {
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into)\\s+(?:the\\s+)?(?:${aliases})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    },
     { regex: /\bm(?:20\/20|2020)\b/i },
-  ]);
+  ];
+  const locations = locationAliases(eventLocation).map(escapeRegex).join('|');
+  if (locations) {
+    patterns.push({
+      regex: new RegExp(
+        `\\b(?:is\\s+this\\s+)?(?:worth|useful|open\\s+to|does\\s+this\\s+belong)\\b[^?]{0,120}\\b(?:before|for|around|into|in)\\s+(?:the\\s+)?(?:${locations})(?:\\s+(?:prep|planning|review|readout|trip))?\\?`,
+        'i',
+      ),
+    });
+  }
+  return patternHits(text, patterns);
 };
 const findSellerFirstPreviewPhrasing = (
   text,
@@ -256,6 +416,126 @@ const youVsWe = (s) => {
   const y = (lower(s).match(/\b(you|your)\b/g) || []).length;
   const w = (lower(s).match(/\b(we|our)\b/g) || []).length;
   return { you: y, we: w };
+};
+const PAIN_STOPWORDS = new Set([
+  'about',
+  'across',
+  'after',
+  'again',
+  'against',
+  'also',
+  'before',
+  'being',
+  'between',
+  'could',
+  'every',
+  'from',
+  'have',
+  'into',
+  'just',
+  'like',
+  'more',
+  'most',
+  'need',
+  'only',
+  'over',
+  'still',
+  'that',
+  'their',
+  'there',
+  'these',
+  'they',
+  'this',
+  'those',
+  'through',
+  'today',
+  'using',
+  'what',
+  'when',
+  'where',
+  'which',
+  'while',
+  'with',
+  'without',
+  'would',
+  'your',
+]);
+const painAngleText = (angle) => {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return [
+    angle.label,
+    angle.sourcePain || angle.source_pain,
+    angle.mechanism,
+    angle.costOfInaction || angle.cost_of_inaction,
+    angle.illuminationQuestion || angle.illumination_question,
+  ]
+    .filter(Boolean)
+    .join(' ');
+};
+const painAngleLabel = (angle) => {
+  if (!angle) return '';
+  if (typeof angle === 'string') return angle;
+  return angle.label || angle.sourcePain || angle.source_pain || '';
+};
+const painAngleTokens = (text) => {
+  const tokens =
+    lower(text)
+      .replace(/\{\{[a-z0-9_]+\}\}/g, ' ')
+      .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g) || [];
+  return Array.from(
+    new Set(
+      tokens
+        .map((token) =>
+          token
+            .replace(/(?:ing|tion|sion|ment|ness|ities|ity|ed|es|s)$/i, '')
+            .replace(/[-/]/g, ''),
+        )
+        .filter((token) => token.length >= 4 && !PAIN_STOPWORDS.has(token)),
+    ),
+  );
+};
+const painSimilarity = (a, b) => {
+  const left = new Set(painAngleTokens(a));
+  const right = new Set(painAngleTokens(b));
+  if (left.size === 0 || right.size === 0) return 0;
+  let intersection = 0;
+  for (const token of left) {
+    if (right.has(token)) intersection++;
+  }
+  return intersection / new Set([...left, ...right]).size;
+};
+const normalizedPainLabel = (angle) => painAngleTokens(painAngleLabel(angle)).join(' ');
+const findReusedPainAngles = (current, previousAngles = [], bodyText = '') => {
+  const hits = new Set();
+  const currentLabel = normalizedPainLabel(current);
+  const currentText = painAngleText(current);
+  let bodyOverlap = 0;
+  const bodyTokenSet = new Set(painAngleTokens(bodyText));
+  for (const previous of previousAngles) {
+    const previousLabel = normalizedPainLabel(previous);
+    const previousText = painAngleText(previous);
+    if (!previousText.trim()) continue;
+    const previousTokens = painAngleTokens(previousText);
+    const sharedWithBody = previousTokens.filter((token) => bodyTokenSet.has(token));
+    const overlap =
+      previousTokens.length === 0 ? 0 : sharedWithBody.length / previousTokens.length;
+    bodyOverlap = Math.max(bodyOverlap, overlap);
+    if (
+      (currentLabel && previousLabel && currentLabel === previousLabel) ||
+      painSimilarity(currentText, previousText) >= 0.42 ||
+      (sharedWithBody.length >= 2 && overlap >= 0.6)
+    ) {
+      hits.add(painAngleLabel(previous) || previousText);
+    }
+  }
+  return { hits: Array.from(hits), bodyOverlap: Number(bodyOverlap.toFixed(2)) };
+};
+const painAngleMatchesBody = (angle, bodyText) => {
+  const tokens = painAngleTokens(painAngleText(angle));
+  if (tokens.length === 0) return false;
+  const bodyTokenSet = new Set(painAngleTokens(bodyText));
+  return tokens.some((token) => bodyTokenSet.has(token));
 };
 
 // --- Validate --------------------------------------------------------------
@@ -374,13 +654,90 @@ if (permissionToSendHits.length > 0) {
   });
 }
 
-const forcedEventPhrasingHits = findForcedEventPhrasing(combined, touch.eventName);
+const clearCtaHits = findClearCtaPhrasing(
+  body,
+  touchType,
+  channel,
+  rules.specific_pass_phrases?.lean_back_ctas,
+);
+const missingClearCta =
+  requiresClearCta(touchType, channel) && clearCtaHits.length === 0;
+if (missingClearCta) {
+  errors.push({
+    rule: 'clearCta',
+    message:
+      touchType === 'linkedin_connection_request'
+        ? 'LinkedIn connection requests must close with an explicit connection ask such as "Open to connecting?" or "Worth connecting?".'
+        : 'Every touch must close with a clear lean-back CTA question such as "Worth looking into?", "Open to taking a look?", or "Does this belong in the roadmap conversation?".',
+  });
+}
+
+const commaSplicedCtaHits = findCommaSplicedCtaPhrasing(body);
+if (commaSplicedCtaHits.length > 0) {
+  errors.push({
+    rule: 'commaSplicedCta',
+    message:
+      'Do not comma-splice an asset statement into the CTA. Use a clean CTA sentence or rewrite the final sentence around the question.',
+    offendingValue: commaSplicedCtaHits.join(', '),
+  });
+}
+
+const forcedEventPhrasingHits = findForcedEventPhrasing(
+  combined,
+  touch.eventName,
+  touch.eventLocation,
+);
 if (forcedEventPhrasingHits.length > 0) {
   errors.push({
     rule: 'forcedEventPhrasing',
     message:
       'Event reference feels forced. Use the buyer responsibility as the reason to write; use the event naturally only when it helps the ask.',
     offendingValue: forcedEventPhrasingHits.join(', '),
+  });
+}
+
+const strictContext = touch.strictTruth === true;
+const mergeSpec = rules.strict_context_rules?.apollo_merge_fields;
+const mergeApplies =
+  touch.apolloMergeFieldsRequired === true ||
+  (strictContext &&
+    Array.isArray(mergeSpec?.applies_to) &&
+    mergeSpec.applies_to.includes(touchType));
+const requiredMergeFields = mergeSpec?.required_fields || ['{{first_name}}', '{{company}}'];
+const missingMergeFields = mergeApplies
+  ? findMissingMergeFields(body, requiredMergeFields)
+  : [];
+if (missingMergeFields.length > 0) {
+  errors.push({
+    rule: 'missingMergeFields',
+    message: `Body must include Apollo-ready merge fields: ${missingMergeFields.join(', ')}.`,
+    offendingValue: missingMergeFields.join(', '),
+  });
+}
+
+const availableAssets = Array.isArray(touch.availableAssets)
+  ? touch.availableAssets.filter(Boolean)
+  : [];
+const proofPoints = Array.isArray(touch.proofPoints)
+  ? touch.proofPoints.filter(Boolean)
+  : [];
+const assetPromiseHits = findAssetPromisePhrasing(combined);
+if (strictContext && assetPromiseHits.length > 0 && availableAssets.length === 0) {
+  errors.push({
+    rule: 'unsourcedAssetPromise',
+    message:
+      'Body promises or references an asset, but no availableAssets were supplied. Do not invent matrices, briefs, worksheets, or reports.',
+    offendingValue: assetPromiseHits.join(', '),
+  });
+}
+
+const proofClaimHits = findProofClaimPhrasing(combined);
+if (strictContext && proofClaimHits.length > 0 && proofPoints.length === 0) {
+  errors.push({
+    rule: 'unsourcedProofClaim',
+    message:
+      'Body makes a customer, peer, or before/after proof claim, but no proofPoints were supplied. Ask for proof or write without fabricated validation.',
+    offendingValue: proofClaimHits.join(', '),
   });
 }
 
@@ -417,6 +774,37 @@ if (previewEventHits.length > 0) {
     message:
       'First inbox-preview words are event-first. Use the buyer responsibility as the opener and the event as supporting context.',
     offendingValue: previewEventHits.join(', '),
+  });
+}
+
+const strictAngleDiversity = touch.strictAngleDiversity === true;
+const currentPainAngle = touch.painAngle || touch.pain_angle;
+const usedPainAngles = Array.isArray(touch.usedPainAngles || touch.used_pain_angles)
+  ? touch.usedPainAngles || touch.used_pain_angles
+  : [];
+const reusedPainAngle = findReusedPainAngles(currentPainAngle, usedPainAngles, body);
+const painAngleBodyMatches =
+  !currentPainAngle || painAngleMatchesBody(currentPainAngle, body);
+if (strictAngleDiversity && !currentPainAngle) {
+  errors.push({
+    rule: 'missingPainAngle',
+    message: 'Strict angle diversity requires a painAngle label for every touch.',
+  });
+}
+if (strictAngleDiversity && currentPainAngle && !painAngleBodyMatches) {
+  errors.push({
+    rule: 'painAngleMismatch',
+    message:
+      'Touch declares a pain angle, but the body does not visibly use that angle. Rewrite so the metadata and copy match.',
+    offendingValue: painAngleLabel(currentPainAngle),
+  });
+}
+if (strictAngleDiversity && reusedPainAngle.hits.length > 0) {
+  errors.push({
+    rule: 'painAngleReused',
+    message:
+      'Touch reuses a pain angle or angle vocabulary from an earlier sequence step. Pick a different buyer problem, consequence, or illumination route.',
+    offendingValue: reusedPainAngle.hits.join(', '),
   });
 }
 
@@ -568,8 +956,17 @@ const checks = {
   specificityHits,
   permissionToSendHits,
   forcedEventPhrasingHits,
+  missingMergeFields,
+  assetPromiseHits,
+  proofClaimHits,
   previewSellerHits,
   previewEventHits,
+  clearCtaHits,
+  missingClearCta,
+  commaSplicedCtaHits,
+  painAngleLabel: currentPainAngle ? painAngleLabel(currentPainAngle) : undefined,
+  reusedPainAngleHits: reusedPainAngle.hits,
+  painAngleBodyOverlap: reusedPainAngle.bodyOverlap,
 };
 
 process.stdout.write(

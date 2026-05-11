@@ -15,6 +15,7 @@ describe('scrapeEvent', () => {
 
     expect(eventContext.name).toContain('Mock Tech Conference 2024');
     expect(eventContext.dates).toContain('October 26 - 28, 2024');
+    expect(eventContext.startDate).toBe('2024-10-26');
     expect(eventContext.location).toContain('San Francisco, CA');
     expect(eventContext.agendaTitles.length).toBeGreaterThan(0);
     expect(eventContext.speakers.length).toBeGreaterThan(0);
@@ -31,6 +32,7 @@ describe('scrapeEvent', () => {
 
     expect(eventContext.name).toContain('Luma AI/ML Summit');
     expect(eventContext.dates).toContain('Nov 15, 2024');
+    expect(eventContext.startDate).toBe('2024-11-15');
     expect(eventContext.location).toContain('New York, NY');
     expect(eventContext.agendaTitles.length).toBeGreaterThan(0);
     expect(eventContext.speakers.length).toBeGreaterThan(0);
@@ -47,9 +49,22 @@ describe('scrapeEvent', () => {
 
     expect(eventContext.name).toContain('Simple Event Title');
     expect(eventContext.dates).toContain('2025-01-01');
+    expect(eventContext.startDate).toBe('2025-01-01');
     expect(eventContext.location).toContain('Unknown Location');
     expect(eventContext.agendaTitles).toEqual([]);
     expect(eventContext.speakers).toEqual([]);
     expect(eventContext.exhibitorList).toEqual([]);
+  });
+
+  it('extracts JSON-LD start and end dates when available', async () => {
+    const htmlFixture = readFileSync(path.join(__dirname, 'fixtures/event-pages/static-jsonld.html'), 'utf-8');
+    global.fetch = async (url: RequestInfo | URL) => {
+      return new Response(htmlFixture, { status: 200 });
+    };
+
+    const eventContext = await scrapeEvent('https://example.com/jsonld-event');
+
+    expect(eventContext.startDate).toBe('2024-10-26');
+    expect(eventContext.endDate).toBe('2024-10-28');
   });
 });

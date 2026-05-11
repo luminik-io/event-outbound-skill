@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-73%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-122%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -22,7 +22,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 > **Built on 20,000+ personalized touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns three inputs (event, ICP, sender identity) into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, body 50–100 words, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, no unsourced proof, and no recycled pain angles across steps. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
 
 ## Install
 
@@ -47,7 +47,7 @@ The same plugin package is used for Claude Code and Cowork. The local validator 
 
 | Audience | What you get |
 |---|---|
-| **AEs and SDRs** working a trade-show attendee list four weeks out | Multi-touch email + LinkedIn sequence per persona, ready to paste into Apollo, Outreach, Salesloft, Instantly, or Smartlead |
+| **AEs and SDRs** working a trade-show attendee list four weeks out | Multi-touch email + LinkedIn sequence per persona, ready for human review before loading into Apollo, Outreach, Salesloft, Instantly, or Smartlead |
 | **Event marketers** running dinner invites, side events, speaker meet-and-greets, booth-visit campaigns | Channel-appropriate copy that gets opened and RSVP'd, not blasted and ignored |
 | **Founders doing their own outbound** | The same workflow and the same validated output, without hiring an SDR |
 
@@ -65,42 +65,51 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **Structure** | 4T pattern: Trigger → Think (illumination question) → Third-party validation → Talk? (direct CTA) |
 | **Pronoun ratio** | "you/your" must outnumber "we/our" |
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
+| **CTA clarity** | Every touch must close with a clear lean-back question. Connection requests need an explicit connection ask like "Open to connecting?" |
+| **Event ask posture** | When sender event presence is real, one touch should include a natural event-route ask. When presence is unknown, meetup and coffee CTAs are blocked |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
+| **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
+| **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, and high-overlap pain vocabulary across email and LinkedIn |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
-| **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations or forced event phrasing |
+| **No sequence mechanics** | Follow-ups cannot open by announcing the outreach thread; each step has to stand on its own buyer-relevant angle |
+| **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations, forced event phrasing, or location-pasted CTAs |
+| **Strict truth** | In `strictTruth` mode, asset promises require `availableAssets`, proof claims require `proofPoints`, and Apollo-ready `{{first_name}}` / `{{company}}` fields are required |
 
 ## What it does
 
-You hand the skill three things:
+You hand the skill five things:
 
 1. **Event**, name, dates, agenda, speakers, exhibitor list.
-2. **ICP**, industry, size range, and one or more buyer personas with concrete priorities and pain points (vague aspirations like "build the brand" or "scale the team" fail the specificity check).
-3. **Sequence params**, lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), sending identity.
+2. **ICP**, industry, size range, website, and one or more buyer personas with concrete priorities and pain points (vague aspirations like "build the brand" or "scale the team" fail the specificity check).
+3. **Buyer research**, buyer job, current workaround, hidden risk, likely objections, and customer-language pain.
+4. **Truth sources**, proof points and assets the sender can truthfully attach or link, including lead magnets, tools, calculators, checklists, reports, templates, or event-specific prep materials.
+5. **Sequence params**, lead time in weeks (1–8, default 4), channels (email, LinkedIn, or both), optional touch count, minimum gap days, event dates, today's date, sending identity.
 
-It returns a full sequence per persona. Six to twelve touches on a four-week lead time, distributed across email and LinkedIn, covering pre-event, day-of, and post-event.
+If proof or assets are missing, the skill asks for them before drafting. If the user explicitly proceeds without them, strict mode writes around the gap instead of inventing matrices, briefs, peer teams, or before/after numbers.
+
+If the sender is confirmed to attend, sponsor, host, or have real availability at the event, the skill aims for one natural event-specific ask, for example a coffee or short conversation at the event. If attendance or availability is unknown, it avoids meetup CTAs and says why.
+
+It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run by default, configurable when the user wants more or fewer steps. The cadence planner enforces at least four days between adjacent touches, infers the event start from structured or human-readable dates, and uses the runtime's local date when `today` is not supplied.
 
 ## What the output looks like
 
-A single touch from the Money20/20 Europe 2026 example (full sequence is 12 touches across two personas):
+A single validator-clean touch from the checked-in Claude showcase. This run was strict no-invention mode: no approved proof, no approved assets, and unknown sender attendance.
 
 ```
-Touch 2 · T-14d · email cold
+Touch 2 · T-4d · email cold
 
-Subject: money20/20 attribution
+Subject: evidence pack
 
-{{first_name}}, the {{event_name}} line item on {{company}}'s P&L is going to
-land in front of the CFO under the same last-touch, 90-day attribution rules
-your inbound runs on. The booth touch is usually the 3rd interaction in an
-8-month fintech cycle, so the $200K {{event_name}} spend reads as sourcing $0
-by the time {{company}}'s board prep opens. Attached is a one-page recap of
-how three {{title}}s rebuilt the attribution window to surface the real
-number before the {{event_city}} show. Worth a skim before your board prep
-locks?
+{{first_name}}, audit evidence at {{company}} can become a scavenger hunt
+when the auth log, rail trace, and case notes live in different systems. How
+quickly can your team reconstruct why a payment moved after authentication
+changed? If that evidence pack still takes manual stitching across instant
+rails and cards, is the gap worth looking into?
 
-channel: email · offset: -14d · type: email_cold · cta: make_offer · words: 96
+channel: email · offset: -4d · type: cold_email_followup_2 · cta: ask_for_interest · words: 55 · pain_angle: evidence pack latency
 ```
 
-Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-anchored observation, not a population-shape generalization. The CTA is a concrete offer (one-page recap), not a meeting-ask. The touch passes the full validator stack at 5/5.
+Apollo-ready merge-field syntax. The opening sentence names a specific evidence-chain pain, not a population-shape generalization. The CTA is a clean buyer-timing question. Because no approved assets or sender logistics were supplied, the touch avoids attachments, proof claims, and meetup language.
 
 ## Worked examples
 
@@ -109,6 +118,7 @@ Apollo-ready merge-field syntax. The opening sentence is a specific, recipient-a
 | [`examples/black-hat-usa-2026/`](examples/black-hat-usa-2026/) | Cybersecurity (mid-market SaaS buyer) | Director of Security Engineering + VP Security | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/money2020-europe-2026/`](examples/money2020-europe-2026/) | Fintech (payments + neobank buyer) | VP Risk and Fraud + Head of Compliance / KYC Operations | 4 weeks | Pre-rendered, validator-clean |
 | [`examples/singapore-fintech-festival-2026/`](examples/singapore-fintech-festival-2026/) | Fintech IDV | (input fixtures) | (n/a) | Regenerate inside Claude with no API key |
+| [`examples/claude-showcase/`](examples/claude-showcase/) | Real Claude runs | Positive + guardrail cases | Mixed | Checked-in outputs with deterministic showcase checks |
 
 Every shipped sequence is hand-verified against the full validator stack: zero hits across the ten cliche categories, channel-length compliance, illumination-question coverage, pronoun ratio in favour of the reader.
 
@@ -121,7 +131,7 @@ Create an outbound sequence for Black Hat USA 2026 targeting Directors of Securi
 4 week lead time, email plus LinkedIn.
 ```
 
-The skill picks up the request, asks for any missing input fields (sending identity, lead time, channels), and returns a full `SequencerOutput` plus a rendered markdown preview ready to paste into your sequencer.
+The skill picks up the request, researches public company/event context when URLs or company names are available, asks for missing proof/assets, and returns a full `SequencerOutput` plus a rendered markdown preview ready to paste into your sequencer.
 
 ### Local development
 
@@ -153,7 +163,29 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-73 tests across 6 files (cliche-validator unit tests, timeline computations, persona analyser, event scraper, end-to-end evals). Vitest, ~1 second cold.
+122 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+
+The repo also includes real Claude-generated showcase outputs:
+
+```bash
+npm run check:showcase
+```
+
+This deterministic check reads [`examples/claude-showcase/`](examples/claude-showcase/), verifies cadence dates, validator-clean touches, strict no-invention output, and guardrail behavior for thin input, impossible cadence, and wrong-persona prompts. It does not call Claude, so it is safe for CI.
+
+To validate pain-angle diversity for a full generated sequence:
+
+```bash
+node scripts/validate-sequence.mjs --sequence examples/claude-showcase/rich-positive-availability-unknown/sequencer-output.json
+```
+
+To rerun the live Claude showcase locally:
+
+```bash
+npm run e2e:claude -- --case rich-positive-availability-unknown
+```
+
+Add `--update-fixtures` only when you intentionally want to refresh the checked-in showcase outputs after human review.
 
 ### Headless / batch generation (optional)
 
@@ -165,10 +197,10 @@ Full TypeScript types in `src/types/index.ts`. The short version:
 
 | Input | Required fields | Notes |
 |---|---|---|
-| `EventContext` | `name`, `dates`, `location`, `agendaTitles` | Speaker + exhibitor lists improve specificity but are optional |
-| `CompanyICP` | `industry`, `sizeRange`, `personas[]` | Minimum one persona; two personas is the real-world default |
-| `AttendeePersona` | `personaId`, `role`, `seniority`, `priorities[]`, `painPoints[]` | Priorities and pains must be concrete. Vague aspirations fail the specificity check |
-| `SequenceParams` | `leadTimeWeeks` (1–8), `channels`, `sendingIdentity` | 4 weeks is the sweet spot |
+| `EventContext` | `name`, `dates`, optional `startDate`, optional `endDate`, `location`, `agendaTitles` | Speaker + exhibitor lists improve specificity but are optional |
+| `CompanyICP` | `industry`, `sizeRange`, `personas[]` | Optional `website`, `productSummary`, `proofPoints`, and `availableAssets` improve strict-mode output |
+| `AttendeePersona` | `personaId`, `role`, `seniority`, `priorities[]`, `painPoints[]` | Optional `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets` prevent generic copy |
+| `SequenceParams` | `leadTimeWeeks` (1–8), `channels`, optional `touchCount`, optional `minGapDays`, optional `today`, `sendingIdentity` | 4 weeks and 4-day gaps are the default |
 
 ## Output shape
 
@@ -186,6 +218,10 @@ type SequencerOutput = {
 ```
 
 Each `OutreachTouch` carries a `checks` block so you can see exactly why it passed. Touches that burned all three validation retries return with `quality_flag: 'rules_violated'`. They are the minority, and they are your cue to rewrite by hand.
+
+Strict mode adds `missingMergeFields`, `assetPromiseHits`, and `proofClaimHits` to the checks block so a reviewer can see whether Claude tried to invent a useful-sounding but unsourced claim.
+
+Angle diversity adds `pain_angle` to every touch, plus `reusedPainAngleHits` and `painAngleBodyOverlap` in the checks block. A sequence only passes when `validate-sequence.mjs` sees one distinct pain angle per touch across all channels.
 
 ## Validation rules
 

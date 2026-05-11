@@ -1,0 +1,17 @@
+/event-outbound:event-outbound
+
+Create an email-only sequence for Money20/20 Europe 2026.
+Event dates: June 2-4, 2026.
+Event location: Amsterdam.
+Today is May 11, 2026.
+Use 4 touches with at least 4 days between touches.
+Persona: VP / Director / Head of Payments at fintechs and digital banks.
+Sender: Maya Rao, VP Partnerships at Northstar Ledger.
+Sender attendance, booth, agenda track, and availability are unknown.
+Northstar Ledger helps fintech payments teams route, monitor, and audit instant-payment flows across FedNow, RTP, SEPA Instant, and card rails from one control layer.
+Buyer job: reconcile instant-payment authentication, exception handling, and audit evidence across product, risk, and compliance before Q3 roadmap freeze.
+Current workaround: separate spreadsheets, rail-specific dashboards, and manual Slack escalations.
+Hidden risk: unclear ownership when exceptions touch both SCA / step-up authentication and funds-flow operations.
+Proof: none approved.
+Assets: none.
+Write final_sequence.md and sequencer-output.json. Keep it ready for human review.

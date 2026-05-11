@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.2.5 (2026-05-10)
+
+Buyer-first quality-bar hardening for thin event-outbound inputs.
+
+### Added
+- Sequence-level pain-angle validation via `scripts/validate-sequence.mjs`. Every touch now needs a distinct `pain_angle`, and repeated angle labels or high-overlap pain vocabulary across email and LinkedIn are rejected.
+- Touch-level angle-diversity checks via `strictAngleDiversity`, `painAngle`, and `usedPainAngles`, so Claude gets feedback before a recycled-pain sequence reaches the final output.
+- Sequence-mechanics phrases such as "separate thread", "sent a note", "earlier note", and "following up on my..." are now blocked in generated copy.
+- Vague calendar-trigger openers, invented event logistics, and invented buyer-state claims are now blocked, including generic "this week" timing filler, fabricated hosted sessions, unsupplied coffee locations, and unsourced auditor findings.
+
+### Changed
+- Skill intake now requires an Outbound Research Brief before drafting: buyer job, current workaround, hidden risk, customer-language pain, trigger, proof points, available assets, and likely objection.
+- Skill workflow now requires a pain-angle ledger before drafting and reports distinct pain-angle coverage in the sequence summary.
+- Skill frontmatter now allows web fetch/search so Claude can research the sender company and event page before asking the user to restate facts that are public.
+- `CompanyICP` and `AttendeePersona` types now support optional `website`, `productSummary`, `buyerJob`, `currentWorkaround`, `hiddenRisk`, `objections`, `proofPoints`, and `availableAssets`.
+- Sequencer prompt now treats proof and assets as sacred: no invented matrices, briefs, peer teams, named customers, before/after numbers, agenda sessions, day-of slots, or locations.
+- CTA guidance now separates buyer priorities from event logistics: "before [city]" and "[city] prep" closers are rejected unless the ask is literal meetup logistics.
+- Cadence planner output now includes deterministic `send_date` values so installed-skill runs do not hand-calculate calendar dates.
+
+### Added Earlier
+- Strict validator mode via `strictTruth: true`.
+- `missingMergeFields` check for Apollo-ready `{{first_name}}` and `{{company}}`.
+- `unsourcedAssetPromise` check when copy mentions attached/linked assets without `availableAssets`.
+- `unsourcedProofClaim` check when copy uses customer, peer, or before/after proof without `proofPoints`.
+- Generic post-event pleasantries such as "hope the week in [city] went well" are now blocked as sales-speak openers.
+- Invented sender logistics such as "I am around the [track] side of the agenda" are blocked unless supplied by the user.
+- Source-grounded craft evals covering role fluency, current workaround language, cost of inaction, neutral illumination questions, lean-back CTAs, and wrong-persona failures.
+- 100+ tests covering strict context helpers, date-aware cadence, CTA location misuse, and CLI rejection/acceptance paths.
+- Real Claude showcase outputs for positive and guardrail scenarios, plus a deterministic `npm run check:showcase` verifier for those artifacts.
+- Optional `npm run e2e:claude` runner for regenerating showcase outputs with local Claude auth.
+
 ## v0.2.4 (2026-05-05)
 
 Cowork support hardening before official plugin-directory submission.
