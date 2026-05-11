@@ -29,6 +29,9 @@ import {
   findMissingMergeFields,
   findAssetPromisePhrasing,
   findProofClaimPhrasing,
+  findClearCtaPhrasing,
+  requiresClearCta,
+  findCommaSplicedCtaPhrasing,
   findReusedPainAngles,
   painAngleLabel,
   painAngleMatchesBody,
@@ -376,6 +379,34 @@ function validateTouch(
     });
   }
 
+  const clearCtaHits = findClearCtaPhrasing(
+    touch.body,
+    ruleKey,
+    touch.channel,
+    jbRules.specific_pass_phrases?.lean_back_ctas,
+  );
+  const missingClearCta =
+    requiresClearCta(ruleKey, touch.channel) && clearCtaHits.length === 0;
+  if (missingClearCta) {
+    errors.push({
+      rule: 'clearCta',
+      message:
+        ruleKey === 'linkedin_connection_request'
+          ? 'LinkedIn connection requests must close with an explicit connection ask such as "Open to connecting?" or "Worth connecting?".'
+          : 'Every touch must close with a clear lean-back CTA question such as "Worth looking into?", "Open to taking a look?", or "Does this belong in the roadmap conversation?".',
+    });
+  }
+
+  const commaSplicedCtaHits = findCommaSplicedCtaPhrasing(touch.body);
+  if (commaSplicedCtaHits.length > 0) {
+    errors.push({
+      rule: 'commaSplicedCta',
+      message:
+        'Do not comma-splice an asset statement into the CTA. Use a clean CTA sentence or rewrite the final sentence around the question.',
+      offendingValue: commaSplicedCtaHits.join(', '),
+    });
+  }
+
   const forcedEventPhrasingHits = findForcedEventPhrasing(
     combined,
     eventContext.name,
@@ -654,6 +685,9 @@ function validateTouch(
     proofClaimHits,
     previewSellerHits,
     previewEventHits,
+    clearCtaHits,
+    missingClearCta,
+    commaSplicedCtaHits,
     painAngleLabel: painAngle ? painAngleLabel(painAngle) : undefined,
     reusedPainAngleHits: reusedPainAngle.hits,
     painAngleBodyOverlap: reusedPainAngle.bodyOverlap,
@@ -675,28 +709,28 @@ function touchBrief(
     return {
       label: 'linkedin_connect',
       instruction:
-        'LinkedIn connection request. 18-35 words / max 200 chars / 1-2 sentences. Mention the event by name + one specific observation. Subject empty. CTA type: none. NO illumination question required (compress 4T into 3 sentences max).',
+        'LinkedIn connection request. 18-35 words / max 200 chars / 1-2 sentences. Mention the event by name + one specific buyer observation. Subject empty. CTA type: ask_for_interest. Close with "Open to connecting?" or "Worth connecting?". NO illumination question required.',
     };
   }
   if (channel === 'linkedin' && offset_days < 0) {
     return {
       label: 'linkedin_nudge',
       instruction:
-        'Pre-event LinkedIn nudge. 30-60 words / 2-3 sentences. Reference the upcoming event + one specific pain point. Lean-back CTA. CTA type: ask_for_interest or make_offer.',
+        'Pre-event LinkedIn nudge. 30-60 words / 2-3 sentences. Reference the upcoming event + one specific pain point. Close with a clear lean-back CTA question, e.g. "Worth looking into?" or "Does this belong in the roadmap conversation?". CTA type: ask_for_interest or make_offer.',
     };
   }
   if (channel === 'linkedin' && offset_days === 0) {
     return {
       label: 'linkedin_day_of',
       instruction:
-        'Day-of LinkedIn message. 30-60 words / 2-3 sentences. Reference a concrete time + place. One CTA. CTA type: ask_for_interest.',
+        'Day-of LinkedIn message. 30-60 words / 2-3 sentences. Reference the event day without inventing sender location, time, booth, or track. Close with one clear buyer-timing CTA question. CTA type: ask_for_interest.',
     };
   }
   if (channel === 'linkedin' && offset_days > 0) {
     return {
       label: 'linkedin_followup',
       instruction:
-        'Post-event LinkedIn follow-up. 40-90 words / 2-4 sentences. Reference something specific from the event. Lean-back CTA. CTA type: make_offer.',
+        'Post-event LinkedIn follow-up. 40-90 words / 2-4 sentences. Reference the returned-to-desk work after the event, without fake pleasantries or invented sessions. Close with a clear lean-back CTA question. CTA type: make_offer.',
     };
   }
   if (channel === 'email' && offset_days < 0) {
@@ -872,6 +906,16 @@ HARD VALIDATOR RULES (auto-rejected)
   seller pronouns ("I", "we", "our", "us") or the event name at the front of the inbox preview.
 - Cold emails AND post-connect DMs MUST contain a "how/what/why ARE/DO/IS you/your"
   illumination question. (Connection requests are exempt.)
+- Every generated touch MUST close with a clear lean-back CTA question. Do not end
+  with an asset statement, a clever observation, or an implied next step.
+- NO comma-spliced asset CTAs. Do not write "I attached X, worth looking into?".
+  Use "I attached X. Worth looking into?" only when the channel sentence count allows it,
+  otherwise rewrite the CTA around the buyer question.
+- LinkedIn connection requests MUST close with an explicit connection ask:
+  "Open to connecting?" or "Worth connecting?". CTA type must be ask_for_interest.
+- LinkedIn DMs and nudges MUST close with a clear lean-back CTA question:
+  "Worth looking into?", "Open to taking a look?", "Does this belong in the roadmap conversation?",
+  or a similarly clear buyer-timing ask. Do not end LinkedIn copy as a standalone observation.
 - NO leading / moon-and-stars patterns: "if I could...", "would you be interested?",
   "wouldn't you agree?", "would you agree...", "don't you think..." - AUTO-REJECTED.
 - NO permission-to-send CTAs. Auto-rejected: "should I send", "can I send",

@@ -138,6 +138,7 @@ Concrete rules that follow from that:
 - **Do not ask permission to send the useful thing.** If the asset is real and useful, attach it or link it. Banned because they add fake friction: `"should I send"`, `"can I send"`, `"want me to send"`, `"want the one-pager"`, `"happy to send"`. Better: `"I attached the worksheet. Worth a coffee at Black Hat if this is on your audit list?"` If the asset does not exist, do not mention it.
 - **Proof is sacred.** Never invent "three orgs", named customers, before/after numbers, or "peer teams" because the framework wants third-party validation. If proof is missing, ask for it. If the user says none exists, use a mechanism or buyer-risk sentence instead and mark the proof gap in the brief.
 - **Close with a real question, not a polite ritual.** "Worth a look?" is fine but overused. Prefer natural buyer-timing asks: `"Worth looking into?"`, `"Open to taking a look?"`, `"Worth a closer look?"`, `"Is this on your roadmap, or parked for later?"`, `"Does this belong in the roadmap conversation?"`. Do not close with `"Open to a look?"`; it sounds clipped and unnatural. Do not bolt a location onto the ask unless the ask is literally about meeting there.
+- **LinkedIn is not exempt from CTAs.** Connection requests still need a direct connection ask: `"Open to connecting?"` or `"Worth connecting?"`. DMs and nudges need a clear lean-back question at the end. Do not end with a clever observation or an `"I attached..."` statement and make the reader guess how to respond.
 - **Reread aloud.** If you'd be slightly embarrassed sending this to a peer, the copy is wrong. Rewrite.
 
 ## The 4T framework
@@ -147,7 +148,7 @@ Every cold email and post-event email follows this shape. LinkedIn DMs follow it
 1. **Trigger**, why this person, why now? A specific observation or situation. Patterns: `"noticed [observable thing] which suggests [deduction]"`, `"saw you're [doing X] at [event]"`. If you have no signal, use a situation trigger sized to the role (e.g. "end of Q3 and the CFO is locking the FY27 plan"). **Never open with a population claim** ("Most teams…", "Most VPs…", "In our experience…", "Many fintechs…"). Auto-rejected.
 2. **Think**, the **illumination question**. A neutral how/what/why-are-you question that shines a light on a problem the persona owns. Not a leading question. Auto-rejected: `"if I could…"`, `"would you be interested?"`, `"wouldn't you agree?"`, `"don't you think?"`. Required for cold emails and post-connect DMs.
 3. **Third-party validation**, let other people toot your horn. One sentence. Pattern: `"[Peer A] and [Peer B] [outcome] [SHARP NUMBER] compared to [old number] before."` Use real published peer references, customer-approved proof, or supplied case-study facts. If no proof exists, stop and ask for proof before drafting; if the user explicitly says to proceed, omit third-party validation rather than fabricating it. Banned: `"we're the best"`, `"industry-leading"`, `"world-class"`.
-4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth looking into?"`, `"Open to taking a look?"`, `"Worth a closer look?"`, `"Is this on your roadmap, or parked for later?"`, `"Does this belong in the roadmap conversation?"`, `"What do you think?"`. Banned: `"Open to a look?"`, `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, `"worth pressure-testing before [city]"`, `"useful for [city] prep"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
+4. **Talk?**, interest-based CTA, with a question mark, lean-back energy. Approved shapes: `"Worth looking into?"`, `"Open to taking a look?"`, `"Worth a closer look?"`, `"Is this on your roadmap, or parked for later?"`, `"Does this belong in the roadmap conversation?"`, `"What do you think?"`. For connection requests, use `"Open to connecting?"` or `"Worth connecting?"`. Banned: `"Open to a look?"`, `"Got 15 minutes?"`, `"Book a call"`, `"schedule a meeting"`, `"calendar link"`, `"worth pressure-testing before [city]"`, `"useful for [city] prep"`, and the over-deployed `"comparing notes"` / `"compare notes"` / `"open to comparing notes"`.
 
 ## Channel-specific length rules (hard)
 
@@ -158,7 +159,7 @@ These are enforced by [scripts/validate-touch.mjs](../../scripts/validate-touch.
 | `cold_email_first_touch` | 50 | 100 | 3-5 | needs illumination Q |
 | `cold_email_followup_2` | 40 | 90 | 3-4 | |
 | `cold_email_followup_3plus` | 25 | 60 | 2-3 | |
-| `linkedin_connection_request` | 18 | 35 | 1-2 | max 200 chars, no subject |
+| `linkedin_connection_request` | 18 | 35 | 1-2 | max 200 chars, no subject, explicit connection CTA |
 | `linkedin_dm_post_connect` | 50 | 120 | 3-5 | needs illumination Q |
 | `linkedin_day_of_nudge` | 30 | 60 | 2-3 | |
 | `post_event_followup` | 40 | 90 | 2-4 | |
@@ -201,6 +202,10 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 
 - Subject ≤ 4 lowercase words, no digits in cold-email subjects, no banned subject buzzwords.
 - Body within the channel length rule (above).
+- Every generated touch must close with a clear lean-back CTA question. Do not end with an asset statement, clever observation, or implied next step.
+- No comma-spliced asset CTAs like `"I attached the review, worth looking into?"`. Use a clean CTA sentence when sentence count allows it, or rewrite the final question around the buyer's decision.
+- LinkedIn connection requests must close with a direct connection ask such as `"Open to connecting?"` or `"Worth connecting?"`.
+- LinkedIn DMs and nudges must close with a clear lean-back CTA question such as `"Worth looking into?"`, `"Open to taking a look?"`, or `"Does this belong in the roadmap conversation?"`.
 - Cold first touches + post-connect DMs must keep the first 18 words buyer-first: no seller pronouns (`I/me/my/we/us/our`) and no event-first opener.
 - Cold emails + post-connect DMs must contain a `how/what/why-are/do/is-you/your` illumination question.
 - No leading questions: `if I could…`, `would you be interested`, `wouldn't you agree`, `don't you think`.

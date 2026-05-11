@@ -322,7 +322,7 @@ Reference table per touch type. All ranges derived from canon material + platfor
 | **Cold email (first touch)** | 50-100 | 3-4 (max 5) | Canon: "literally four to five sentences" (cold-email-archive:561-563); CEB |
 | **Cold email (follow-up #2)** | 40-90 | 3-4 | Slightly shorter. the canon allows visual / image / metaphor in #2 (cold-email-archive:826-840) |
 | **Cold email (follow-up #3+)** | 25-60 | 2-3 | Pattern interrupts (lumpy mail, video, embedded graphic) |
-| **LinkedIn connection request** | 20-35 (max ~200 chars) | 1-2 | LinkedIn free-tier 200-char ceiling. canonical DM example "Josh, looks like your podcast episodes are under five minutes…" is 32 words / 200 chars (LinkedIn-CSV) |
+| **LinkedIn connection request** | 20-35 (max ~200 chars) | 1-2 | LinkedIn free-tier 200-char ceiling. Must include a direct connection ask such as "Open to connecting?" or "Worth connecting?" |
 | **LinkedIn DM (post-connect)** | 50-120 | 3-5 | LinkedIn 1300-char ceiling allows up to ~200 words but the cadence is shorter. The canon-approved DM example is 32 words. Default: 50-120. |
 | **LinkedIn day-of nudge** | 30-60 | 2-3 | Short, time-sensitive, references concrete time/place. Tone matches the canon's lean-back CTAs. |
 | **Post-event LinkedIn message** | 40-90 | 2-4 | "It was great meeting at X — saw you mentioned Y in our chat — worth a follow-up?" pattern |
@@ -428,9 +428,9 @@ These are the **eval ground-truth** examples. The skill's output should score hi
 **Pass #1 — Warmbox (4T canonical)**
 > Subject: cold emails in spam?
 >
-> noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises your inbox reputation. open to a look?
+> noticed you're hiring SDRs which suggests you might be sending lots of cold emails. how are you ensuring cold emails don't land in spam? Google and Salesforce are using us to deliver 94% of cold emails to inboxes compared to 12% before. it involves a warm-up tool that raises your inbox reputation. open to taking a look?
 >
-> *Source: 4T transcript reconstructed.* Word count: 60. Sentences: 4. Pronouns: you/your=4, we/our=1, I=0. Pronoun ratio: pass.
+> *Source pattern: 4T transcript reconstructed; CTA normalized to current style.* Word count: 61. Sentences: 4. Pronouns: you/your=4, we/our=1, I=0. Pronoun ratio: pass.
 
 **Pass #2 — CaptivateIQ (How_to_construct canonical)**
 > Subject: end of month
@@ -458,15 +458,15 @@ These are the **eval ground-truth** examples. The skill's output should score hi
 
 ### LinkedIn connection request (≤200 chars)
 
-**Pass #1 — Podcast editing (the canon's gold-standard DM)**
-> Josh, looks like your podcast episodes are under five minutes. do you ever do long-form interviews? if so, any conditions you'd consider hiring an editor?
+**Pass #1 — Podcast editing (adapted to connection request format)**
+> Josh, looks like your podcast episodes are under five minutes, which made me wonder about the long-form interview workflow. Open to connecting?
 >
-> *Source: LinkedIn-CSV.* 26 words / 158 chars. Notice: trigger ("under five minutes") → think question (long-form?) → soft ask (any conditions?). Compresses 4T into 3 sentences.
+> *Source pattern: LinkedIn-CSV.* 20 words / 128 chars. Notice: trigger ("under five minutes") plus a direct connection ask. Connection requests must not end as observations.
 
 **Pass #2 — Hypothetical fintech AE prospecting**
-> Avi — saw you're hiring 4 AEs for the SOC2 compliance vertical. curious how you're getting them ramped on the new pricing model. open to comparing notes?
+> Avi, hiring AEs into a SOC2 vertical usually exposes the pricing-model ramp gap before the first renewal conversation. Open to connecting?
 >
-> 27 words / ~165 chars.
+> 21 words / ~120 chars.
 
 ### LinkedIn DM (post-connect, 50-120 words)
 
@@ -478,16 +478,16 @@ These are the **eval ground-truth** examples. The skill's output should score hi
 ### LinkedIn day-of nudge (30-60 words)
 
 **Pass #1 — RSA day-of**
-> Pete — running our identity-verification roundtable today at 4pm at the Marriott bar (a block from Moscone West). 8 CISOs already RSVP'd, room for 2 more. low-pressure, no slides, just a conversation. swing by?
+> Pete, running our identity-verification roundtable today at 4pm at the Marriott bar (a block from Moscone West). Eight CISOs already RSVP'd, room for two more, and help-desk reset friction is the focus. Worth a seat?
 >
-> 40 words.
+> 36 words. Use this only when the user supplied the roundtable, time, place, and RSVP count.
 
 ### Post-event follow-up (40-90 words)
 
 **Pass #1 — Black Hat post-event**
-> Pete — appreciated your take on phishing-resistant MFA at the Friday breakfast. you mentioned the rollout to your help desk was the friction point. how are you keeping the help desk from defaulting back to SMS resets? we've seen Auth0 + a 30-second runbook get adoption from 40% to 92%. worth comparing notes?
+> Pete, appreciated your take on phishing-resistant MFA at the Friday breakfast. you mentioned the rollout to your help desk was the friction point. how are you keeping the help desk from defaulting back to SMS resets? we've seen Auth0 plus a 30-second runbook get adoption from 40% to 92%. Worth looking into?
 >
-> 56 words. Contains: post-event hook + illumination question + 3rd-party validation + soft CTA.
+> 56 words. Contains: post-event hook + illumination question + 3rd-party validation + clear lean-back CTA.
 
 ---
 

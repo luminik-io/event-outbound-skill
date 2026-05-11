@@ -174,6 +174,66 @@ const PERMISSION_TO_SEND_PATTERNS: PhrasePattern[] = [
   },
 ];
 
+const LINKEDIN_CONNECTION_CTA_PATTERNS: PhrasePattern[] = [
+  {
+    label: 'open-to-connecting',
+    regex: /\bopen\s+to\s+connect(?:ing)?(?:\s+here)?\?/i,
+  },
+  {
+    label: 'worth-connecting',
+    regex: /\bworth\s+connect(?:ing)?(?:\s+here)?\?/i,
+  },
+];
+
+const LEAN_BACK_CTA_PATTERNS: PhrasePattern[] = [
+  {
+    label: 'worth-question',
+    regex:
+      /\bworth\s+(?:a\s+)?(?:look|closer\s+look|peek|skim|read|conversation|exchange|coffee|seat|review|look\s+into|looking\s+into|taking\s+a\s+look|checking)\b[^.!?]{0,80}\?/i,
+  },
+  {
+    label: 'open-to-question',
+    regex:
+      /\bopen\s+to\s+(?:taking\s+a\s+look|looking\s+into|learning\s+more|connect(?:ing)?|checking|reviewing)\b[^.!?]{0,80}\?/i,
+  },
+  {
+    label: 'does-this-belong-question',
+    regex: /\bdoes\s+this\s+belong\b[^?]{0,100}\?/i,
+  },
+  {
+    label: 'roadmap-priority-question',
+    regex: /\bis\s+this\s+(?:on|a|worth)\b[^?]{0,100}\?/i,
+  },
+  {
+    label: 'what-do-you-think-question',
+    regex: /\bwhat\s+do\s+you\s+think\?/i,
+  },
+  {
+    label: 'table-or-ignore-question',
+    regex:
+      /\bor\s+(?:parked|tabled|table\s+for\s+now|ignore|not\s+worth\s+it|too\s+early|later)\b[^?]{0,80}\?/i,
+  },
+];
+
+const CLEAR_CTA_TOUCH_TYPES = new Set([
+  'cold_email_first_touch',
+  'cold_email_followup_2',
+  'cold_email_followup_3plus',
+  'email_cold',
+  'linkedin_connection_request',
+  'linkedin_dm_post_connect',
+  'linkedin_day_of_nudge',
+  'post_event_followup',
+]);
+
+const COMMA_SPLICED_CTA_PATTERNS: PhrasePattern[] = [
+  {
+    label: 'attached-comma-cta',
+    regex:
+      /\b(?:i\s+)?attached\b[^.!?]{0,160},\s*(?:worth|open\s+to|does\s+this\s+belong|is\s+this\s+on|what\s+do\s+you\s+think)\b[^?]{0,100}\?/i,
+  },
+];
+
 function patternHits(text: string, patterns: PhrasePattern[]): string[] {
   const found = new Set<string>();
   for (const pattern of patterns) {
@@ -285,6 +345,43 @@ function locationAliases(eventLocation?: string): string[] {
  */
 export function findPermissionToSendPhrasing(text: string): string[] {
   return patternHits(text, PERMISSION_TO_SEND_PATTERNS);
+}
+
+export function requiresClearCta(
+  touchType?: string,
+  channel?: 'email' | 'linkedin',
+): boolean {
+  return (
+    channel === 'linkedin' ||
+    touchType?.startsWith('linkedin_') === true ||
+    (touchType ? CLEAR_CTA_TOUCH_TYPES.has(touchType) : false)
+  );
+}
+
+export function findClearCtaPhrasing(
+  text: string,
+  touchType?: string,
+  channel?: 'email' | 'linkedin',
+  approvedPhrases: string[] = [],
+): string[] {
+  if (!requiresClearCta(touchType, channel)) return [];
+
+  const tail = text.slice(-240);
+  if (touchType === 'linkedin_connection_request') {
+    return patternHits(text, LINKEDIN_CONNECTION_CTA_PATTERNS);
+  }
+
+  const hits = new Set<string>(patternHits(tail, LEAN_BACK_CTA_PATTERNS));
+  for (const phrase of approvedPhrases) {
+    if (!phrase) continue;
+    const phraseCta = new RegExp(`${escapeRegex(phrase)}[^.!?]{0,80}\\?`, 'i');
+    if (phraseCta.test(tail)) hits.add(phrase);
+  }
+  return Array.from(hits);
+}
+
+export function findCommaSplicedCtaPhrasing(text: string): string[] {
+  return patternHits(text, COMMA_SPLICED_CTA_PATTERNS);
 }
 
 export function findMissingMergeFields(

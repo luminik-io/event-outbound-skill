@@ -253,6 +253,129 @@ test('validate-touch CLI rejects invented buyer state', () => {
   );
 });
 
+test('validate-touch CLI rejects LinkedIn connection requests without a clear connection CTA', () => {
+  const payload = {
+    subject: '',
+    body: '{{first_name}}, rule ownership after the original writer moves teams creates the SOC2 evidence gap for your team at {{company}}, and Black Hat seems relevant.',
+    channel: 'linkedin',
+    touch_type: 'linkedin_connection_request',
+    eventName: 'Black Hat USA 2026',
+    personaPriorities: ['SOC2 evidence readiness'],
+    personaPainPoints: ['detection rule ownership creates SOC2 evidence gaps'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('clearCta');
+  expect(parsed.checks.missingClearCta).toBe(true);
+});
+
+test('validate-touch CLI accepts LinkedIn connection requests with an explicit connection CTA', () => {
+  const payload = {
+    subject: '',
+    body: '{{first_name}}, rule ownership after the original writer moves teams creates the SOC2 evidence gap for your team at {{company}}, and Black Hat seems relevant. Open to connecting?',
+    channel: 'linkedin',
+    touch_type: 'linkedin_connection_request',
+    eventName: 'Black Hat USA 2026',
+    personaPriorities: ['SOC2 evidence readiness'],
+    personaPainPoints: ['detection rule ownership creates SOC2 evidence gaps'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(parsed.checks.clearCtaHits.length).toBeGreaterThan(0);
+});
+
+test('validate-touch CLI rejects LinkedIn DMs that end without a lean-back CTA', () => {
+  const payload = {
+    subject: '',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem.",
+    channel: 'linkedin',
+    touch_type: 'linkedin_dm_post_connect',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('clearCta');
+});
+
+test('validate-touch CLI accepts LinkedIn DMs with a clear lean-back CTA', () => {
+  const payload = {
+    subject: '',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?",
+    channel: 'linkedin',
+    touch_type: 'linkedin_dm_post_connect',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(parsed.checks.clearCtaHits).toEqual(expect.arrayContaining(['Worth looking into?']));
+});
+
+test('validate-touch CLI rejects email touches that end on an asset statement without a CTA', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. I attached the review sheet.",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('clearCta');
+});
+
+test('validate-touch CLI rejects comma-spliced asset CTAs', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. I attached the review sheet, worth looking into?",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'commaSplicedCta',
+  );
+});
+
 test('validate-sequence CLI rejects repeated pain angles across channels', () => {
   const payload = {
     sequencesByPersona: {

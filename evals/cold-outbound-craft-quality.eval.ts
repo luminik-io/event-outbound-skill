@@ -90,7 +90,7 @@ const CASES: CraftCase[] = [
     subject: 'handoff checklist',
     availableAssets: ['approved instant-payment exception handoff checklist'],
     body:
-      '{{first_name}}, a step-up exception at {{company}} can change the payment state while audit evidence lands in a different queue. How are you checking whether risk, ops, and compliance agree on ownership before roadmap freeze? Money20/20 Europe puts instant payments and regulation in the same room, so the timing is useful. I attached the approved handoff checklist for that review. Is this useful for the ownership review?',
+      '{{first_name}}, a step-up exception at {{company}} can change the payment state while audit evidence lands in a different queue. How are you checking whether risk, ops, and compliance agree on ownership before roadmap freeze? Money20/20 Europe puts instant payments and regulation in the same room, so the timing is useful. I attached the approved handoff checklist for that review. Worth looking into for the ownership review?',
     note: 'Gold case with a real supplied asset. Asset mention must be grounded in availableAssets.',
   },
   {

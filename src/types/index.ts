@@ -108,6 +108,9 @@ export type OutreachTouch = {
     proofClaimHits?: string[];
     previewSellerHits?: string[];
     previewEventHits?: string[];
+    clearCtaHits?: string[];
+    missingClearCta?: boolean;
+    commaSplicedCtaHits?: string[];
     painAngleLabel?: string;
     reusedPainAngleHits?: string[];
     painAngleBodyOverlap?: number;

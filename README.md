@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-114%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-120%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -65,6 +65,7 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **Structure** | 4T pattern: Trigger → Think (illumination question) → Third-party validation → Talk? (direct CTA) |
 | **Pronoun ratio** | "you/your" must outnumber "we/our" |
 | **No em-dashes, exclamation marks, or emoji** | Hard-rejected |
+| **CTA clarity** | Every touch must close with a clear lean-back question. Connection requests need an explicit connection ask like "Open to connecting?" |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
 | **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, and high-overlap pain vocabulary across email and LinkedIn |
@@ -162,7 +163,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-114 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+120 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 

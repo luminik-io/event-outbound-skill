@@ -247,6 +247,68 @@ const findPermissionToSendPhrasing = (text) =>
       regex: /\b(?:free for|worth)\s+(?:ten|fifteen|twenty|thirty|\d+)\s+minutes?\b/i,
     },
   ]);
+const LINKEDIN_CONNECTION_CTA_PATTERNS = [
+  { regex: /\bopen\s+to\s+connect(?:ing)?(?:\s+here)?\?/i },
+  { regex: /\bworth\s+connect(?:ing)?(?:\s+here)?\?/i },
+];
+const LEAN_BACK_CTA_PATTERNS = [
+  {
+    regex:
+      /\bworth\s+(?:a\s+)?(?:look|closer\s+look|peek|skim|read|conversation|exchange|coffee|seat|review|look\s+into|looking\s+into|taking\s+a\s+look|checking)\b[^.!?]{0,80}\?/i,
+  },
+  {
+    regex:
+      /\bopen\s+to\s+(?:taking\s+a\s+look|looking\s+into|learning\s+more|connect(?:ing)?|checking|reviewing)\b[^.!?]{0,80}\?/i,
+  },
+  { regex: /\bdoes\s+this\s+belong\b[^?]{0,100}\?/i },
+  { regex: /\bis\s+this\s+(?:on|a|worth)\b[^?]{0,100}\?/i },
+  { regex: /\bwhat\s+do\s+you\s+think\?/i },
+  {
+    regex:
+      /\bor\s+(?:parked|tabled|table\s+for\s+now|ignore|not\s+worth\s+it|too\s+early|later)\b[^?]{0,80}\?/i,
+  },
+];
+const CLEAR_CTA_TOUCH_TYPES = new Set([
+  'cold_email_first_touch',
+  'cold_email_followup_2',
+  'cold_email_followup_3plus',
+  'email_cold',
+  'linkedin_connection_request',
+  'linkedin_dm_post_connect',
+  'linkedin_day_of_nudge',
+  'post_event_followup',
+]);
+const COMMA_SPLICED_CTA_PATTERNS = [
+  {
+    regex:
+      /\b(?:i\s+)?attached\b[^.!?]{0,160},\s*(?:worth|open\s+to|does\s+this\s+belong|is\s+this\s+on|what\s+do\s+you\s+think)\b[^?]{0,100}\?/i,
+  },
+];
+const requiresClearCta = (candidateTouchType, candidateChannel) =>
+  candidateChannel === 'linkedin' ||
+  String(candidateTouchType || '').startsWith('linkedin_') ||
+  CLEAR_CTA_TOUCH_TYPES.has(String(candidateTouchType || ''));
+const findClearCtaPhrasing = (
+  text,
+  candidateTouchType,
+  candidateChannel,
+  approvedPhrases = [],
+) => {
+  if (!requiresClearCta(candidateTouchType, candidateChannel)) return [];
+  if (candidateTouchType === 'linkedin_connection_request') {
+    return patternHits(text, LINKEDIN_CONNECTION_CTA_PATTERNS);
+  }
+  const tail = String(text || '').slice(-240);
+  const hits = new Set(patternHits(tail, LEAN_BACK_CTA_PATTERNS));
+  for (const phrase of approvedPhrases) {
+    if (!phrase) continue;
+    const phraseCta = new RegExp(`${escapeRegex(phrase)}[^.!?]{0,80}\\?`, 'i');
+    if (phraseCta.test(tail)) hits.add(phrase);
+  }
+  return Array.from(hits);
+};
+const findCommaSplicedCtaPhrasing = (text) =>
+  patternHits(text, COMMA_SPLICED_CTA_PATTERNS);
 const findMissingMergeFields = (text, requiredFields = ['{{first_name}}', '{{company}}']) => {
   const hay = lower(text);
   return requiredFields.filter((field) => !hay.includes(lower(field)));
@@ -592,6 +654,34 @@ if (permissionToSendHits.length > 0) {
   });
 }
 
+const clearCtaHits = findClearCtaPhrasing(
+  body,
+  touchType,
+  channel,
+  rules.specific_pass_phrases?.lean_back_ctas,
+);
+const missingClearCta =
+  requiresClearCta(touchType, channel) && clearCtaHits.length === 0;
+if (missingClearCta) {
+  errors.push({
+    rule: 'clearCta',
+    message:
+      touchType === 'linkedin_connection_request'
+        ? 'LinkedIn connection requests must close with an explicit connection ask such as "Open to connecting?" or "Worth connecting?".'
+        : 'Every touch must close with a clear lean-back CTA question such as "Worth looking into?", "Open to taking a look?", or "Does this belong in the roadmap conversation?".',
+  });
+}
+
+const commaSplicedCtaHits = findCommaSplicedCtaPhrasing(body);
+if (commaSplicedCtaHits.length > 0) {
+  errors.push({
+    rule: 'commaSplicedCta',
+    message:
+      'Do not comma-splice an asset statement into the CTA. Use a clean CTA sentence or rewrite the final sentence around the question.',
+    offendingValue: commaSplicedCtaHits.join(', '),
+  });
+}
+
 const forcedEventPhrasingHits = findForcedEventPhrasing(
   combined,
   touch.eventName,
@@ -871,6 +961,9 @@ const checks = {
   proofClaimHits,
   previewSellerHits,
   previewEventHits,
+  clearCtaHits,
+  missingClearCta,
+  commaSplicedCtaHits,
   painAngleLabel: currentPainAngle ? painAngleLabel(currentPainAngle) : undefined,
   reusedPainAngleHits: reusedPainAngle.hits,
   painAngleBodyOverlap: reusedPainAngle.bodyOverlap,

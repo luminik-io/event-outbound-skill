@@ -85,7 +85,7 @@ Today the skill validates that EACH touch has a CTA from the approved ranking. T
 | Touch | Step | Strategy | Why |
 |---|---|---|---|
 | Touch 1 | Cold first email | Question + asset offer | Best chance to earn a click |
-| Touch 2 | LinkedIn connection request | Question only, no ask | Connect requests with asks feel needy |
+| Touch 2 | LinkedIn connection request | Direct connection ask | The ask should be clear and tiny: "Open to connecting?" or "Worth connecting?" |
 | Touch 3 | Cold email follow-up | "Thoughts?" — rephrase the question, no new ask | Bump emails with no new ask outperform new pitches |
 | Touch 4 | LinkedIn nudge / day-of | Light observation + soft CTA, no offer | Reader is in event mode — short context wins |
 | Touch 5 | Post-event email | New angle + offer (if you have a specific recap to share) | Permission has been earned |
@@ -98,7 +98,7 @@ Today the skill validates that EACH touch has a CTA from the approved ranking. T
   {
     "cta_strategy_per_touch_type": {
       "email_cold_first":          { "preferred": "make_offer", "alternates": ["ask_for_interest"], "may_omit": false },
-      "linkedin_connect":          { "preferred": "ask_for_interest", "alternates": [], "may_omit": true, "max_chars": 200 },
+      "linkedin_connect":          { "preferred": "ask_for_interest", "alternates": [], "may_omit": false, "max_chars": 200 },
       "email_followup_2":          { "preferred": "ask_for_interest", "alternates": ["thoughts"], "may_omit": true },
       "linkedin_nudge":            { "preferred": "ask_for_interest", "alternates": [], "may_omit": false },
       "linkedin_day_of":           { "preferred": "ask_for_interest", "alternates": [], "may_omit": false },
