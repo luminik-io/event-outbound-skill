@@ -66,7 +66,7 @@ VP Partnerships, Northstar Ledger
 
 **Body:**
 
-{{first_name}}, separate thread from my earlier note: audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. The question is less who owns the exception and more how quickly your team can reconstruct why a payment moved after authentication changed. If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?
+{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?
 
 Maya Rao
 VP Partnerships, Northstar Ledger

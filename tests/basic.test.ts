@@ -163,6 +163,29 @@ test('validate-touch CLI rejects recycled pain angles within a sequence', () => 
   expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('painAngleReused');
 });
 
+test('validate-touch CLI rejects sequence-mechanics openers', () => {
+  const payload = {
+    subject: 'evidence pack',
+    body: '{{first_name}}, separate thread from my earlier note: audit evidence at {{company}} can become a scavenger hunt when auth logs and rail traces live in different systems. How are you reconstructing why the payment moved after authentication changed? Worth a closer look?',
+    channel: 'email',
+    touch_type: 'cold_email_followup_2',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['audit-ready payment authentication evidence'],
+    personaPainPoints: ['audit evidence scattered across auth logs and rail traces'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('bannedWords');
+  expect(parsed.checks.bannedWordsFound).toEqual(
+    expect.arrayContaining(['separate thread', 'earlier note', 'my earlier note']),
+  );
+});
+
 test('validate-sequence CLI rejects repeated pain angles across channels', () => {
   const payload = {
     sequencesByPersona: {

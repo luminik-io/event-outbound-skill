@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-110%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-111%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -69,6 +69,7 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
 | **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, and high-overlap pain vocabulary across email and LinkedIn |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
+| **No sequence mechanics** | Follow-ups cannot open by announcing the outreach thread; each step has to stand on its own buyer-relevant angle |
 | **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations, forced event phrasing, or location-pasted CTAs |
 | **Strict truth** | In `strictTruth` mode, asset promises require `availableAssets`, proof claims require `proofPoints`, and Apollo-ready `{{first_name}}` / `{{company}}` fields are required |
 
@@ -161,7 +162,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-110 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+111 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 

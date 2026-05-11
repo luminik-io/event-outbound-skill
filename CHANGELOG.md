@@ -7,6 +7,7 @@ Buyer-first quality-bar hardening for thin event-outbound inputs.
 ### Added
 - Sequence-level pain-angle validation via `scripts/validate-sequence.mjs`. Every touch now needs a distinct `pain_angle`, and repeated angle labels or high-overlap pain vocabulary across email and LinkedIn are rejected.
 - Touch-level angle-diversity checks via `strictAngleDiversity`, `painAngle`, and `usedPainAngles`, so Claude gets feedback before a recycled-pain sequence reaches the final output.
+- Sequence-mechanics phrases such as "separate thread", "sent a note", "earlier note", and "following up on my..." are now blocked in generated copy.
 
 ### Changed
 - Skill intake now requires an Outbound Research Brief before drafting: buyer job, current workaround, hidden risk, customer-language pain, trigger, proof points, available assets, and likely objection.

@@ -711,13 +711,13 @@ function touchBrief(
       return {
         label: 'email_followup_2',
         instruction:
-          'Second pre-event email. 40-90 words / 3-4 sentences. Continue the same buyer problem without pretending familiarity. Use one neutral question and one lean-back CTA. CTA type: ask_for_interest.',
+          'Second pre-event email. 40-90 words / 3-4 sentences. Open on the assigned fresh buyer angle. Do not label the email as a follow-up, previous note, earlier note, or separate thread. Use one neutral question and one lean-back CTA. CTA type: ask_for_interest.',
       };
     }
     return {
       label: 'email_followup_3plus',
       instruction:
-        'Later pre-event email. 25-60 words / 2-3 sentences. Stay on one buyer problem, no fake familiarity, no meeting-first ask. CTA type: ask_for_interest.',
+        'Later pre-event email. 25-60 words / 2-3 sentences. Open on the assigned fresh buyer angle. No sequence mechanics, no "following up", no "earlier note", no fake familiarity, no meeting-first ask. CTA type: ask_for_interest.',
     };
   }
   if (channel === 'email' && offset_days === 0) {
@@ -893,6 +893,9 @@ HARD VALIDATOR RULES (auto-rejected)
   buyer pain, consequence, or mechanism. Do not reuse the same pain across email
   and LinkedIn, even in different wording. Return the selected pain_angle metadata
   with every touch and make the body visibly match it.
+- NO sequence-mechanics openers. Do not write "separate thread", "sent a note",
+  "earlier note", "previous note", or "following up on my..." in generated copy.
+  Each step should stand on its own buyer-relevant angle.
 - NO em-dashes (—). Use comma, period, or parentheses.
 - NO exclamation marks. NO emoji.
 - "you/your" must outnumber "we/our" in the body.

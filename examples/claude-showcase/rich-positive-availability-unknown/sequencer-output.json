@@ -105,7 +105,7 @@
           "channel": "email",
           "touch_type": "cold_email_followup_2",
           "subject": "evidence pack",
-          "body": "{{first_name}}, separate thread from my earlier note: audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. The question is less who owns the exception and more how quickly your team can reconstruct why a payment moved after authentication changed. If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?",
+          "body": "{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across FedNow, RTP, SEPA Instant, and cards, worth a closer look?",
           "pain_angle": {
             "label": "evidence pack latency",
             "sourcePain": "audit evidence lives in rail dashboards and auth logs that do not line up",
@@ -117,8 +117,8 @@
           "checks": {
             "subjectWordCount": 2,
             "allLowercase": true,
-            "bodyWordCount": 71,
-            "bodyCharCount": 442,
+            "bodyWordCount": 54,
+            "bodyCharCount": 344,
             "bodySentenceCount": 3,
             "bannedWordsFound": [],
             "llmClicheHardBans": {},
