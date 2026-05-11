@@ -111,6 +111,25 @@ const HARD_BAN_CATEGORIES = [
   'gpt_vocabulary',
 ];
 
+const TOUCH_TYPE_ALIASES = {
+  email_cold: 'cold_email_first_touch',
+  email_followup: 'cold_email_followup_2',
+  email_followup_2: 'cold_email_followup_2',
+  email_followup_3plus: 'cold_email_followup_3plus',
+  email_day_of: 'cold_email_followup_3plus',
+  email_post_event: 'post_event_followup',
+  post_event: 'post_event_followup',
+  linkedin_connect: 'linkedin_connection_request',
+  linkedin_connection: 'linkedin_connection_request',
+  linkedin_nudge: 'linkedin_day_of_nudge',
+  linkedin_day_of: 'linkedin_day_of_nudge',
+  linkedin_followup: 'post_event_followup',
+  linkedin_post_event: 'post_event_followup',
+};
+
+const canonicalTouchType = (touchType) =>
+  touchType ? TOUCH_TYPE_ALIASES[touchType] || touchType : '';
+
 // --- Helpers ---------------------------------------------------------------
 
 const lower = (s) => String(s || '').toLowerCase();
@@ -286,8 +305,8 @@ const COMMA_SPLICED_CTA_PATTERNS = [
 ];
 const requiresClearCta = (candidateTouchType, candidateChannel) =>
   candidateChannel === 'linkedin' ||
-  String(candidateTouchType || '').startsWith('linkedin_') ||
-  CLEAR_CTA_TOUCH_TYPES.has(String(candidateTouchType || ''));
+  canonicalTouchType(candidateTouchType).startsWith('linkedin_') ||
+  CLEAR_CTA_TOUCH_TYPES.has(canonicalTouchType(candidateTouchType));
 const findClearCtaPhrasing = (
   text,
   candidateTouchType,
@@ -295,7 +314,8 @@ const findClearCtaPhrasing = (
   approvedPhrases = [],
 ) => {
   if (!requiresClearCta(candidateTouchType, candidateChannel)) return [];
-  if (candidateTouchType === 'linkedin_connection_request') {
+  const ruleKey = canonicalTouchType(candidateTouchType);
+  if (ruleKey === 'linkedin_connection_request') {
     return patternHits(text, LINKEDIN_CONNECTION_CTA_PATTERNS);
   }
   const tail = String(text || '').slice(-240);
@@ -545,6 +565,7 @@ const subject = touch.subject || '';
 const body = touch.body || '';
 const channel = touch.channel;
 const touchType = touch.touch_type;
+const ruleKey = canonicalTouchType(touchType);
 const isLinkedIn = channel === 'linkedin';
 const combined = `${subject} ${body}`;
 
@@ -557,7 +578,15 @@ if (!touchType) {
 
 // Subject
 const subjectWords = countWords(subject);
-if (!isLinkedIn) {
+if (isLinkedIn) {
+  if (subject.trim().length > 0) {
+    errors.push({
+      rule: 'linkedinSubject',
+      message: 'LinkedIn touches must not include a subject.',
+      offendingValue: subject,
+    });
+  }
+} else {
   if (subjectWords === 0) {
     errors.push({ rule: 'emptySubject', message: 'Email subject is empty.' });
   } else if (subjectWords > benchmarks.subject_line_rules.max_word_count) {
@@ -592,40 +621,46 @@ if (!isLinkedIn) {
 }
 
 // Body length
-const lenRule = (rules.channel_length_rules || {})[touchType];
+const lenRule = (rules.channel_length_rules || {})[ruleKey];
 const bodyWords = countWords(body);
 const bodySentences = countSentences(body);
 const bodyChars = body.length;
 
-if (lenRule) {
+if (!ruleKey || !lenRule) {
+  errors.push({
+    rule: 'unknownTouchType',
+    message: `Unknown touch_type '${touchType}'. Use a supported channel length rule key.`,
+    offendingValue: touchType,
+  });
+} else {
   if (lenRule.min_words !== undefined && bodyWords < lenRule.min_words) {
     errors.push({
       rule: 'bodyWordCount',
-      message: `Body has ${bodyWords} words; expected min ${lenRule.min_words} for ${touchType}.`,
+      message: `Body has ${bodyWords} words; expected min ${lenRule.min_words} for ${ruleKey}.`,
     });
   }
   if (lenRule.max_words !== undefined && bodyWords > lenRule.max_words) {
     errors.push({
       rule: 'bodyWordCount',
-      message: `Body has ${bodyWords} words; expected max ${lenRule.max_words} for ${touchType}.`,
+      message: `Body has ${bodyWords} words; expected max ${lenRule.max_words} for ${ruleKey}.`,
     });
   }
   if (lenRule.min_sent !== undefined && bodySentences < lenRule.min_sent) {
     errors.push({
       rule: 'bodySentenceCount',
-      message: `Body has ${bodySentences} sentences; expected min ${lenRule.min_sent} for ${touchType}.`,
+      message: `Body has ${bodySentences} sentences; expected min ${lenRule.min_sent} for ${ruleKey}.`,
     });
   }
   if (lenRule.max_sent !== undefined && bodySentences > lenRule.max_sent) {
     errors.push({
       rule: 'bodySentenceCount',
-      message: `Body has ${bodySentences} sentences; expected max ${lenRule.max_sent} for ${touchType}.`,
+      message: `Body has ${bodySentences} sentences; expected max ${lenRule.max_sent} for ${ruleKey}.`,
     });
   }
   if (lenRule.max_chars !== undefined && bodyChars > lenRule.max_chars) {
     errors.push({
       rule: 'bodyCharCount',
-      message: `Body has ${bodyChars} chars; expected max ${lenRule.max_chars} for ${touchType}.`,
+      message: `Body has ${bodyChars} chars; expected max ${lenRule.max_chars} for ${ruleKey}.`,
     });
   }
 }
@@ -656,17 +691,17 @@ if (permissionToSendHits.length > 0) {
 
 const clearCtaHits = findClearCtaPhrasing(
   body,
-  touchType,
+  ruleKey,
   channel,
   rules.specific_pass_phrases?.lean_back_ctas,
 );
 const missingClearCta =
-  requiresClearCta(touchType, channel) && clearCtaHits.length === 0;
+  requiresClearCta(ruleKey, channel) && clearCtaHits.length === 0;
 if (missingClearCta) {
   errors.push({
     rule: 'clearCta',
     message:
-      touchType === 'linkedin_connection_request'
+      ruleKey === 'linkedin_connection_request'
         ? 'LinkedIn connection requests must close with an explicit connection ask such as "Open to connecting?" or "Worth connecting?".'
         : 'Every touch must close with a clear lean-back CTA question such as "Worth looking into?", "Open to taking a look?", or "Does this belong in the roadmap conversation?".',
   });
@@ -702,7 +737,7 @@ const mergeApplies =
   touch.apolloMergeFieldsRequired === true ||
   (strictContext &&
     Array.isArray(mergeSpec?.applies_to) &&
-    mergeSpec.applies_to.includes(touchType));
+    mergeSpec.applies_to.includes(ruleKey));
 const requiredMergeFields = mergeSpec?.required_fields || ['{{first_name}}', '{{company}}'];
 const missingMergeFields = mergeApplies
   ? findMissingMergeFields(body, requiredMergeFields)
@@ -743,7 +778,7 @@ if (strictContext && proofClaimHits.length > 0 && proofPoints.length === 0) {
 
 const previewSpec = rules.preview_line_rules;
 const previewApplies = Boolean(
-  Array.isArray(previewSpec?.applies_to) && previewSpec.applies_to.includes(touchType),
+  Array.isArray(previewSpec?.applies_to) && previewSpec.applies_to.includes(ruleKey),
 );
 const previewSellerHits = previewApplies
   ? findSellerFirstPreviewPhrasing(
@@ -902,12 +937,12 @@ if (iqSpec) {
   hasIQ = iqMatches.length >= (iqSpec.min_count || 1);
   if (
     Array.isArray(iqSpec.applies_to) &&
-    iqSpec.applies_to.includes(touchType) &&
+    iqSpec.applies_to.includes(ruleKey) &&
     !hasIQ
   ) {
     errors.push({
       rule: 'illuminationQuestion',
-      message: `${touchType} must contain at least ${iqSpec.min_count || 1} neutral how/what/why-are-you question.`,
+      message: `${ruleKey} must contain at least ${iqSpec.min_count || 1} neutral how/what/why-are-you question.`,
     });
   }
 }
@@ -945,6 +980,8 @@ const checks = {
   bodyWordCount: bodyWords,
   bodyCharCount: bodyChars,
   bodySentenceCount: bodySentences,
+  canonicalTouchType: ruleKey,
+  linkedinSubject: isLinkedIn ? subject : undefined,
   bannedWordsFound: banHits,
   llmClicheHardBans: hardBans,
   llmClicheSoftWarnings: softHits,

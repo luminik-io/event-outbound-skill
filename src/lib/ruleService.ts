@@ -78,6 +78,27 @@ export type ColdOutboundRules = {
   };
 };
 
+export const TOUCH_TYPE_ALIASES: Record<string, string> = {
+  email_cold: 'cold_email_first_touch',
+  email_followup: 'cold_email_followup_2',
+  email_followup_2: 'cold_email_followup_2',
+  email_followup_3plus: 'cold_email_followup_3plus',
+  email_day_of: 'cold_email_followup_3plus',
+  email_post_event: 'post_event_followup',
+  post_event: 'post_event_followup',
+  linkedin_connect: 'linkedin_connection_request',
+  linkedin_connection: 'linkedin_connection_request',
+  linkedin_nudge: 'linkedin_day_of_nudge',
+  linkedin_day_of: 'linkedin_day_of_nudge',
+  linkedin_followup: 'post_event_followup',
+  linkedin_post_event: 'post_event_followup',
+};
+
+export function canonicalTouchType(touchType?: string): string {
+  if (!touchType) return '';
+  return TOUCH_TYPE_ALIASES[touchType] ?? touchType;
+}
+
 export type LlmClicheCategory =
   | 'performative_empathy'
   | 'generic_compliments'
@@ -351,10 +372,11 @@ export function requiresClearCta(
   touchType?: string,
   channel?: 'email' | 'linkedin',
 ): boolean {
+  const ruleKey = canonicalTouchType(touchType);
   return (
     channel === 'linkedin' ||
-    touchType?.startsWith('linkedin_') === true ||
-    (touchType ? CLEAR_CTA_TOUCH_TYPES.has(touchType) : false)
+    ruleKey.startsWith('linkedin_') === true ||
+    (ruleKey ? CLEAR_CTA_TOUCH_TYPES.has(ruleKey) : false)
   );
 }
 
@@ -366,8 +388,9 @@ export function findClearCtaPhrasing(
 ): string[] {
   if (!requiresClearCta(touchType, channel)) return [];
 
+  const ruleKey = canonicalTouchType(touchType);
   const tail = text.slice(-240);
-  if (touchType === 'linkedin_connection_request') {
+  if (ruleKey === 'linkedin_connection_request') {
     return patternHits(text, LINKEDIN_CONNECTION_CTA_PATTERNS);
   }
 

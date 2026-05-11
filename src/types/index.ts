@@ -101,6 +101,8 @@ export type OutreachTouch = {
     hasExclamation: boolean;
     hasEmoji: boolean;
     specificityHits: number;
+    canonicalTouchType?: string;
+    linkedinSubject?: string;
     permissionToSendHits?: string[];
     forcedEventPhrasingHits?: string[];
     missingMergeFields?: string[];

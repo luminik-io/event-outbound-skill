@@ -9,7 +9,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-122%20pass-2ea043.svg)](#run-the-tests)
+[![Tests](https://img.shields.io/badge/tests-129%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -22,7 +22,7 @@ Claude Code + Claude Cowork. Free, MIT, open source.
 
 > **Built on 20,000+ personalized touches across 50+ B2B events that sourced $6M+ in pipeline.** Distilled from four years of fintech IDV and cybersecurity outbound run by hand.
 
-The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, no unsourced proof, and no recycled pain angles across steps. Failures retry up to 3× with temperature jitter; touches that exhaust retries ship with `quality_flag: 'rules_violated'` for human review.
+The skill turns event, ICP, sender identity, proof, real campaign assets, and cadence constraints into a full multi-touch sequence per persona, pre-event, day-of, post-event. Every touch is validated before it lands: subject ≤ 4 words, buyer-first inbox preview, channel-specific body length, no buzzwords, illumination question on first touch, direct CTA, no permission-to-send gating, no invented assets, no unsourced proof, and no recycled pain angles across steps. Failed touches retry up to 3× with validator feedback. If they still fail, the skill stops and writes a QA report instead of shipping unchecked copy.
 
 ## Install
 
@@ -163,7 +163,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-122 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+129 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~3 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 
@@ -186,6 +186,16 @@ npm run e2e:claude -- --case rich-positive-availability-unknown
 ```
 
 Add `--update-fixtures` only when you intentionally want to refresh the checked-in showcase outputs after human review.
+
+For broader local Claude coverage, run the matrix runner:
+
+```bash
+npm run e2e:claude:matrix -- --mode lite --max-cases 24 --command claude
+npm run e2e:claude:matrix -- --mode validated --max-cases 5 --command claude
+```
+
+`lite` disables tools and verifies the skill blocks drafting when the validator cannot run. `validated` asks Claude to generate one touch per case, write `validated-touch.json`, and pass it back through `scripts/validate-touch.mjs`. Use `--command` for whatever local Claude command should be tested on your machine.
+Run artifacts and rollups are written under `.tmp/claude-matrix-live/`.
 
 ### Headless / batch generation (optional)
 
@@ -217,7 +227,7 @@ type SequencerOutput = {
 };
 ```
 
-Each `OutreachTouch` carries a `checks` block so you can see exactly why it passed. Touches that burned all three validation retries return with `quality_flag: 'rules_violated'`. They are the minority, and they are your cue to rewrite by hand.
+Each `OutreachTouch` carries a `checks` block so you can see exactly why it passed. Final sequence files are written only after validator-clean touches. If a touch burns all three validation retries, the installed skill stops and reports the failed rule names for human review.
 
 Strict mode adds `missingMergeFields`, `assetPromiseHits`, and `proofClaimHits` to the checks block so a reviewer can see whether Claude tried to invent a useful-sounding but unsourced claim.
 

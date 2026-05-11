@@ -27,6 +27,23 @@ Do **not** generate a sequence from thin inputs like event + persona + channel +
 
 Before drafting, build a short **Outbound Research Brief**. If the user gives a company website or event URL, fetch it. If the user only gives a company name, use web search to find the official site before asking. If web tools are unavailable, say that and ask for the missing facts.
 
+### Validation gate
+
+The local validator is mandatory, not advisory. If Bash/node tools are unavailable, if the user asks to disable tools, or if `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --stdin` cannot run, do **not** draft copy. Return a blocked status with the missing capability and the next input needed. Do not include sample subject lines, sample bodies, or rejected phrase examples in that blocked response.
+
+Before the first draft, do this preflight:
+
+- Confirm each touch uses a canonical `touch_type`: `cold_email_first_touch`, `cold_email_followup_2`, `cold_email_followup_3plus`, `linkedin_connection_request`, `linkedin_dm_post_connect`, `linkedin_day_of_nudge`, or `post_event_followup`. Documented aliases from timeline labels are okay, but improvised labels are not.
+- Email subjects are static, lowercase, 1-4 words, no digits, no colons, and no merge fields.
+- LinkedIn touches have no subject at all. Use `""` or omit the field in prose, never `n/a`.
+- Cold first touches and post-connect DMs need a neutral how/what/why illumination question that matches the validator.
+- Every touch ends with one clear lean-back question. Connection requests end with a direct connection ask.
+- Asset language is allowed only when `availableAssets` is non-empty. Proof language is allowed only when `proofPoints` is non-empty.
+- Event-specific coffee, meetup, booth, or side-event asks are allowed only when sender logistics were supplied.
+- No pain angle repeats across the sequence, including across email and LinkedIn.
+
+If any preflight item is missing, ask targeted questions or continue in strict no-invention mode only when the user explicitly says to proceed. Even in strict no-invention mode, the validator gate remains mandatory.
+
 The brief must contain:
 
 1. **Buyer job**, the progress this persona is trying to make.
@@ -96,14 +113,14 @@ The planner uses the runtime's local date when `today` is omitted. Prefer passin
 Use this validator path. Do not assume the current working directory is the plugin root:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --stdin
 ```
 
 1. **Pick the channel, offset, and send date** from the planner output. Do not invent dates by hand.
 2. **Assign a fresh pain angle** from the ledger. The touch must use that angle and no previous angle. Across the whole sequence, including mixed email + LinkedIn runs, no pain angle may repeat. If you do not have enough angles, split the buyer problem into different dimensions (current workaround, ownership, timing, audit evidence, stakeholder conflict, cost of inaction, objection) or ask the user for more customer-language pains.
 3. **Choose CTA posture**. If the sender supplied real event presence or availability, include exactly one natural event-specific ask in the sequence, usually the last pre-event or day-of touch: `"Worth coffee at {{event_name}} if this is already on your list?"` or `"Worth a quick conversation at {{event_name}} if this is already on the roadmap?"`. Do not use this if attendance, booth, side-event, or availability is unknown. If relevant assets exist, include at most one asset-backed CTA in the best-fit touch. If no assets exist, do not mention assets.
 4. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-5. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, mark the touch `quality_flag: rules_violated` and continue, do not ship a fake-passing touch.
+5. **Validate** by running `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"` with the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, stop the sequence, report the failed rule names, and ask for the missing input or manual review. Do not include the failed copy in the final answer or final files.
 6. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 7. **Append** to the sequence; move to the next touch.
 
@@ -117,7 +134,7 @@ Pass the full `sequencer-output.json` on stdin or with `--sequence`. This catche
 
 If the user supplied confirmed sender attendance, booth, table, side-event, or coffee availability, set `eventSpecificAskRequired: true` on the top-level `sequencer-output.json` or per sequence before running `validate-sequence.mjs`. The validator will then require at least one natural event-specific ask. If sender event presence is unknown, leave this false and include a note: no meetup CTA because event logistics were not supplied.
 
-After all validators pass or are explicitly flagged, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
+After all validators pass, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output. If any validator cannot run or any touch still fails after retries, do not write final sequence files. Write a QA report with failed rule names instead. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
@@ -207,6 +224,8 @@ For other lead times, touch counts, dates, or single-channel cadences, use `scri
 Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-touch.mjs). On failure, the script returns JSON with each failed rule. **Read the errors, fix the draft, re-validate.**
 
 - Subject ≤ 4 lowercase words, no digits in cold-email subjects, no banned subject buzzwords.
+- Unknown or improvised `touch_type` values are rejected. Use only the canonical keys in the channel table or the documented timeline aliases.
+- LinkedIn touches must not include a subject. Empty or omitted is correct; `"n/a"`, event names, and label-style subjects are rejected.
 - Body within the channel length rule (above).
 - Every generated touch must close with a clear lean-back CTA question. Do not end with an asset statement, clever observation, or implied next step.
 - No comma-spliced asset CTAs like `"I attached the review, worth looking into?"`. Use a clean CTA sentence when sentence count allows it, or rewrite the final question around the buyer's decision.

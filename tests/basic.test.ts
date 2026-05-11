@@ -1,6 +1,8 @@
 import { expect, test } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { EventContext } from '../src/types/index.js';
+import { validateTouchExternal } from '../src/agents/sequencer.js';
+import { canonicalTouchType } from '../src/lib/ruleService.js';
+import type { CTAType, EventContext, AttendeePersona } from '../src/types/index.js';
 
 test('EventContext type exists', () => {
   const context: EventContext = {
@@ -12,6 +14,52 @@ test('EventContext type exists', () => {
     exhibitorList: [],
   };
   expect(context).toBeDefined();
+});
+
+test('canonicalTouchType maps timeline aliases and leaves canonical types untouched', () => {
+  expect(canonicalTouchType('email_cold')).toBe('cold_email_first_touch');
+  expect(canonicalTouchType('linkedin_connect')).toBe('linkedin_connection_request');
+  expect(canonicalTouchType('post_event_followup')).toBe('post_event_followup');
+});
+
+test('validateTouchExternal rejects unknown touch types on the TypeScript path', async () => {
+  const eventContext: EventContext = {
+    name: 'Money20/20 Europe 2026',
+    dates: 'June 2-4, 2026',
+    location: 'Amsterdam',
+    agendaTitles: [],
+    speakers: [],
+    exhibitorList: [],
+  };
+  const persona: AttendeePersona = {
+    personaId: 'payments',
+    role: 'Head of Payments',
+    seniority: 'executive',
+    priorities: ['same-day fraud model drift review'],
+    painPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+    exampleTitles: ['Head of Payments'],
+  };
+  const { result } = await validateTouchExternal(
+    {
+      subject: 'drift review',
+      body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?",
+      channel: 'email',
+      touch_type: 'first-touch',
+      cta_type: 'ask_for_interest' as CTAType,
+    },
+    eventContext,
+    persona,
+  );
+  expect(result.isValid).toBe(false);
+  expect(result.errors.map((e) => e.rule)).toContain('unknownTouchType');
+});
+
+test('run-claude-matrix self-test covers runner helper failures', () => {
+  const result = spawnSync('node', ['scripts/run-claude-matrix.mjs', '--self-test'], {
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  expect(result.stdout).toContain('self-test passed');
 });
 
 test('validate-touch CLI rejects digits in subject lines', () => {
@@ -294,6 +342,70 @@ test('validate-touch CLI accepts LinkedIn connection requests with an explicit c
   expect(parsed.checks.clearCtaHits.length).toBeGreaterThan(0);
 });
 
+test('validate-touch CLI rejects LinkedIn touches with subjects', () => {
+  const payload = {
+    subject: 'connection request',
+    body: '{{first_name}}, rule ownership after the original writer moves teams creates the SOC2 evidence gap for your team at {{company}}, and Black Hat seems relevant. Open to connecting?',
+    channel: 'linkedin',
+    touch_type: 'linkedin_connection_request',
+    eventName: 'Black Hat USA 2026',
+    personaPriorities: ['SOC2 evidence readiness'],
+    personaPainPoints: ['detection rule ownership creates SOC2 evidence gaps'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'linkedinSubject',
+  );
+});
+
+test('validate-touch CLI accepts legacy email_cold touch type alias', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?",
+    channel: 'email',
+    touch_type: 'email_cold',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(parsed.checks.canonicalTouchType).toBe('cold_email_first_touch');
+});
+
+test('validate-touch CLI rejects unknown touch types instead of falling back', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?",
+    channel: 'email',
+    touch_type: 'first-touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'unknownTouchType',
+  );
+});
+
 test('validate-touch CLI rejects LinkedIn DMs that end without a lean-back CTA', () => {
   const payload = {
     subject: '',
@@ -374,6 +486,28 @@ test('validate-touch CLI rejects comma-spliced asset CTAs', () => {
   expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
     'commaSplicedCta',
   );
+});
+
+test('validate-touch CLI rejects minutes and compare-notes CTAs', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth 30 minutes to compare notes?",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  const rules = parsed.errors.map((e: { rule: string }) => e.rule);
+  expect(parsed.isValid).toBe(false);
+  expect(rules).toContain('permissionToSendCta');
+  expect(rules).toContain('bannedWords');
 });
 
 test('validate-sequence CLI rejects repeated pain angles across channels', () => {
