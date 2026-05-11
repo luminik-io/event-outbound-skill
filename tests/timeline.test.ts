@@ -94,6 +94,16 @@ describe('generateTimeline', () => {
     }
   });
 
+  it('can infer eventStartDate from a human event date string', () => {
+    const plan = generateTimeline(4, ['email'], {
+      today: '2026-05-11',
+      eventDates: 'June 2-4, 2026',
+      touchCount: 6,
+      minGapDays: 4,
+    });
+    expect(plan.map((touch) => touch.offset_days)).toEqual([-22, -16, -10, -4, 0, 4]);
+  });
+
   it('rejects impossible touch counts for the available lead window', () => {
     expect(() =>
       generateTimeline(1, ['email'], {
@@ -119,6 +129,30 @@ describe('generateTimeline', () => {
     expect(parsed.isValid).toBe(true);
     expect(parsed.timeline[0].offset_days).toBe(-23);
     expect(parsed.timeline).toHaveLength(6);
+  });
+
+  it('installed-skill CLI infers eventStartDate from eventDates', () => {
+    const output = execFileSync('node', ['scripts/plan-timeline.mjs'], {
+      input: JSON.stringify({
+        leadTimeWeeks: 4,
+        channels: ['email'],
+        touchCount: 6,
+        minGapDays: 4,
+        today: '2026-05-11',
+        eventDates: 'June 2-4, 2026',
+      }),
+      encoding: 'utf8',
+    });
+    const parsed = JSON.parse(output);
+    expect(parsed.isValid).toBe(true);
+    expect(parsed.timeline.map((touch: { offset_days: number }) => touch.offset_days)).toEqual([
+      -22,
+      -16,
+      -10,
+      -4,
+      0,
+      4,
+    ]);
   });
 
   it('rejects out-of-range lead times', () => {

@@ -83,7 +83,7 @@ You hand the skill five things:
 
 If proof or assets are missing, the skill asks for them before drafting. If the user explicitly proceeds without them, strict mode writes around the gap instead of inventing matrices, briefs, peer teams, or before/after numbers.
 
-It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run by default, configurable when the user wants more or fewer steps. The cadence planner enforces at least four days between adjacent touches and uses the event date plus today's date to avoid scheduling in the past.
+It returns an Outbound Research Brief plus a full sequence per persona. Six touches for a four-week email-only run by default, configurable when the user wants more or fewer steps. The cadence planner enforces at least four days between adjacent touches, infers the event start from structured or human-readable dates, and uses the runtime's local date when `today` is not supplied.
 
 ## What the output looks like
 
@@ -159,7 +159,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-86 tests across 6 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
+100 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~2 seconds cold.
 
 ### Headless / batch generation (optional)
 

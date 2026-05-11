@@ -68,7 +68,7 @@ For event-led outbound, it is acceptable to ask for the sender's website first a
 
 ## How Claude executes this skill
 
-For each persona, build one outreach sequence with a user-configurable number of touches distributed across the lead-time window. The standard gap is **at least 4 days between adjacent steps**. A 4-week email-only sequence defaults to 6 touches, but if today is already inside the lead window, the first touch starts no earlier than today. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
+For each persona, build one outreach sequence with a user-configurable number of touches distributed across the lead-time window. The standard gap is **at least 4 days between adjacent steps**. Determine today's date yourself by omitting `today` from the planner input unless the user gives an explicit date. Determine event dates from the user, the fetched event page, JSON-LD, or the visible event date text. A 4-week email-only sequence defaults to 6 touches, but if today is already inside the lead window, the first touch starts no earlier than today. If the user explicitly asks for pre-event only, omit day-of/post-event touches and keep the pre-event touches. Each touch is a separate generation step.
 
 Before drafting, run the deterministic cadence planner:
 
@@ -84,12 +84,11 @@ Pass JSON on stdin:
   "channels": ["email"],
   "touchCount": 6,
   "minGapDays": 4,
-  "today": "2026-05-10",
-  "eventStartDate": "2026-06-02"
+  "eventDates": "June 2-4, 2026"
 }
 ```
 
-Use the active session date as `today` unless the user provides another date. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, reduce channels, change `minGapDays`, or include post-event steps.
+The planner uses the runtime's local date when `today` is omitted. Prefer passing `eventStartDate` when available; otherwise pass the human-readable `eventDates` string and let the planner infer the start date. If the planner returns `"isValid": false`, do not draft. Explain the feasibility issue and ask whether to reduce touch count, adjust channels, change `minGapDays`, switch to pre/post-event mix, or accept fewer steps. Preserve the 4-day gap as the recommended default unless the user explicitly overrides it.
 
 Use this validator path. Do not assume the current working directory is the plugin root:
 

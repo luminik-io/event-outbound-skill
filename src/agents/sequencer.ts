@@ -865,6 +865,7 @@ export async function generateSequence(
         minGapDays: sequenceParams.minGapDays,
         today: sequenceParams.today,
         eventStartDate: eventContext.startDate,
+        eventDates: eventContext.dates,
         includeDayOf: sequenceParams.includeDayOf,
         includePostEvent: sequenceParams.includePostEvent,
         preEventOnly: sequenceParams.preEventOnly,

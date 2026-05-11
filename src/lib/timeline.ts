@@ -4,6 +4,7 @@ export type TimelineOptions = {
   touchCount?: number;
   minGapDays?: number;
   eventStartDate?: string;
+  eventDates?: string;
   today?: string;
   includeDayOf?: boolean;
   includePostEvent?: boolean;
@@ -151,19 +152,28 @@ function resolveLeadWindowDays(
   options: TimelineOptions,
 ): number {
   const requestedLeadDays = leadTimeWeeks * 7;
-  if (!options.eventStartDate || !options.today) return requestedLeadDays;
+  const eventStartDate = options.eventStartDate ?? parseStartDateFromText(options.eventDates);
+  if (!eventStartDate) return requestedLeadDays;
 
-  const eventStart = parseDateOnly(options.eventStartDate, 'eventStartDate');
-  const today = parseDateOnly(options.today, 'today');
+  const eventStart = parseDateOnly(eventStartDate, 'eventStartDate');
+  const todayString = options.today ?? currentLocalDate();
+  const today = parseDateOnly(todayString, 'today');
   const daysUntilEvent = Math.floor(
     (eventStart.getTime() - today.getTime()) / 86_400_000,
   );
   if (daysUntilEvent < 0) {
     throw new Error(
-      `today (${options.today}) is after eventStartDate (${options.eventStartDate})`,
+      `today (${todayString}) is after eventStartDate (${eventStartDate})`,
     );
   }
   return Math.min(requestedLeadDays, daysUntilEvent);
+}
+
+function currentLocalDate(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function parseDateOnly(value: string, label: string): Date {
@@ -174,6 +184,46 @@ function parseDateOnly(value: string, label: string): Date {
     throw new Error(`${label} must be a valid date, got ${value}`);
   }
   return date;
+}
+
+function parseStartDateFromText(value?: string): string | undefined {
+  if (!value) return undefined;
+  const iso = /\b(\d{4}-\d{2}-\d{2})\b/.exec(value);
+  if (iso) return iso[1];
+
+  const monthNames: Record<string, string> = {
+    jan: '01',
+    january: '01',
+    feb: '02',
+    february: '02',
+    mar: '03',
+    march: '03',
+    apr: '04',
+    april: '04',
+    may: '05',
+    jun: '06',
+    june: '06',
+    jul: '07',
+    july: '07',
+    aug: '08',
+    august: '08',
+    sep: '09',
+    sept: '09',
+    september: '09',
+    oct: '10',
+    october: '10',
+    nov: '11',
+    november: '11',
+    dec: '12',
+    december: '12',
+  };
+  const named = /\b(January|February|March|April|May|June|July|August|September|Sept|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s*[-–]\s*\d{1,2}(?:st|nd|rd|th)?)?,?\s+(\d{4})\b/i.exec(
+    value,
+  );
+  if (!named) return undefined;
+  const month = monthNames[named[1].toLowerCase().replace('.', '')];
+  const day = named[2].padStart(2, '0');
+  return `${named[3]}-${month}-${day}`;
 }
 
 function buildEmailOnlyTimeline(
