@@ -22,11 +22,14 @@
     "lint": "eslint . --ext .ts",
     "scan": "tsx scripts/scan-deliverables.ts",
     "validate:sequence": "node scripts/validate-sequence.mjs",
+    "validate:artifact": "node scripts/validate-artifact.mjs",
     "check:showcase": "node scripts/check-claude-showcase.mjs",
     "e2e:claude": "node scripts/run-claude-showcase.mjs",
     "e2e:claude:matrix": "node scripts/run-claude-matrix.mjs",
+    "e2e:claude:full": "node scripts/run-claude-full-sequence.mjs",
     "test:matrix-runner": "node scripts/run-claude-matrix.mjs --self-test",
-    "verify": "npm run build && npm run test -- --run && npm run test:matrix-runner && npm run scan && npm run check:showcase"
+    "test:full-runner": "node scripts/run-claude-full-sequence.mjs --self-test",
+    "verify": "npm run build && npm run test -- --run && npm run test:matrix-runner && npm run test:full-runner && npm run scan && npm run check:showcase"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",

@@ -3,13 +3,19 @@
 ## Unreleased
 
 ### Added
-- Live Claude matrix harness via `npm run e2e:claude:matrix` with lite no-tools blocking checks and validated one-touch checks.
+- Final artifact validator via `scripts/validate-artifact.mjs`, covering required summary/date fields, per-touch `checks`, snake_case `pain_angle`, empty `validation_errors`, final markdown hygiene, and full `validate-sequence.mjs` status.
+- Live Claude matrix runner via `npm run e2e:claude:matrix` with lite no-tools blocking checks and validated one-touch checks.
+- Live Claude full-sequence runner via `npm run e2e:claude:full`, which asks the installed skill to write both final files and then runs the artifact validator.
 - Matrix case corpus covering thin inputs, cadence feasibility, LinkedIn subjects, asset gating, event logistics, proof gaps, current-date planning, and pain-angle reuse.
 
 ### Changed
 - Skill instructions now treat the local validator as a hard gate. If the validator cannot run, the skill blocks drafting instead of producing unchecked copy.
 - Touch validation now canonicalizes documented timeline aliases while rejecting improvised `touch_type` values.
 - LinkedIn touches now fail validation when a subject is present.
+- Touch validation now rejects generic `Hi {{first_name}}` greetings, signatures embedded in `body`, and awkward comma-plus-gerund clauses.
+- Sequence validation now checks cadence semantics: `send_date` vs `offset_days`, generic cold follow-ups during the event window, post-event timing, and `leadTimeWeeks` vs actual earliest pre-event step.
+- Sequence validation now rejects later touches that reuse concrete pain-anchor phrases from earlier pain angles, even when the overall similarity score is below the old threshold.
+- Skill instructions now require the final artifact validator before declaring drafts ready for human review.
 
 ## v0.2.5 (2026-05-10)
 

@@ -65,6 +65,7 @@
           "touch_type": "cold_email_first_touch",
           "subject": "step-up owner",
           "body": "{{first_name}}, when a step-up decision at {{company}} changes the payment state, ownership can get blurry: product sees authentication, risk sees funds movement, and payments ops gets the exception. How are you deciding who owns the handoff when SCA evidence and payment evidence disagree? The expensive part is the unresolved owner when roadmap tradeoffs start. Is that ownership question worth sorting now, or later?",
+          "cta_type": "ask_for_interest",
           "pain_angle": {
             "label": "step-up owner",
             "sourcePain": "SCA step-up owner unclear when auth changes payment state",
@@ -107,6 +108,7 @@
           "touch_type": "cold_email_followup_2",
           "subject": "evidence pack",
           "body": "{{first_name}}, audit evidence at {{company}} can become a scavenger hunt when the auth log, rail trace, and case notes live in different systems. How quickly can your team reconstruct why a payment moved after authentication changed? If that evidence pack still takes manual stitching across instant rails and cards, is the gap worth looking into?",
+          "cta_type": "ask_for_interest",
           "pain_angle": {
             "label": "evidence pack latency",
             "sourcePain": "audit evidence lives in rail dashboards and auth logs that do not line up",
@@ -148,7 +150,8 @@
           "channel": "email",
           "touch_type": "cold_email_followup_3plus",
           "subject": "roadmap queue",
-          "body": "{{first_name}}, when payment-auth cleanup is framed as ops work at {{company}}, it can miss the product roadmap until the next rail change forces it back. Where is that sitting on your side now: product scope, risk cleanup, or still unnamed?",
+          "body": "{{first_name}}, when payment-auth cleanup is framed as ops work at {{company}}, it can miss the product roadmap until the next rail change forces it back. Is this on your roadmap, or parked for later?",
+          "cta_type": "ask_for_interest",
           "pain_angle": {
             "label": "roadmap queue",
             "sourcePain": "payments-auth work can miss Q3 roadmap when it is treated as ops cleanup",
@@ -190,7 +193,8 @@
           "channel": "email",
           "touch_type": "post_event_followup",
           "subject": "after the notes",
-          "body": "{{first_name}}, after the event, the hard part at {{company}} is turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, the cost is another quarter of reviews that nobody can confidently close. What is your threshold for putting one owner on this now?",
+          "body": "{{first_name}}, after the event, the hard part for your team at {{company}} is turning vendor notes into one ownership decision. If the same auth-change work is still split between payments ops, product, and risk, your team can lose another quarter of reviews nobody can confidently close. Does this belong in the roadmap conversation?",
+          "cta_type": "ask_for_interest",
           "pain_angle": {
             "label": "vendor-note translation",
             "sourcePain": "vendor notes do not translate into ownership decisions",

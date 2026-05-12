@@ -101,7 +101,50 @@ const STOPWORDS = new Set([
   'your',
 ]);
 
+const TOUCH_TYPE_ALIASES = {
+  email_cold: 'cold_email_first_touch',
+  email_followup: 'cold_email_followup_2',
+  email_followup_2: 'cold_email_followup_2',
+  email_followup_3plus: 'cold_email_followup_3plus',
+  email_day_of: 'cold_email_followup_3plus',
+  email_post_event: 'post_event_followup',
+  post_event: 'post_event_followup',
+  linkedin_connect: 'linkedin_connection_request',
+  linkedin_connection: 'linkedin_connection_request',
+  linkedin_nudge: 'linkedin_day_of_nudge',
+  linkedin_day_of: 'linkedin_day_of_nudge',
+  linkedin_followup: 'post_event_followup',
+  linkedin_post_event: 'post_event_followup',
+};
+
+const canonicalTouchType = (touchType) =>
+  touchType ? TOUCH_TYPE_ALIASES[touchType] || touchType : '';
 const lower = (value) => String(value || '').toLowerCase();
+const parseDateOnly = (value) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return null;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+const dayDiff = (left, right) =>
+  Math.round((left.getTime() - right.getTime()) / (24 * 60 * 60 * 1000));
+const eventStartDateFor = (inputValue, sequence) =>
+  parseDateOnly(
+    inputValue.eventStartDate ||
+      inputValue.event?.startDate ||
+      inputValue.eventContext?.startDate ||
+      sequence.eventStartDate ||
+      sequence.event?.startDate ||
+      sequence.eventContext?.startDate,
+  );
+const eventEndDateFor = (inputValue, sequence, startDate) =>
+  parseDateOnly(
+    inputValue.eventEndDate ||
+      inputValue.event?.endDate ||
+      inputValue.eventContext?.endDate ||
+      sequence.eventEndDate ||
+      sequence.event?.endDate ||
+      sequence.eventContext?.endDate,
+  ) || startDate;
 const angleText = (angle) => {
   if (!angle) return '';
   if (typeof angle === 'string') return angle;
@@ -163,6 +206,38 @@ const bodySimilarity = (leftBody, rightBody) => {
   const union = new Set([...left, ...right]).size;
   return { score: union === 0 ? 0 : shared.length / union, shared };
 };
+const orderedTokens = (text) =>
+  lower(text)
+    .replace(/\{\{[a-z0-9_]+\}\}/g, ' ')
+    .match(/[a-z0-9]+(?:[-/][a-z0-9]+)*/g)
+    ?.map((token) =>
+      (token.length > 4
+        ? token.replace(/(?:ing|tion|sion|ment|ness|ities|ity|ed|es|s)$/i, '')
+        : token
+      ).replace(/[-/]/g, ''),
+    )
+    .filter((token) => token.length >= 3) || [];
+const normalizedCorpus = (text) => ` ${orderedTokens(text).join(' ')} `;
+const painAnchorPhrases = (text) => {
+  const words = orderedTokens(text);
+  const phrases = new Set();
+  for (let size = 3; size <= 5; size += 1) {
+    for (let index = 0; index <= words.length - size; index += 1) {
+      const phraseWords = words.slice(index, index + size);
+      const signalWords = phraseWords.filter(
+        (word) => word.length >= 4 && !STOPWORDS.has(word),
+      );
+      if (signalWords.length >= 2) phrases.add(phraseWords.join(' '));
+    }
+  }
+  return Array.from(phrases);
+};
+const repeatedPainAnchorHits = (previousAngle, currentBody) => {
+  const body = normalizedCorpus(currentBody);
+  return painAnchorPhrases(angleText(previousAngle)).filter((phrase) =>
+    body.includes(` ${phrase} `),
+  );
+};
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const eventAliases = (inputValue, sequence) => {
   const raw =
@@ -208,6 +283,7 @@ const findEventSpecificAskHits = (inputValue, sequence) => {
     ),
   ];
   for (const touch of sequence.touches || []) {
+    if (!touch || typeof touch !== 'object' || Array.isArray(touch)) continue;
     const body = touch.body || '';
     for (const pattern of patterns) {
       const match = body.match(pattern);
@@ -215,6 +291,117 @@ const findEventSpecificAskHits = (inputValue, sequence) => {
     }
   }
   return hits;
+};
+const validateCadence = (inputValue, personaId, sequence, touches) => {
+  const cadenceErrors = [];
+  const cadenceChecks = {
+    eventStartDate: null,
+    eventEndDate: null,
+    minOffsetDays: null,
+    maxOffsetDays: null,
+    expectedLeadTimeWeeks: null,
+    leadTimeWeeks: sequence.leadTimeWeeks ?? null,
+  };
+  const startDate = eventStartDateFor(inputValue, sequence);
+  const endDate = startDate ? eventEndDateFor(inputValue, sequence, startDate) : null;
+  cadenceChecks.eventStartDate = startDate?.toISOString().slice(0, 10) || null;
+  cadenceChecks.eventEndDate = endDate?.toISOString().slice(0, 10) || null;
+
+  const offsets = [];
+  for (let index = 0; index < touches.length; index++) {
+    const touch = touches[index];
+    if (!touch || typeof touch !== 'object' || Array.isArray(touch)) {
+      errors.push({
+        rule: 'touchShape',
+        personaId,
+        touchSlot: index + 1,
+        offendingValue: JSON.stringify(touch),
+        message: 'Every touch must be an object.',
+      });
+      continue;
+    }
+    const slot = touch.touch_slot ?? index + 1;
+    const touchType = canonicalTouchType(touch.touch_type);
+    const sendDate = parseDateOnly(touch.send_date || touch.sendDate);
+
+    const offsetDays =
+      typeof touch.offset_days === 'number'
+        ? touch.offset_days
+        : typeof touch.send_at_offset_days === 'number'
+          ? touch.send_at_offset_days
+          : null;
+    if (typeof offsetDays === 'number') offsets.push(offsetDays);
+    if (!startDate || !sendDate) continue;
+
+    const derivedOffset = dayDiff(sendDate, startDate);
+    if (typeof offsetDays === 'number' && derivedOffset !== offsetDays) {
+      cadenceErrors.push({
+        rule: 'offsetDateMismatch',
+        personaId,
+        touchSlot: slot,
+        offendingValue: `${touch.send_date || touch.sendDate} vs ${offsetDays}`,
+        message:
+          'send_date does not match offset_days relative to the event start date.',
+      });
+    }
+
+    const inEventWindow = sendDate >= startDate && sendDate <= endDate;
+    if (touchType === 'cold_email_first_touch' && sendDate >= startDate) {
+      cadenceErrors.push({
+        rule: 'coldFirstTouchAfterEventStart',
+        personaId,
+        touchSlot: slot,
+        offendingValue: touch.send_date || touch.sendDate,
+        message: 'cold_email_first_touch must be sent before the event starts.',
+      });
+    }
+    if (touchType === 'cold_email_followup_2' && inEventWindow) {
+      cadenceErrors.push({
+        rule: 'coldFollowupDuringEvent',
+        personaId,
+        touchSlot: slot,
+        offendingValue: `${touchType} on ${touch.send_date || touch.sendDate}`,
+        message:
+          'cold_email_followup_2 should not be scheduled during the event window. Use the day-of nudge slot or post_event_followup when the timing changes.',
+      });
+    }
+    if (touchType === 'post_event_followup' && sendDate <= endDate) {
+      cadenceErrors.push({
+        rule: 'postEventBeforeEventEnd',
+        personaId,
+        touchSlot: slot,
+        offendingValue: touch.send_date || touch.sendDate,
+        message: 'post_event_followup must be sent after the event ends.',
+      });
+    }
+  }
+
+  if (offsets.length > 0) {
+    cadenceChecks.minOffsetDays = Math.min(...offsets);
+    cadenceChecks.maxOffsetDays = Math.max(...offsets);
+    const deepestPreEventOffset = Math.min(...offsets.filter((offset) => offset < 0));
+    if (Number.isFinite(deepestPreEventOffset)) {
+      const expectedLeadTimeWeeks = Math.max(
+        1,
+        Math.ceil(Math.abs(deepestPreEventOffset) / 7),
+      );
+      cadenceChecks.expectedLeadTimeWeeks = expectedLeadTimeWeeks;
+      if (
+        typeof sequence.leadTimeWeeks === 'number' &&
+        sequence.leadTimeWeeks !== expectedLeadTimeWeeks
+      ) {
+        cadenceErrors.push({
+          rule: 'leadTimeWeeksMismatch',
+          personaId,
+          offendingValue: `${sequence.leadTimeWeeks} vs ${expectedLeadTimeWeeks}`,
+          message:
+            'leadTimeWeeks must reflect the actual earliest pre-event send date in the generated cadence.',
+        });
+      }
+    }
+  }
+
+  return { errors: cadenceErrors, checks: cadenceChecks };
 };
 
 const errors = [];
@@ -233,10 +420,25 @@ for (const [personaId, sequence] of Object.entries(input.sequencesByPersona || {
     distinctPainAngleCount: 0,
     pairSimilarities,
     eventSpecificAskHits: [],
+    cadence: {},
   };
+
+  const cadence = validateCadence(input, personaId, sequence, touches);
+  errors.push(...cadence.errors);
+  checks.sequences[personaId].cadence = cadence.checks;
 
   for (let index = 0; index < touches.length; index++) {
     const touch = touches[index];
+    if (!touch || typeof touch !== 'object' || Array.isArray(touch)) {
+      errors.push({
+        rule: 'touchShape',
+        personaId,
+        touchSlot: index + 1,
+        offendingValue: JSON.stringify(touch),
+        message: 'Every touch must be an object.',
+      });
+      continue;
+    }
     const slot = touch.touch_slot ?? index + 1;
     const angle = touch.pain_angle || touch.painAngle;
     const label = angleLabel(angle);
@@ -303,6 +505,17 @@ for (const [personaId, sequence] of Object.entries(input.sequencesByPersona || {
           offendingValue: bodyScore.shared.slice(0, 12).join(', '),
           message:
             'Touch body repeats too much pain vocabulary from an earlier touch.',
+        });
+      }
+      const painAnchorHits = repeatedPainAnchorHits(previous.angle, touch.body || '');
+      if (painAnchorHits.length > 0) {
+        errors.push({
+          rule: 'painAnchorReused',
+          personaId,
+          touchSlot: slot,
+          offendingValue: painAnchorHits.slice(0, 4).join(', '),
+          message:
+            'Touch body reuses a concrete pain-anchor phrase from an earlier touch. Pick a different problem, consequence, or illumination route.',
         });
       }
     }
