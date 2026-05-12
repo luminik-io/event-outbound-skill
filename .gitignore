@@ -20,11 +20,14 @@ scripts/*
 !scripts/scan-deliverables.ts
 !scripts/validate-touch.mjs
 !scripts/validate-sequence.mjs
+!scripts/validate-artifact.mjs
 !scripts/plan-timeline.mjs
 !scripts/check-claude-showcase.mjs
 !scripts/run-claude-showcase.mjs
 !scripts/run-claude-matrix.mjs
+!scripts/run-claude-full-sequence.mjs
 !scripts/claude-matrix-cases.json
+!scripts/claude-full-sequence-cases.json
 data/gong-cold-email-data-report.pdf
 examples/*/raw_output.json
 examples/*/generation.log

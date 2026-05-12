@@ -69,7 +69,8 @@ Every cold-email generator claims "proven frameworks." This one validates every 
 | **Event ask posture** | When sender event presence is real, one touch should include a natural event-route ask. When presence is unknown, meetup and coffee CTAs are blocked |
 | **CTA ranking** | `make_offer` > `ask_for_interest` > `ask_for_problem` > `ask_for_meeting` (CTA-type reply-rate deltas from the Gong / 30MPC / Outbound Squad 85M-email report) |
 | **Cadence structure** | User-configurable touch count, 4-day minimum gap by default, date-aware planning so steps do not land in the past |
-| **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, and high-overlap pain vocabulary across email and LinkedIn |
+| **Angle diversity** | Every touch carries `pain_angle` metadata; the sequence validator rejects repeated pain, repeated angle labels, repeated pain-anchor phrases, and high-overlap pain vocabulary across email and LinkedIn |
+| **Artifact gate** | Final JSON must include summary, event dates, `send_date`, `offset_days`, snake_case `pain_angle`, `checks`, and empty `validation_errors`; final markdown is scanned for banned surface phrasing |
 | **Cliche blocklist** | Ten categories, 195 phrases. See [*Validation rules*](#validation-rules) below |
 | **No sequence mechanics** | Follow-ups cannot open by announcing the outreach thread; each step has to stand on its own buyer-relevant angle |
 | **Specificity** | Every touch must reference a concrete persona priority, pain, or event signal, with no population-shape generalizations, forced event phrasing, or location-pasted CTAs |
@@ -142,7 +143,7 @@ npm install
 claude --plugin-dir $(pwd)
 ```
 
-That's it. The installed skill runs inside Claude Code and Cowork with no extra API keys. Claude reads the rules from `${CLAUDE_PLUGIN_ROOT}/data/`, generates each touch, validates it via `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"`, and revises on failure.
+That's it. The installed skill runs inside Claude Code and Cowork with no extra API keys. Claude reads the rules from `${CLAUDE_PLUGIN_ROOT}/data/`, generates each touch, validates it via `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"`, revises on failure, checks the full sequence, then runs the final artifact gate before writing deliverables.
 
 To validate a single hand-written touch against the rule set:
 
@@ -163,7 +164,7 @@ npx tsx scripts/scan-deliverables.ts
 npm test -- --run
 ```
 
-129 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~3 seconds cold.
+139 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~6 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 
@@ -177,6 +178,14 @@ To validate pain-angle diversity for a full generated sequence:
 
 ```bash
 node scripts/validate-sequence.mjs --sequence examples/claude-showcase/rich-positive-availability-unknown/sequencer-output.json
+```
+
+To validate a final generated JSON + markdown pair:
+
+```bash
+node scripts/validate-artifact.mjs \
+  --sequence examples/claude-showcase/rich-positive-availability-unknown/sequencer-output.json \
+  --final examples/claude-showcase/rich-positive-availability-unknown/final_sequence.md
 ```
 
 To rerun the live Claude showcase locally:
@@ -197,6 +206,14 @@ npm run e2e:claude:matrix -- --mode validated --max-cases 5 --command claude
 `lite` disables tools and verifies the skill blocks drafting when the validator cannot run. `validated` asks Claude to generate one touch per case, write `validated-touch.json`, and pass it back through `scripts/validate-touch.mjs`. Use `--command` for whatever local Claude command should be tested on your machine.
 Run artifacts and rollups are written under `.tmp/claude-matrix-live/`.
 
+For full installed-skill runs that generate both final files and then run the artifact validator:
+
+```bash
+npm run e2e:claude:full -- --command claude --max-cases 2
+```
+
+Use `--command` for the authenticated Claude Code command on your machine. Run artifacts and rollups are written under `.tmp/claude-full-sequence-live/`.
+
 ### Headless / batch generation (optional)
 
 If you want to generate sequences outside Claude (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. There is no required cloud API for using the skill inside Claude Code or Cowork, and the repo ships no default external-model dependency.
@@ -216,6 +233,19 @@ Full TypeScript types in `src/types/index.ts`. The short version:
 
 ```ts
 type SequencerOutput = {
+  summary: {
+    totalTouches: number;
+    requestedTouchCount?: number;
+    minGapDays?: number;
+    validatorStatus: string;
+    sequenceValidatorStatus: string;
+  };
+  event: {
+    name: string;
+    startDate: string;
+    endDate?: string;
+    location?: string;
+  };
   sequencesByPersona: {
     [personaId: string]: {
       personaId: string;
@@ -227,7 +257,7 @@ type SequencerOutput = {
 };
 ```
 
-Each `OutreachTouch` carries a `checks` block so you can see exactly why it passed. Final sequence files are written only after validator-clean touches. If a touch burns all three validation retries, the installed skill stops and reports the failed rule names for human review.
+Each `OutreachTouch` carries `send_date`, `offset_days`, snake_case `pain_angle`, `checks`, and `validation_errors: []` so you can see exactly why it passed. Final sequence files are written only after validator-clean touches, sequence validation, and artifact validation. If a touch burns all three validation retries, the installed skill stops and reports the failed rule names for human review.
 
 Strict mode adds `missingMergeFields`, `assetPromiseHits`, and `proofClaimHits` to the checks block so a reviewer can see whether Claude tried to invent a useful-sounding but unsourced claim.
 

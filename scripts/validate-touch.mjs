@@ -329,6 +329,24 @@ const findClearCtaPhrasing = (
 };
 const findCommaSplicedCtaPhrasing = (text) =>
   patternHits(text, COMMA_SPLICED_CTA_PATTERNS);
+const findTemplateGreeting = (text) =>
+  patternHits(text, [
+    { regex: /^\s*(?:hi|hey|hello)\s+\{\{first_name\}\}\s*,/i },
+  ]);
+const findSignatureBlock = (text) => {
+  const trimmedText = String(text || '').trimEnd();
+  const match = trimmedText.match(
+    /\n\s*\n\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}(?:\s*,\s*(?:founder|ceo|vp|head|director|partner|partnerships|sales|marketing|solutions).*)?)\s*$/i,
+  );
+  return match?.[1] ? [match[1]] : [];
+};
+const findAwkwardCoordinatedClause = (text) =>
+  patternHits(text, [
+    {
+      regex:
+        /,\s+and\s+(?:talking|comparing|working|looking|thinking|meeting|checking|reviewing|walking)\b[^.!?]{0,120}/i,
+    },
+  ]);
 const findMissingMergeFields = (text, requiredFields = ['{{first_name}}', '{{company}}']) => {
   const hay = lower(text);
   return requiredFields.filter((field) => !hay.includes(lower(field)));
@@ -717,6 +735,36 @@ if (commaSplicedCtaHits.length > 0) {
   });
 }
 
+const templateGreetingHits = findTemplateGreeting(body);
+if (templateGreetingHits.length > 0) {
+  errors.push({
+    rule: 'templateGreeting',
+    message:
+      'Do not open with a generic greeting. Start directly with {{first_name}}, then the buyer-relevant trigger.',
+    offendingValue: templateGreetingHits.join(', '),
+  });
+}
+
+const signatureBlockHits = findSignatureBlock(body);
+if (signatureBlockHits.length > 0) {
+  errors.push({
+    rule: 'signatureBlock',
+    message:
+      'Do not put sender signatures inside touch.body. Keep the body clean for sequencer import.',
+    offendingValue: signatureBlockHits.join(', '),
+  });
+}
+
+const awkwardCoordinatedClauseHits = findAwkwardCoordinatedClause(body);
+if (awkwardCoordinatedClauseHits.length > 0) {
+  errors.push({
+    rule: 'awkwardCoordinatedClause',
+    message:
+      'Copy has an awkward comma-plus-gerund clause. Rewrite as a direct sentence with one clear action or observation.',
+    offendingValue: awkwardCoordinatedClauseHits.join(', '),
+  });
+}
+
 const forcedEventPhrasingHits = findForcedEventPhrasing(
   combined,
   touch.eventName,
@@ -1001,6 +1049,9 @@ const checks = {
   clearCtaHits,
   missingClearCta,
   commaSplicedCtaHits,
+  templateGreetingHits,
+  signatureBlockHits,
+  awkwardCoordinatedClauseHits,
   painAngleLabel: currentPainAngle ? painAngleLabel(currentPainAngle) : undefined,
   reusedPainAngleHits: reusedPainAngle.hits,
   painAngleBodyOverlap: reusedPainAngle.bodyOverlap,

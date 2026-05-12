@@ -31,16 +31,20 @@ Before drafting, build a short **Outbound Research Brief**. If the user gives a 
 
 The local validator is mandatory, not advisory. If Bash/node tools are unavailable, if the user asks to disable tools, or if `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs" --stdin` cannot run, do **not** draft copy. Return a blocked status with the missing capability and the next input needed. Do not include sample subject lines, sample bodies, or rejected phrase examples in that blocked response.
 
+The no-garbage rules apply to every skill-authored surface: outreach copy, research brief, blocked responses, notes, summaries, QA reports, and final JSON metadata. Do not use em dashes anywhere. Blocked responses must be ASCII-only JSON or plain text. Do not say the work is ready to send, cleared for deployment, or approved for outreach. The approved status phrase is "ready for human review."
+
 Before the first draft, do this preflight:
 
 - Confirm each touch uses a canonical `touch_type`: `cold_email_first_touch`, `cold_email_followup_2`, `cold_email_followup_3plus`, `linkedin_connection_request`, `linkedin_dm_post_connect`, `linkedin_day_of_nudge`, or `post_event_followup`. Documented aliases from timeline labels are okay, but improvised labels are not.
 - Email subjects are static, lowercase, 1-4 words, no digits, no colons, and no merge fields.
 - LinkedIn touches have no subject at all. Use `""` or omit the field in prose, never `n/a`.
 - Cold first touches and post-connect DMs need a neutral how/what/why illumination question that matches the validator.
+- Bodies start directly with `{{first_name}},` followed by the buyer-relevant trigger. Do not open with `Hi {{first_name}}`, `Hey {{first_name}}`, or `Hello {{first_name}}`.
 - Every touch ends with one clear lean-back question. Connection requests end with a direct connection ask.
 - Asset language is allowed only when `availableAssets` is non-empty. Proof language is allowed only when `proofPoints` is non-empty.
 - Event-specific coffee, meetup, booth, or side-event asks are allowed only when sender logistics were supplied.
 - No pain angle repeats across the sequence, including across email and LinkedIn.
+- Do not put sender names or signatures inside `touch.body`. Signatures belong outside sequencer import fields.
 
 If any preflight item is missing, ask targeted questions or continue in strict no-invention mode only when the user explicitly says to proceed. Even in strict no-invention mode, the validator gate remains mandatory.
 
@@ -134,7 +138,17 @@ Pass the full `sequencer-output.json` on stdin or with `--sequence`. This catche
 
 If the user supplied confirmed sender attendance, booth, table, side-event, or coffee availability, set `eventSpecificAskRequired: true` on the top-level `sequencer-output.json` or per sequence before running `validate-sequence.mjs`. The validator will then require at least one natural event-specific ask. If sender event presence is unknown, leave this false and include a note: no meetup CTA because event logistics were not supplied.
 
-After all validators pass, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output. If any validator cannot run or any touch still fails after retries, do not write final sequence files. Write a QA report with failed rule names instead. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
+After all touch and sequence validators pass, write the final output as `final_sequence.md` (human-readable) and `sequencer-output.json` (machine-readable). Include a sequence summary header: total touches, requested touch count, min gap days, average quality, score-band counts, CTA mix, illumination-question coverage, distinct pain-angle coverage, touch validator status, and sequence validator status from the actual CLI output.
+
+The final JSON must include top-level `summary`, `event.startDate`, `event.endDate`, and `sequencesByPersona`. Every touch must include `touch_slot`, `offset_days`, `send_date`, `channel`, `touch_type`, `subject`, `body`, `cta_type`, snake_case `pain_angle`, `quality_band`, `validation_errors`, and the actual `checks` object from `validate-touch.mjs`. Do not use camelCase `painAngle` in the final file. `validation_errors` must be an empty array on successful final touches.
+
+Then run the final artifact validator:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-artifact.mjs" --sequence sequencer-output.json --final final_sequence.md
+```
+
+The sequence is not finished unless this returns `"isValid": true`. If any validator cannot run or any touch still fails after retries, do not write final sequence files. Write a QA report with failed rule names instead. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
 
 The full system prompt with worked pass/fail examples lives at `${CLAUDE_PLUGIN_ROOT}/data/cold-outbound-craft.md`. Treat that file as the canonical playbook. Re-read it any time you're unsure how to handle an edge case (multilingual events, dinner-invite touches, very short lead times).
 
@@ -151,6 +165,7 @@ Concrete rules that follow from that:
 - **Empathy over swagger.** When the persona is dealing with a hard tradeoff, name it honestly. "Tightening the rules drops approval rates 4-7 points and Sales escalates inside 48 hours" is honest empathy. "Most VPs walk in already knowing the pitch" is performative.
 - **No slang and no faux-casual swagger.** Banned tells: `caught my eye`, `caught my attention`, `wall-to-wall`, `no worries`, `no biggie`, `hot mess`, `needle in a haystack`, `fire drill`, `all hands on deck`. The validator catches these. The deeper issue: copy that *needs* slang to sound human is masking weak substance.
 - **Bodies use proper grammar.** Capitalize the first letter of every sentence. Use full punctuation. The "all-lowercase" convention applies only to subject lines (per the cold-email-subject canon). Body copy is not a Slack message.
+- **No generic greeting wrappers.** Start with `{{first_name}},` and the buyer's situation. `Hi {{first_name}}` wastes the preview line and makes every touch feel templated.
 - **Protect the first 18 words.** The inbox preview is where the recipient decides whether to keep reading. For cold first touches and post-connect DMs, the opener must be buyer-first: no `I/we/us/our` in the first 18 words, and no event-first opener like `"Black Hat is coming up..."`.
 - **Don't force the event into the body opener or CTA.** The event is the *occasion* for outreach; it is not the buyer's reason to care. The strongest touches anchor on a persona responsibility first, then use the event only when it makes the ask more natural ("Worth a coffee at Black Hat if this is already on your audit list?"). Forcing "before RSA" / "week of Money20/20" / "into m2020" into every sentence reads like a sequence template. Forcing "before Amsterdam" or "for Amsterdam prep" into the CTA is worse: it makes the city pretend to be the buyer priority.
 - **One event-specific ask is good when it is true.** If the sender is actually attending, sponsoring, hosting, or available for coffee, one touch should usually make the event route explicit: `"Worth coffee at Money20/20 if this is already on your audit list?"`. Do not sprinkle event CTAs across the sequence. One is enough.
@@ -231,6 +246,8 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - No comma-spliced asset CTAs like `"I attached the review, worth looking into?"`. Use a clean CTA sentence when sentence count allows it, or rewrite the final question around the buyer's decision.
 - LinkedIn connection requests must close with a direct connection ask such as `"Open to connecting?"` or `"Worth connecting?"`.
 - LinkedIn DMs and nudges must close with a clear lean-back CTA question such as `"Worth looking into?"`, `"Open to taking a look?"`, or `"Does this belong in the roadmap conversation?"`.
+- Do not put signatures in `body`. `Daniel`, `Maya`, job titles, and sign-off blocks should not be inside the sequencer JSON body.
+- No awkward comma-plus-gerund clauses such as a sentence that tacks on `, and talking...` or `, and comparing...`. Rewrite the idea as a direct sentence.
 - Cold first touches + post-connect DMs must keep the first 18 words buyer-first: no seller pronouns (`I/me/my/we/us/our`) and no event-first opener.
 - Cold emails + post-connect DMs must contain a `how/what/why-are/do/is-you/your` illumination question.
 - No leading questions: `if I could…`, `would you be interested`, `wouldn't you agree`, `don't you think`.
@@ -241,7 +258,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 - No forced event phrasing: `"keeps coming up before RSA"`, `"week of Money20/20"`, `"today at RSA"`, `"into m2020"`, a question that bolts `"before [event]"` onto the end, or a CTA that makes the location do the buyer-priority work (`"worth pressure-testing before Amsterdam"`, `"useful for Amsterdam prep"`). Use buyer responsibility as the reason to write and the event as the route to a clear ask.
 - No generic post-event pleasantries: `"hope the event went well"`, `"hope the event was productive"`, `"hope the week in [city] went well"`. Start from the buyer's returned-to-desk work instead.
 - No invented sender logistics: do not say `"I'm around"`, `"I am around the [track] side of the agenda"`, `"I'll be at booth X"`, or name a session/track unless the user supplied that fact. If sender availability is missing, use a buyer-timing CTA instead of a meetup CTA.
-- No pain-angle recycling. Every touch needs `painAngle` metadata and must use a different buyer problem, consequence, or illumination route than all previous touches. This applies across email and LinkedIn in the same sequence. Rewording the same pain is still a failure.
+- No pain-angle recycling. Every touch needs `painAngle` metadata and must use a different buyer problem, consequence, or illumination route than all previous touches. This applies across email and LinkedIn in the same sequence. Rewording the same pain or repeating a concrete pain-anchor phrase from an earlier touch is still a failure.
 - No sequence-mechanics openers. Do not write `"separate thread"`, `"sent a note"`, `"earlier note"`, `"previous note"`, or `"following up on my..."`. Follow-up steps should stand alone with a fresh buyer-relevant angle, not announce how the sequence is organized.
 - No vague calendar-trigger openers. Do not write `"this is usually the week..."`, `"new rails get attention"`, or any filler that explains the send date instead of the buyer's job. Name the buyer-side consequence directly.
 - No invented event logistics. Do not invent hosted roundtables, coffee times, speaker-lounge locations, Business Hall locations, or prior conversations. Only use those when the user supplied them.
@@ -289,7 +306,7 @@ Returns `{ "isValid": true | false, "errors": [...], "checks": {...} }` on stdou
 Write two files per run, in a directory named for the event:
 
 - `final_sequence.md`, human-readable. One section per persona; one subsection per touch with channel, offset, type, body, and quality band. Sequence summary at top.
-- `sequencer-output.json`, machine-readable. Top-level shape: `{ "sequencesByPersona": { [personaId]: { personaId, leadTimeWeeks, channels, touches: [...] } } }`. See `src/types/index.ts` for the full type. Every touch carries its `checks` object and any `validation_errors`.
+- `sequencer-output.json`, machine-readable. Top-level shape: `{ "summary": {...}, "event": { "startDate": "YYYY-MM-DD", "endDate": "YYYY-MM-DD" }, "sequencesByPersona": { [personaId]: { personaId, leadTimeWeeks, channels, touches: [...] } } }`. See `src/types/index.ts` for the full type. Every touch carries `send_date`, `offset_days`, snake_case `pain_angle`, its `checks` object, and `validation_errors: []`.
 
 Working examples that exercise the full contract:
 
@@ -319,6 +336,8 @@ When you're unsure if a draft is good, read it aloud. If you'd be embarrassed se
 - [data/cold-outbound-canonical-examples.json](../../data/cold-outbound-canonical-examples.json), pass + fail reference touches.
 - [src/types/index.ts](../../src/types/index.ts), full TypeScript types for `EventContext`, `CompanyICP`, `OutreachTouch`, `OutreachSequence`, `SequencerOutput`.
 - [scripts/validate-touch.mjs](../../scripts/validate-touch.mjs), the validator CLI.
+- [scripts/validate-sequence.mjs](../../scripts/validate-sequence.mjs), sequence-level pain-angle and cadence validator.
+- [scripts/validate-artifact.mjs](../../scripts/validate-artifact.mjs), final JSON + markdown artifact validator.
 
 ## Optional: headless runs
 

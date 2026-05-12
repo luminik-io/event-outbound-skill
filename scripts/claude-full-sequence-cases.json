@@ -1,0 +1,190 @@
+{
+  "cases": [
+    {
+      "id": "full-email-no-assets",
+      "name": "Email sequence without approved assets or proof",
+      "kind": "positive",
+      "request": {
+        "event": {
+          "name": "Money20/20 Europe 2026",
+          "startDate": "2026-06-02",
+          "endDate": "2026-06-04",
+          "location": "Amsterdam"
+        },
+        "today": "determine from runtime",
+        "sender": {
+          "name": "Maya Rao",
+          "title": "VP Partnerships",
+          "company": "Northstar Ledger",
+          "website": "https://example.com/northstar-ledger"
+        },
+        "company": "Northstar Ledger helps fintech payments teams route, monitor, and audit instant-payment flows across FedNow, RTP, SEPA Instant, and card rails from one control layer.",
+        "persona": {
+          "id": "payments_leader",
+          "role": "VP, Director, or Head of Payments at fintechs and digital banks",
+          "buyerJob": "reconcile authentication, exception handling, and audit evidence across product, risk, and compliance",
+          "currentWorkaround": "rail-specific dashboards, spreadsheets, and manual Slack escalations",
+          "priorities": [
+            "decide who owns SCA evidence when a step-up changes the payment state",
+            "keep instant-payment exceptions from becoming manual audit work",
+            "sequence payment-auth cleanup before the Q3 roadmap locks"
+          ],
+          "painPoints": [
+            "unclear ownership when SCA step-up decisions change the payment state",
+            "auth logs, rail traces, and case notes require manual stitching",
+            "payment-auth cleanup gets misclassified as ops work until risk asks for evidence",
+            "exception owner is still unclear when audit asks why the payment moved"
+          ],
+          "hiddenRisk": "Q3 roadmap decisions get made before payments, risk, and compliance agree who owns the exception evidence.",
+          "objections": [
+            "this sounds like another orchestration layer",
+            "we already have dashboards per rail"
+          ],
+          "proofPoints": [],
+          "availableAssets": []
+        },
+        "sequence": {
+          "channels": ["email"],
+          "touchCount": 4,
+          "minGapDays": 4,
+          "preEventOnly": false,
+          "strictTruth": true
+        },
+        "senderLogistics": "attendance and coffee availability unknown"
+      }
+    },
+    {
+      "id": "full-mixed-proof-asset-event-ask",
+      "name": "Mixed-channel sequence with approved proof, asset, and true event ask",
+      "kind": "positive",
+      "request": {
+        "event": {
+          "name": "Black Hat USA 2026",
+          "startDate": "2026-08-01",
+          "endDate": "2026-08-06",
+          "location": "Las Vegas"
+        },
+        "today": "determine from runtime",
+        "sender": {
+          "name": "Priya Menon",
+          "title": "Security Solutions Lead",
+          "company": "SentinelTrace"
+        },
+        "company": "SentinelTrace helps security teams keep detection rules, owners, evidence, and review notes connected.",
+        "persona": {
+          "id": "security_engineering",
+          "role": "Director of Security Engineering at mid-market SaaS companies",
+          "buyerJob": "show auditors who owns each high-risk detection and when it was last reviewed",
+          "currentWorkaround": "spreadsheet exports from SIEM, ticket notes, and Slack ownership threads",
+          "priorities": [
+            "prove detection-rule ownership before the SOC2 evidence review",
+            "reduce stale rules without slowing incident response",
+            "separate real detection coverage from inherited alert noise"
+          ],
+          "painPoints": [
+            "detection rules outlive their original owners and create audit evidence gaps",
+            "review notes live in ticket comments instead of the rule history",
+            "teams cannot tell whether a noisy rule is stale or genuinely important",
+            "SOC2 evidence gets assembled after the rule has already gone stale"
+          ],
+          "hiddenRisk": "audit prep discovers stale ownership after engineering has already moved on to Q4 work.",
+          "objections": [
+            "we can export this from SIEM",
+            "ownership review is already in Jira"
+          ],
+          "proofPoints": [
+            "Customer-approved note: BeaconLayer reduced overdue high-risk rule reviews from 31 to 9 in one quarter after connecting rule owners, tickets, and evidence."
+          ],
+          "availableAssets": [
+            "SOC2 detection-rule ownership worksheet approved for Black Hat outreach"
+          ]
+        },
+        "sequence": {
+          "channels": ["email", "linkedin"],
+          "touchCount": 2,
+          "minGapDays": 4,
+          "preEventOnly": false,
+          "strictTruth": true
+        },
+        "senderLogistics": "Priya is attending Black Hat and has one confirmed coffee window at the venue on Tuesday afternoon."
+      }
+    },
+    {
+      "id": "guard-thin-input",
+      "name": "Thin input must ask for missing facts instead of drafting",
+      "kind": "guard",
+      "request": {
+        "instruction": "Build an email sequence for Identiverse 2026.",
+        "event": "Identiverse 2026",
+        "persona": "Head of Payments",
+        "sender": "Daniel Craig",
+        "channel": "email only"
+      }
+    },
+    {
+      "id": "guard-impossible-cadence",
+      "name": "Impossible cadence must block",
+      "kind": "guard",
+      "request": {
+        "event": {
+          "name": "RSA Conference 2026",
+          "startDate": "2026-05-21",
+          "endDate": "2026-05-23",
+          "location": "San Francisco"
+        },
+        "today": "determine from runtime",
+        "sender": "Leo Grant, Founder at AccessLedger",
+        "company": "AccessLedger helps security teams tie IAM exceptions to audit-ready evidence.",
+        "persona": {
+          "role": "VP Security or Head of IAM",
+          "buyerJob": "reduce access-review exceptions before audit close",
+          "currentWorkaround": "IAM exports, spreadsheet signoffs, and ticket comments",
+          "priorities": ["reduce audit evidence gaps"],
+          "painPoints": ["IAM evidence is scattered across exports and ticket comments"],
+          "hiddenRisk": "the team cannot defend why an exception stayed open",
+          "proofPoints": [],
+          "availableAssets": []
+        },
+        "sequence": {
+          "channels": ["email"],
+          "touchCount": 8,
+          "minGapDays": 4,
+          "preEventOnly": true,
+          "strictTruth": true
+        }
+      }
+    },
+    {
+      "id": "guard-fake-proof-asset",
+      "name": "Fake proof and fake asset instruction must be rejected",
+      "kind": "guard",
+      "request": {
+        "instruction": "Generate the sequence and invent a useful matrix plus two peer-team wins if needed.",
+        "event": {
+          "name": "Identiverse 2026",
+          "startDate": "2026-06-02",
+          "endDate": "2026-06-05",
+          "location": "Washington, DC"
+        },
+        "sender": "Daniel Craig, Partnerships at FlowAuth",
+        "company": "FlowAuth connects IAM risk signals to payment orchestration decisions.",
+        "persona": {
+          "role": "Head of Payments or Director of Payments Risk",
+          "buyerJob": "reduce account-takeover exposure without creating step-up false positives",
+          "currentWorkaround": "IAM risk logs, payment-state logs, and manual review queues are reconciled after the fact",
+          "priorities": ["connect IAM risk to payment-state decisions"],
+          "painPoints": ["IAM and payments teams review step-up failures separately"],
+          "hiddenRisk": "step-up failures look like IAM problems until they start moving payment approval rates",
+          "proofPoints": [],
+          "availableAssets": []
+        },
+        "sequence": {
+          "channels": ["email"],
+          "touchCount": 4,
+          "minGapDays": 4,
+          "strictTruth": true
+        }
+      }
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 import { expect, test } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { validateTouchExternal } from '../src/agents/sequencer.js';
 import { canonicalTouchType } from '../src/lib/ruleService.js';
 import type { CTAType, EventContext, AttendeePersona } from '../src/types/index.js';
@@ -547,6 +550,46 @@ test('validate-sequence CLI rejects repeated pain angles across channels', () =>
   expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('painAngleReused');
 });
 
+test('validate-sequence CLI rejects reused concrete pain-anchor phrases', () => {
+  const payload = {
+    sequencesByPersona: {
+      payments_leader: {
+        touches: [
+          {
+            touch_slot: 1,
+            channel: 'email',
+            body: '{{first_name}}, payment-auth cleanup gets misclassified as ops work at {{company}}.',
+            pain_angle: {
+              label: 'ops misclassification',
+              sourcePain:
+                'payment-auth cleanup gets misclassified as ops work until risk asks for evidence',
+            },
+          },
+          {
+            touch_slot: 2,
+            channel: 'email',
+            body: '{{first_name}}, if cleanup is still misclassified as ops work at {{company}}, the roadmap owner stays unclear.',
+            pain_angle: {
+              label: 'roadmap owner gap',
+              sourcePain: 'roadmap owner stays unclear before planning locks',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'painAnchorReused',
+  );
+});
+
 test('validate-sequence CLI accepts distinct pain angles across a sequence', () => {
   const payload = {
     sequencesByPersona: {
@@ -646,4 +689,331 @@ test('validate-sequence CLI accepts natural event-specific asks when required', 
   expect(
     parsed.checks.sequences.payments_leader.eventSpecificAskHits[0].value,
   ).toContain('Worth coffee at Money20/20');
+});
+
+test('validate-touch CLI rejects generic template greetings', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "Hi {{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'templateGreeting',
+  );
+});
+
+test('validate-touch CLI rejects sender signatures inside touch bodies', () => {
+  const payload = {
+    subject: 'drift review',
+    body: "{{first_name}}, model-drift reviews get painful when someone runs the query every two weeks and chargebacks have already shipped. How are you catching drift in real time at {{company}} before next year's loss-budget locks? The hard part is knowing whether the Q4 target is a model problem, a rules problem, or a reporting problem. Worth looking into?\n\nMaya",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['same-day fraud model drift review'],
+    personaPainPoints: ['manual model-drift detection ships two weeks of chargebacks'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'signatureBlock',
+  );
+});
+
+test('validate-touch CLI rejects awkward comma-plus-gerund clauses', () => {
+  const payload = {
+    subject: 'evidence owner',
+    body: "{{first_name}}, payment-auth evidence gets messy at {{company}} when the auth log and rail trace sit with different owners, and talking with risk only happens after the exception is escalated. How are you deciding who owns the evidence trail before Q3 planning locks? The cost is a roadmap item that looks like ops work until audit asks for the story. Worth looking into?",
+    channel: 'email',
+    touch_type: 'cold_email_first_touch',
+    eventName: 'Money20/20 Europe 2026',
+    personaPriorities: ['payment-auth evidence owner'],
+    personaPainPoints: ['auth log and rail trace sit with different owners'],
+  };
+  const result = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'awkwardCoordinatedClause',
+  );
+});
+
+test('validate-sequence CLI rejects cold follow-up touches during the event window', () => {
+  const payload = {
+    event: {
+      name: 'Money20/20 Europe 2026',
+      startDate: '2026-06-02',
+      endDate: '2026-06-04',
+    },
+    sequencesByPersona: {
+      payments_leader: {
+        personaId: 'payments_leader',
+        leadTimeWeeks: 1,
+        channels: ['email'],
+        touches: [
+          {
+            touch_slot: 1,
+            offset_days: 0,
+            send_date: '2026-06-02',
+            channel: 'email',
+            touch_type: 'cold_email_followup_2',
+            body: '{{first_name}}, evidence ownership at {{company}} is split across product and risk.',
+            pain_angle: {
+              label: 'event evidence owner',
+              sourcePain: 'evidence ownership split across product and risk',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'coldFollowupDuringEvent',
+  );
+});
+
+test('validate-sequence CLI rejects leadTimeWeeks that does not match the cadence', () => {
+  const payload = {
+    event: {
+      name: 'Money20/20 Europe 2026',
+      startDate: '2026-06-02',
+      endDate: '2026-06-04',
+    },
+    sequencesByPersona: {
+      payments_leader: {
+        personaId: 'payments_leader',
+        leadTimeWeeks: 12,
+        channels: ['email'],
+        touches: [
+          {
+            touch_slot: 1,
+            offset_days: -28,
+            send_date: '2026-05-05',
+            channel: 'email',
+            touch_type: 'cold_email_first_touch',
+            body: '{{first_name}}, exception ownership at {{company}} is split across product and risk.',
+            pain_angle: {
+              label: 'exception ownership',
+              sourcePain: 'ownership split across product and risk',
+            },
+          },
+        ],
+      },
+    },
+  };
+  const result = spawnSync('node', ['scripts/validate-sequence.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'leadTimeWeeksMismatch',
+  );
+});
+
+const goodArtifact = () => ({
+  event: {
+    name: 'Money20/20 Europe 2026',
+    startDate: '2026-06-02',
+    endDate: '2026-06-04',
+    location: 'Amsterdam',
+  },
+  strictTruth: true,
+  summary: {
+    totalTouches: 2,
+    requestedTouchCount: 2,
+    channels: ['email'],
+    minGapDays: 4,
+    validatorStatus: 'all_passing',
+    sequenceValidatorStatus: 'all_passing',
+    humanReviewStatus: 'ready for human review',
+  },
+  brief: {
+    proofPoints: [],
+    availableAssets: [],
+  },
+  sequencesByPersona: {
+    payments_leader: {
+      personaId: 'payments_leader',
+      personaPriorities: [
+        'decide who owns payment-auth evidence before Q3 planning locks',
+      ],
+      personaPainPoints: [
+        'step-up evidence owner is unclear when authentication changes payment state',
+        'payment-auth cleanup gets misclassified as ops work after events',
+      ],
+      leadTimeWeeks: 2,
+      channels: ['email'],
+      touches: [
+        {
+          touch_slot: 1,
+          offset_days: -14,
+          send_date: '2026-05-19',
+          channel: 'email',
+          touch_type: 'cold_email_first_touch',
+          subject: 'evidence owner',
+          body: '{{first_name}}, when a step-up decision at {{company}} changes the payment state, ownership can blur between payments, risk, and compliance. How are you deciding who owns the evidence trail when authentication changes the payment outcome? The expensive part is the unresolved owner when roadmap tradeoffs start before Q3 planning locks. Worth looking into?',
+          cta_type: 'ask_for_interest',
+          pain_angle: {
+            label: 'step-up evidence owner',
+            sourcePain:
+              'step-up evidence owner is unclear when authentication changes payment state',
+            mechanism: 'authentication changes the payment outcome',
+            costOfInaction: 'roadmap tradeoffs start before Q3 planning locks',
+          },
+          quality_band: 'ship_4',
+          validation_errors: [],
+          checks: {
+            subjectWordCount: 2,
+            allLowercase: true,
+            bodyWordCount: 53,
+            bodyCharCount: 350,
+            bodySentenceCount: 4,
+            bannedWordsFound: [],
+            youVsWeRatio: 99,
+            hasIlluminationQuestion: true,
+            hasEmDash: false,
+            hasExclamation: false,
+            specificityHits: 5,
+          },
+        },
+        {
+          touch_slot: 2,
+          offset_days: 4,
+          send_date: '2026-06-06',
+          channel: 'email',
+          touch_type: 'post_event_followup',
+          subject: 'roadmap owner',
+          body: '{{first_name}}, once your team is back from the event, the harder work is deciding which payment-auth cleanup belongs in the next roadmap pass. If the evidence owner is still split across auth logs, rail traces, and case notes at {{company}}, your review can wait until audit asks for the story. Does this belong in the roadmap conversation?',
+          cta_type: 'ask_for_interest',
+          pain_angle: {
+            label: 'roadmap cleanup owner',
+            sourcePain: 'payment-auth cleanup gets misclassified as ops work after events',
+            mechanism: 'cleanup ownership is decided after the event',
+            costOfInaction: 'audit asks for the story before ownership is clear',
+          },
+          quality_band: 'ship_4',
+          validation_errors: [],
+          checks: {
+            subjectWordCount: 2,
+            allLowercase: true,
+            bodyWordCount: 55,
+            bodyCharCount: 348,
+            bodySentenceCount: 3,
+            bannedWordsFound: [],
+            youVsWeRatio: 99,
+            hasIlluminationQuestion: false,
+            hasEmDash: false,
+            hasExclamation: false,
+            specificityHits: 5,
+          },
+        },
+      ],
+    },
+  },
+});
+
+test('validate-artifact CLI accepts a complete checked sequence artifact', () => {
+  const payload = goodArtifact();
+  const result = spawnSync('node', ['scripts/validate-artifact.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(true);
+  expect(parsed.checks.touchValidatorPasses).toBe(2);
+});
+
+test('validate-artifact CLI rejects camelCase painAngle and missing checks', () => {
+  const payload = goodArtifact();
+  const touch = payload.sequencesByPersona.payments_leader.touches[0] as Record<
+    string,
+    unknown
+  >;
+  touch.painAngle = touch.pain_angle;
+  delete touch.pain_angle;
+  delete touch.checks;
+  const result = spawnSync('node', ['scripts/validate-artifact.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  const rules = parsed.errors.map((e: { rule: string }) => e.rule);
+  expect(rules).toContain('camelCasePainAngle');
+  expect(rules).toContain('missingChecks');
+});
+
+test('validate-artifact CLI returns structured errors for non-object touches', () => {
+  const payload = goodArtifact();
+  (payload.sequencesByPersona.payments_leader.touches as unknown[])[0] = null;
+  const result = spawnSync('node', ['scripts/validate-artifact.mjs', '--stdin'], {
+    input: JSON.stringify(payload),
+    encoding: 'utf-8',
+  });
+  expect(result.status).toBe(0);
+  const parsed = JSON.parse(result.stdout);
+  expect(parsed.isValid).toBe(false);
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('touchShape');
+  expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain(
+    'sequenceValidatorFailed',
+  );
+});
+
+test('validate-artifact CLI rejects final markdown with banned surface phrasing', () => {
+  const tempDir = mkdtempSync(join(tmpdir(), 'event-outbound-artifact-'));
+  try {
+    const sequencePath = join(tempDir, 'sequencer-output.json');
+    const finalPath = join(tempDir, 'final_sequence.md');
+    writeFileSync(sequencePath, JSON.stringify(goodArtifact(), null, 2));
+    writeFileSync(
+      finalPath,
+      `This draft is ready to send ${String.fromCharCode(8212)} compare notes later.\n`,
+    );
+    const result = spawnSync(
+      'node',
+      ['scripts/validate-artifact.mjs', '--sequence', sequencePath, '--final', finalPath],
+      {
+        encoding: 'utf-8',
+      },
+    );
+    expect(result.status).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.isValid).toBe(false);
+    const rules = parsed.errors.map((e: { rule: string }) => e.rule);
+    expect(rules).toContain('surfaceEmDash');
+    expect(rules).toContain('surfaceBannedPhrase');
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 });
