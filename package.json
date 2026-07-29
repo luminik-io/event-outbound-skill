@@ -44,7 +44,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.1"
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
@@ -54,6 +54,8 @@
   "overrides": {
     "vite": "^6.4.2",
     "esbuild": "^0.25.0",
-    "minimatch": "^9.0.7"
+    "minimatch": "^9.0.7",
+    "js-yaml": "^4.3.0",
+    "brace-expansion": "^5.0.8"
   }
 }
