@@ -8,8 +8,10 @@ on:
 
 jobs:
   verify:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    runs-on: [self-hosted, linux, x64, luminik-org]
+    # Pull requests can contain untrusted workflow changes, so they must stay on
+    # GitHub-hosted isolation. Only the trusted main-branch push uses the
+    # organization runner.
+    runs-on: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') || fromJSON('["self-hosted","linux","x64","luminik-org"]') }}
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
