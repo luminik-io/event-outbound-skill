@@ -8,7 +8,10 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    # Pull requests can contain untrusted workflow changes, so they must stay on
+    # GitHub-hosted isolation. Only the trusted main-branch push uses the
+    # organization runner.
+    runs-on: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') || fromJSON('["self-hosted","linux","x64","luminik-org"]') }}
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
