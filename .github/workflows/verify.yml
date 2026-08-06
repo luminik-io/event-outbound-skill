@@ -8,10 +8,13 @@ on:
 
 jobs:
   verify:
-    # Pull requests can contain untrusted workflow changes, so they must stay on
-    # GitHub-hosted isolation. Only the trusted main-branch push uses the
-    # organization runner.
-    runs-on: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') || fromJSON('["self-hosted","linux","x64","luminik-org"]') }}
+    # Both events run on Blacksmith now, and the isolation the split existed to
+    # protect is preserved rather than given up: a Blacksmith runner is an
+    # ephemeral per-job VM, so an untrusted pull request gets a clean machine
+    # that is destroyed afterwards, which is what GitHub-hosted was buying. The
+    # persistent self-hosted box, which was the thing actually worth worrying
+    # about for a trusted push, is gone entirely.
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
