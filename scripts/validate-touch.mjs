@@ -147,12 +147,24 @@ const normalizePreviewToken = (token) =>
     .replace(/^i(?:'m|'d|'ll|'ve)?$/, 'i')
     .replace(/^we(?:'re|'d|'ll|'ve)?$/, 'we');
 const countSentences = (s) => {
-  // Match a sentence terminator [.!?] only when it is NOT inside a number
-  // (e.g. "1.4%" should not count as two sentences). The negative lookahead
-  // skips `.` immediately followed by a digit. Multiple terminators in a row
-  // ("?!") count as one. Leading/trailing whitespace handled by the caller.
-  const m = String(s || '').match(/[.!?]+(?!\d)/g);
-  return m ? m.length : 0;
+  // Scan once instead of applying a backtracking regexp to model output.
+  // Punctuation clusters ("?!") count once. Preserve the legacy rule that a
+  // terminator immediately followed by a digit does not count.
+  const text = String(s || '');
+  let count = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (char !== '.' && char !== '!' && char !== '?') continue;
+
+    const next = text[index + 1];
+    if (next >= '0' && next <= '9') continue;
+
+    count += 1;
+    while (index + 1 < text.length && '.!?'.includes(text[index + 1])) {
+      index += 1;
+    }
+  }
+  return count;
 };
 const findHits = (text, list) => {
   const hay = lower(text);
