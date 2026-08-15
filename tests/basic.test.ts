@@ -104,7 +104,7 @@ test('sentence counting safely handles long punctuation runs', async () => {
   };
   const punctuationRun = '!'.repeat(20_000);
 
-  const { result } = await validateTouchExternal(
+  const { checks } = await validateTouchExternal(
     {
       subject: 'detection ownership',
       body: `${punctuationRun}1`,
@@ -115,7 +115,7 @@ test('sentence counting safely handles long punctuation runs', async () => {
     eventContext,
     persona,
   );
-  expect(result.checks.bodySentenceCount).toBe(1);
+  expect(checks.bodySentenceCount).toBe(1);
 
   const cli = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
     input: JSON.stringify({
@@ -152,7 +152,7 @@ test('sentence counting preserves digit-adjacent and punctuation-cluster behavio
     exampleTitles: ['Security Director'],
   };
   const body = '!0 ?0 .0 Loss moved from 1.4% to 2.1%. Who owns the alert?!';
-  const { result } = await validateTouchExternal(
+  const { checks } = await validateTouchExternal(
     {
       subject: 'detection ownership',
       body,
@@ -164,7 +164,7 @@ test('sentence counting preserves digit-adjacent and punctuation-cluster behavio
     persona,
   );
 
-  expect(result.checks.bodySentenceCount).toBe(2);
+  expect(checks.bodySentenceCount).toBe(2);
 
   const cli = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
     input: JSON.stringify({
