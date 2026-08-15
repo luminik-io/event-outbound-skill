@@ -85,6 +85,104 @@ test('validate-touch CLI rejects digits in subject lines', () => {
   expect(parsed.errors.map((e: { rule: string }) => e.rule)).toContain('subjectNumbers');
 });
 
+test('sentence counting safely handles long punctuation runs', async () => {
+  const eventContext: EventContext = {
+    name: 'Black Hat USA 2026',
+    dates: 'August 1-6, 2026',
+    location: 'Las Vegas',
+    agendaTitles: [],
+    speakers: [],
+    exhibitorList: [],
+  };
+  const persona: AttendeePersona = {
+    personaId: 'security',
+    role: 'Security Director',
+    seniority: 'director',
+    priorities: ['detection coverage'],
+    painPoints: ['alert ownership'],
+    exampleTitles: ['Security Director'],
+  };
+  const punctuationRun = '!'.repeat(20_000);
+
+  const { result } = await validateTouchExternal(
+    {
+      subject: 'detection ownership',
+      body: `${punctuationRun}1`,
+      channel: 'email',
+      touch_type: 'cold_email_first_touch',
+      cta_type: 'ask_for_interest',
+    },
+    eventContext,
+    persona,
+  );
+  expect(result.checks.bodySentenceCount).toBe(1);
+
+  const cli = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify({
+      subject: 'detection ownership',
+      body: `${punctuationRun}1`,
+      channel: 'email',
+      touch_type: 'cold_email_first_touch',
+      eventName: 'Black Hat USA 2026',
+      personaPriorities: ['detection coverage'],
+      personaPainPoints: ['alert ownership'],
+    }),
+    encoding: 'utf-8',
+  });
+  expect(cli.error).toBeUndefined();
+  expect(cli.status).toBe(0);
+  expect(JSON.parse(cli.stdout).checks.bodySentenceCount).toBe(1);
+});
+
+test('sentence counting preserves digit-adjacent and punctuation-cluster behavior', async () => {
+  const eventContext: EventContext = {
+    name: 'Black Hat USA 2026',
+    dates: 'August 1-6, 2026',
+    location: 'Las Vegas',
+    agendaTitles: [],
+    speakers: [],
+    exhibitorList: [],
+  };
+  const persona: AttendeePersona = {
+    personaId: 'security',
+    role: 'Security Director',
+    seniority: 'director',
+    priorities: ['detection coverage'],
+    painPoints: ['alert ownership'],
+    exampleTitles: ['Security Director'],
+  };
+  const body = '!0 ?0 .0 Loss moved from 1.4% to 2.1%. Who owns the alert?!';
+  const { result } = await validateTouchExternal(
+    {
+      subject: 'detection ownership',
+      body,
+      channel: 'email',
+      touch_type: 'cold_email_first_touch',
+      cta_type: 'ask_for_interest',
+    },
+    eventContext,
+    persona,
+  );
+
+  expect(result.checks.bodySentenceCount).toBe(2);
+
+  const cli = spawnSync('node', ['scripts/validate-touch.mjs', '--stdin'], {
+    input: JSON.stringify({
+      subject: 'detection ownership',
+      body,
+      channel: 'email',
+      touch_type: 'cold_email_first_touch',
+      eventName: 'Black Hat USA 2026',
+      personaPriorities: ['detection coverage'],
+      personaPainPoints: ['alert ownership'],
+    }),
+    encoding: 'utf-8',
+  });
+  expect(cli.error).toBeUndefined();
+  expect(cli.status).toBe(0);
+  expect(JSON.parse(cli.stdout).checks.bodySentenceCount).toBe(2);
+});
+
 test('validate-touch CLI strict mode rejects invented assets and proof', () => {
   const payload = {
     subject: 'fednow auth',

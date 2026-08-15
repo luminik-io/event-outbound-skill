@@ -59,10 +59,23 @@ function countWords(s: string): number {
 }
 
 function countSentences(s: string): number {
-  // Skip `.` followed by a digit (e.g. "1.4%") so decimal numbers do not
-  // inflate sentence counts. Mirrors scripts/validate-touch.mjs.
-  const matches = s.match(/[.!?]+(?!\d)/g);
-  return matches ? matches.length : 0;
+  // Scan once instead of applying a backtracking regexp to model output.
+  // Punctuation clusters ("?!") count once. Preserve the legacy rule that a
+  // terminator immediately followed by a digit does not count.
+  let count = 0;
+  for (let index = 0; index < s.length; index += 1) {
+    const char = s[index];
+    if (char !== '.' && char !== '!' && char !== '?') continue;
+
+    const next = s[index + 1];
+    if (next >= '0' && next <= '9') continue;
+
+    count += 1;
+    while (index + 1 < s.length && '.!?'.includes(s[index + 1])) {
+      index += 1;
+    }
+  }
+  return count;
 }
 
 const EMOJI_REGEX =
