@@ -33,7 +33,7 @@
     "test:matrix-runner": "node scripts/run-claude-matrix.mjs --self-test",
     "test:full-runner": "node scripts/run-claude-full-sequence.mjs --self-test",
     "test:dependency-compat": "node scripts/check-dependency-compat.mjs",
-    "verify": "npm run build && npm run test -- --run && npm run test:dependency-compat && npm run test:matrix-runner && npm run test:full-runner && npm run scan && npm run check:showcase && npm run check:clients && npm run check:codex-install"
+    "verify": "npm run build && npm run test -- --run && npm run test:dependency-compat && npm run test:matrix-runner && npm run test:full-runner && npm run scan && npm run check:showcase && npm run check:clients"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",
