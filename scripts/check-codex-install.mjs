@@ -160,7 +160,6 @@ try {
         workspace,
         '--skip-git-repo-check',
         '--ephemeral',
-        '--ignore-user-config',
         '--output-schema',
         outputSchemaPath,
         '--output-last-message',
