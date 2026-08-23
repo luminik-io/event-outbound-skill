@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Event Outbound'
+  short_description: 'Validate buyer-first event outreach'
+  default_prompt: 'Use $event-outbound to create a validated buyer-first email and LinkedIn sequence for this B2B event.'

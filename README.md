@@ -5,11 +5,12 @@
 # event-outbound
 
 Buyer-first email and LinkedIn outreach for B2B trade shows and conferences. <br/>
-Claude Code + Claude Cowork. Free, MIT, open source.
+Claude Code, Claude Cowork, and Codex. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
-[![Tests](https://img.shields.io/badge/tests-129%20pass-2ea043.svg)](#run-the-tests)
+[![Codex plugin](https://img.shields.io/badge/Codex-plugin-111111.svg)](https://developers.openai.com/codex)
+[![Tests](https://img.shields.io/badge/tests-141%20pass-2ea043.svg)](#run-the-tests)
 [![Made by Luminik](https://img.shields.io/badge/made%20by-Luminik-f63e8c.svg)](https://www.luminik.io)
 
 [**Install**](#install) · [**What it does**](#what-it-does) · [**Worked examples**](#worked-examples) · [**Validation rules**](#validation-rules) · [**Why use this**](#why-use-this-over-alternatives) · [**Credits**](#credits)
@@ -41,7 +42,20 @@ That's it. The skill registers itself, and any prompt mentioning a B2B event, at
 
 Install `event-outbound` from Cowork's plugin directory once listed. In Cowork, open **Customize**, choose **Browse plugins**, then install `event-outbound`.
 
-The same plugin package is used for Claude Code and Cowork. The local validator is referenced through `${CLAUDE_PLUGIN_ROOT}`, so it resolves inside the installed plugin directory rather than depending on the current working directory.
+The same plugin package is used for Claude Code and Cowork. The skill's client-neutral bridge resolves the canonical validator inside the installed plugin instead of depending on the current working directory.
+
+### Codex
+
+Add Luminik's plugin marketplace and install the same package:
+
+```bash
+codex plugin marketplace add https://github.com/luminik-io/claude-plugins.git
+codex plugin add event-outbound@luminik-plugins
+```
+
+Start a new task after installation so Codex discovers `$event-outbound`. The Codex manifest and UI metadata are native to the package; the outreach workflow, data, examples, and validators remain the same files Claude uses.
+
+This release proves the Codex plugin marketplace, CLI installation, cache load, and fresh-task skill path. A standalone ChatGPT marketplace or catalog installation has not been proven. The included OpenAI skill metadata may be reusable by compatible ChatGPT surfaces, but it is not a claim of current ChatGPT availability.
 
 ## Who this is for
 
@@ -125,7 +139,7 @@ Every shipped sequence is hand-verified against the full validator stack: zero h
 
 ## Quickstart
 
-From Claude Code or Cowork, after installing the plugin:
+From Claude Code, Cowork, or Codex after installing the plugin:
 
 ```
 Create an outbound sequence for Black Hat USA 2026 targeting Directors of Security Engineering at mid-market SaaS.
@@ -143,7 +157,7 @@ npm install
 claude --plugin-dir $(pwd)
 ```
 
-That's it. The installed skill runs inside Claude Code and Cowork with no extra API keys. Claude reads the rules from `${CLAUDE_PLUGIN_ROOT}/data/`, generates each touch, validates it via `node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-touch.mjs"`, revises on failure, checks the full sequence, then runs the final artifact gate before writing deliverables.
+That's it. The installed skill runs inside Claude or Codex with no extra model API key. The active model reads the shared rules, generates each touch, calls the bundled client-neutral validator bridge, revises on failure, checks the full sequence, then runs the final artifact gate before writing deliverables.
 
 To validate a single hand-written touch against the rule set:
 
@@ -158,13 +172,31 @@ To run the full validator scan against every shipped artefact:
 npx tsx scripts/scan-deliverables.ts
 ```
 
+To verify both client manifests, Codex UI metadata, and validator execution from outside the plugin working directory:
+
+```bash
+npm run check:clients
+```
+
+To exercise a real Codex marketplace add, plugin install, cache load, and installed validator bridge in an isolated `CODEX_HOME`:
+
+```bash
+npm run check:codex-install
+```
+
+Maintainers can additionally prove discovery and validator execution in a fresh authenticated task without exposing credentials:
+
+```bash
+CODEX_SMOKE_AUTH_FILE="$HOME/.codex/auth.json" npm run check:codex-install -- --forward-test
+```
+
 ### Run the tests
 
 ```bash
 npm test -- --run
 ```
 
-139 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~6 seconds cold.
+141 tests across 7 files (cliche-validator unit tests, strict context checks, date-aware timeline computations, installed-skill timeline CLI, sequence-level pain-angle validation, source-grounded craft evals, persona analyser, event scraper, end-to-end evals). Vitest, ~6 seconds cold.
 
 The repo also includes real Claude-generated showcase outputs:
 
@@ -216,7 +248,7 @@ Use `--command` for the authenticated Claude Code command on your machine. Run a
 
 ### Headless / batch generation (optional)
 
-If you want to generate sequences outside Claude (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. There is no required cloud API for using the skill inside Claude Code or Cowork, and the repo ships no default external-model dependency.
+If you want to generate sequences outside an interactive client (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. Interactive use in Claude or Codex needs no separate model API key, and the repo ships no default external-model dependency.
 
 ## Parameters
 
@@ -305,7 +337,8 @@ Sources cited inline in [`data/llm-cliche-blocklist.md`](data/llm-cliche-blockli
 ├── evals/                  End-to-end output evaluations
 ├── scripts/                Run-example, scan-deliverables, install verification
 ├── marketplace/            Cover image (1200x630)
-└── .claude-plugin/         Claude plugin descriptor
+├── .claude-plugin/         Claude plugin descriptor
+└── .codex-plugin/          Codex plugin descriptor
 ```
 
 ## License

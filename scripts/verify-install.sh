@@ -5,13 +5,15 @@
 # Pre-launch smoke test for the event-outbound plugin.
 #
 # What this checks:
-#  1. claude CLI is installed and on PATH
+#  1. Claude and Codex CLIs are reported when available
 #  2. .claude-plugin/plugin.json validates against Anthropic's schema
-#  3. marketplace manifest in ../claude-plugins validates (if present)
-#  4. skill file exists where plugin.json expects it
-#  5. all Apollo merge fields in the example sequences resolve from a known list
-#  6. no banned phrases or em-dashes have snuck back into the prose docs
-#  7. (optional) fresh Claude Code session can load the plugin via --plugin-dir
+#  3. Cross-client metadata and relocated-runtime checks pass
+#  4. A real isolated Codex marketplace install and cache load passes when Codex is available
+#  5. marketplace manifest in ../claude-plugins validates when present and Claude is available
+#  6. skill file exists where both plugin manifests expect it
+#  7. all Apollo merge fields in the example sequences resolve from a known list
+#  8. no banned phrases or em-dashes have snuck back into the prose docs
+#  9. (optional) fresh Claude Code session can load the plugin via --plugin-dir
 #
 # Usage:
 #  bash scripts/verify-install.sh                # run all checks
@@ -21,7 +23,7 @@
 set -u
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$REPO_ROOT"
+cd "$REPO_ROOT" || exit 1
 
 SKIP_LIVE=0
 if [[ "${1:-}" == "--skip-live" ]]; then
@@ -31,22 +33,33 @@ fi
 pass=0
 fail=0
 warn=0
+has_claude=0
+has_codex=0
 
 ok()   { printf "  \033[32mOK\033[0m   %s\n" "$1"; pass=$((pass+1)); }
 bad()  { printf "  \033[31mFAIL\033[0m %s\n" "$1"; fail=$((fail+1)); }
 soft() { printf "  \033[33mWARN\033[0m %s\n" "$1"; warn=$((warn+1)); }
 step() { printf "\n\033[1m%s\033[0m\n" "$1"; }
 
-step "1. claude CLI"
+step "1. Client CLIs"
 if command -v claude >/dev/null 2>&1; then
+  has_claude=1
   ok "claude found at $(command -v claude) (version: $(claude --version 2>/dev/null | head -1))"
 else
-  bad "claude CLI not found on PATH. Install it from https://code.claude.com"
+  soft "claude CLI not found on PATH; live Claude load will be skipped"
+fi
+if command -v codex >/dev/null 2>&1; then
+  has_codex=1
+  ok "codex found at $(command -v codex) (version: $(codex --version 2>/dev/null | head -1))"
+else
+  soft "codex CLI not found on PATH; deterministic Codex packaging checks will still run"
 fi
 
-step "2. Plugin manifest"
+step "2. Claude plugin manifest"
 if [[ -f .claude-plugin/plugin.json ]]; then
-  if claude plugin validate . >/dev/null 2>&1; then
+  if [[ $has_claude -eq 0 ]]; then
+    soft "claude CLI unavailable; skipping Anthropic manifest validation"
+  elif claude plugin validate . >/dev/null 2>&1; then
     ok ".claude-plugin/plugin.json validates against Anthropic schema"
   else
     bad ".claude-plugin/plugin.json failed validation. Run: claude plugin validate ."
@@ -55,10 +68,28 @@ else
   bad ".claude-plugin/plugin.json missing"
 fi
 
-step "3. Marketplace manifest (sibling repo)"
+step "3. Cross-client packaging"
+if node scripts/check-client-packaging.mjs >/dev/null 2>&1; then
+  ok ".codex-plugin, agents/openai.yaml, and relocated validator bridge pass"
+else
+  bad "Cross-client packaging failed. Run: npm run check:clients"
+fi
+
+step "4. Isolated Codex marketplace install"
+if [[ $has_codex -eq 0 ]]; then
+  soft "codex CLI unavailable; skipping isolated marketplace install"
+elif node scripts/check-codex-install.mjs >/dev/null 2>&1; then
+  ok "Codex marketplace add, plugin install, cache load, and installed bridge pass"
+else
+  bad "Isolated Codex install failed. Run: npm run check:codex-install"
+fi
+
+step "5. Marketplace manifest (sibling repo)"
 MKT_REPO="$REPO_ROOT/../claude-plugins"
 if [[ -f "$MKT_REPO/.claude-plugin/marketplace.json" ]]; then
-  if claude plugin validate "$MKT_REPO" >/dev/null 2>&1; then
+  if [[ $has_claude -eq 0 ]]; then
+    soft "claude CLI unavailable; skipping sibling Claude marketplace validation"
+  elif claude plugin validate "$MKT_REPO" >/dev/null 2>&1; then
     ok "claude-plugins/.claude-plugin/marketplace.json validates"
   else
     bad "marketplace.json failed validation. Run: claude plugin validate $MKT_REPO"
@@ -67,14 +98,14 @@ else
   soft "claude-plugins repo not found at $MKT_REPO; skipping marketplace check"
 fi
 
-step "4. Skill path"
+step "6. Skill path"
 if [[ -f skills/event-outbound/SKILL.md ]]; then
   ok "skills/event-outbound/SKILL.md exists"
 else
   bad "skills/event-outbound/SKILL.md missing. Plugin will load but skill will not register."
 fi
 
-step "5. Apollo merge fields"
+step "7. Apollo merge fields"
 ALLOWED='first_name|company|title|sender_first_name|sender_company|event_name|event_city|event_venue|event_day_of_week|booth_or_hall|peer_company|activity_signal|session_name|snake_case'
 bad_fields=$(grep -hoE '\{\{[a-z_]+\}\}' examples/*/final_sequence.md 2>/dev/null \
   | sed -E 's/\{\{|\}\}//g' \
@@ -87,7 +118,7 @@ else
   printf "%s\n" "$bad_fields" | sed 's/^/         /'
 fi
 
-step "6. Banned phrases in example touches"
+step "8. Banned phrases in example touches"
 # Only scan the generated sequences. The credits section intentionally mentions
 # "no pitch-speak" when describing the validator; that is a rule description,
 # not a touch violation.
@@ -102,7 +133,7 @@ else
   printf "%s\n" "$banned" | sed 's/^/         /'
 fi
 
-step "7. Em-dashes in prose"
+step "9. Em-dashes in prose"
 emd=$(grep -rn -- "—" README.md skills/event-outbound/SKILL.md CHANGELOG.md 2>/dev/null || true)
 if [[ -z "$emd" ]]; then
   ok "No em-dashes in top-level prose"
@@ -111,7 +142,7 @@ else
   printf "%s\n" "$emd" | sed 's/^/         /'
 fi
 
-step "8. Cover image"
+step "10. Cover image"
 COVER="marketplace/cover-1200x630.png"
 if [[ -f "$COVER" ]]; then
   dim=$(file "$COVER" 2>/dev/null | grep -oE '[0-9]+ x [0-9]+' | head -1)
@@ -125,11 +156,11 @@ else
   bad "Cover image not found at $COVER"
 fi
 
-step "9. Live plugin load test"
+step "11. Live Claude plugin load test"
 if [[ $SKIP_LIVE -eq 1 ]]; then
   soft "Skipped (--skip-live). Run manually: claude --plugin-dir $REPO_ROOT"
 else
-  if command -v claude >/dev/null 2>&1; then
+  if [[ $has_claude -eq 1 ]]; then
     # Non-interactive: ask claude to list plugins and confirm ours is loaded.
     out=$(claude --plugin-dir "$REPO_ROOT" -p "Run /plugin list and output only the plugin names you see, one per line." 2>&1 || true)
     if echo "$out" | grep -qi "event-outbound"; then
@@ -140,7 +171,7 @@ else
       echo "         (This check is best-effort; run 'claude --plugin-dir $REPO_ROOT' manually to verify.)"
     fi
   else
-    bad "claude CLI missing; cannot run live load test"
+    soft "claude CLI unavailable; live Claude load skipped"
   fi
 fi
 

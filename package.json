@@ -1,11 +1,12 @@
 {
   "name": "event-outbound-skill",
-  "version": "0.2.5",
-  "description": "Claude skill for generating event-driven outbound sequences.",
+  "version": "0.3.0",
+  "description": "Cross-client skill for generating validated event-driven outbound sequences.",
   "main": "dist/index.js",
   "type": "module",
   "files": [
     ".claude-plugin/",
+    ".codex-plugin/",
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
@@ -24,13 +25,15 @@
     "validate:sequence": "node scripts/validate-sequence.mjs",
     "validate:artifact": "node scripts/validate-artifact.mjs",
     "check:showcase": "node scripts/check-claude-showcase.mjs",
+    "check:clients": "node scripts/check-client-packaging.mjs",
+    "check:codex-install": "node scripts/check-codex-install.mjs",
     "e2e:claude": "node scripts/run-claude-showcase.mjs",
     "e2e:claude:matrix": "node scripts/run-claude-matrix.mjs",
     "e2e:claude:full": "node scripts/run-claude-full-sequence.mjs",
     "test:matrix-runner": "node scripts/run-claude-matrix.mjs --self-test",
     "test:full-runner": "node scripts/run-claude-full-sequence.mjs --self-test",
     "test:dependency-compat": "node scripts/check-dependency-compat.mjs",
-    "verify": "npm run build && npm run test -- --run && npm run test:dependency-compat && npm run test:matrix-runner && npm run test:full-runner && npm run scan && npm run check:showcase"
+    "verify": "npm run build && npm run test -- --run && npm run test:dependency-compat && npm run test:matrix-runner && npm run test:full-runner && npm run scan && npm run check:showcase && npm run check:clients"
   },
   "keywords": [],
   "author": "Luminik (DataRavel Inc.)",

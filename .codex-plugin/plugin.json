@@ -1,0 +1,30 @@
+{
+  "name": "event-outbound",
+  "version": "0.3.0",
+  "description": "Create validated, buyer-first email and LinkedIn outreach for B2B events.",
+  "author": {
+    "name": "Luminik",
+    "email": "prasad@luminik.io",
+    "url": "https://www.luminik.io"
+  },
+  "homepage": "https://www.luminik.io/tools/event-outbound",
+  "repository": "https://github.com/luminik-io/event-outbound-skill",
+  "license": "MIT",
+  "keywords": ["event-outbound", "cold-email", "linkedin", "trade-shows", "sales-enablement"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Event Outbound",
+    "shortDescription": "Validated outreach for B2B events",
+    "longDescription": "Research buyer context, plan a feasible event cadence, draft buyer-first email and LinkedIn touches, and verify every deliverable with deterministic local validators before human review.",
+    "developerName": "Luminik",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://www.luminik.io/tools/event-outbound",
+    "defaultPrompt": [
+      "Create a validated outbound sequence for an upcoming B2B event",
+      "Turn this event and ICP into buyer-first email and LinkedIn outreach"
+    ],
+    "brandColor": "#F63E8C",
+    "screenshots": []
+  }
+}

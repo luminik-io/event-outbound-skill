@@ -23,6 +23,8 @@ scripts/*
 !scripts/validate-artifact.mjs
 !scripts/plan-timeline.mjs
 !scripts/check-claude-showcase.mjs
+!scripts/check-client-packaging.mjs
+!scripts/check-codex-install.mjs
 !scripts/check-dependency-compat.mjs
 !scripts/run-claude-showcase.mjs
 !scripts/run-claude-matrix.mjs

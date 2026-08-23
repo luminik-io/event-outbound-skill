@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install pinned Codex CLI
+        run: npm install --global @openai/codex@0.148.0-alpha.9
+
       - name: Type-check (tsc)
         run: npm run build
 
@@ -41,3 +44,12 @@ jobs:
 
       - name: Validator scan against shipped deliverables
         run: npm run scan
+
+      - name: Cross-client manifest checks
+        run: npm run check:clients
+
+      - name: Isolated Codex marketplace install and load
+        run: npm run check:codex-install
+
+      - name: Install verifier without Claude
+        run: bash scripts/verify-install.sh --skip-live
