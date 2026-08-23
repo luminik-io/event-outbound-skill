@@ -104,4 +104,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-process.stdout.write('Cross-client packaging checks passed for Claude and Codex/ChatGPT\n');
+process.stdout.write('Cross-client manifest and relocation checks passed for Claude and Codex\n');

@@ -5,13 +5,12 @@ description: Create validated, buyer-first email and LinkedIn outreach sequences
 
 # Event Outbound Skill
 
-Turn an event plus a target persona into a validated multi-channel outreach sequence. Use the active Claude, Codex, or ChatGPT model as the generator. No external model API key is required. Run the bundled local validator between drafts.
+Turn an event plus a target persona into a validated multi-channel outreach sequence. Use the active Claude or Codex model as the generator. No external model API key is required. Run the bundled local validator between drafts.
 
-Resolve `EVENT_OUTBOUND_SKILL_ROOT` once before running a bundled command. It is the absolute directory containing this `SKILL.md`. In a Claude plugin session it is `${CLAUDE_PLUGIN_ROOT}/skills/event-outbound`; in Codex or ChatGPT use the absolute skill path shown by the client. Always invoke validators through the client-neutral bridge:
+For every command below, replace `<absolute-skill-directory>` with the resolved absolute directory containing this `SKILL.md`. Do not type the placeholder literally and do not rely on a new environment variable.
 
-```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" <command> [arguments]
-```
+- Claude Code or Cowork: expand `${CLAUDE_PLUGIN_ROOT}/skills/event-outbound` to its absolute path.
+- Codex: use the absolute path shown for `event-outbound` in the available-skills catalog.
 
 Install the complete plugin. A copied `SKILL.md` does not include the canonical validator and data files.
 
@@ -34,7 +33,7 @@ Before drafting, build a short **Outbound Research Brief**. If the user gives a 
 
 ### Validation gate
 
-The local validator is mandatory, not advisory. If shell/node tools are unavailable, if the user asks to disable tools, or if `node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-touch --stdin` cannot run, do **not** draft copy. Return a blocked status with the missing capability and the next input needed. Do not include sample subject lines, sample bodies, or rejected phrase examples in that blocked response.
+The local validator is mandatory, not advisory. If shell/node tools are unavailable, if the user asks to disable tools, or if `node "<absolute-skill-directory>/scripts/run.mjs" validate-touch --stdin` cannot run after substituting the resolved path, do **not** draft copy. Return a blocked status with the missing capability and the next input needed. Do not include sample subject lines, sample bodies, or rejected phrase examples in that blocked response.
 
 The no-garbage rules apply to every skill-authored surface: outreach copy, research brief, blocked responses, notes, summaries, QA reports, and final JSON metadata. Do not use em dashes anywhere. Blocked responses must be ASCII-only JSON or plain text. Do not say the work is ready to send, cleared for deployment, or approved for outreach. The approved status phrase is "ready for human review."
 
@@ -102,7 +101,7 @@ For each persona, build one outreach sequence with a user-configurable number of
 Before drafting, run the deterministic cadence planner:
 
 ```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" plan-timeline
+node "<absolute-skill-directory>/scripts/run.mjs" plan-timeline
 ```
 
 Pass JSON on stdin:
@@ -122,21 +121,21 @@ The planner uses the runtime's local date when `today` is omitted. Prefer passin
 Use this validator path. Do not assume the current working directory is the plugin root:
 
 ```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-touch --stdin
+node "<absolute-skill-directory>/scripts/run.mjs" validate-touch --stdin
 ```
 
 1. **Pick the channel, offset, and send date** from the planner output. Do not invent dates by hand.
 2. **Assign a fresh pain angle** from the ledger. The touch must use that angle and no previous angle. Across the whole sequence, including mixed email + LinkedIn runs, no pain angle may repeat. If you do not have enough angles, split the buyer problem into different dimensions (current workaround, ownership, timing, audit evidence, stakeholder conflict, cost of inaction, objection) or ask the user for more customer-language pains.
 3. **Choose CTA posture**. If the sender supplied real event presence or availability, include exactly one natural event-specific ask in the sequence, usually the last pre-event or day-of touch: `"Worth coffee at {{event_name}} if this is already on your list?"` or `"Worth a quick conversation at {{event_name}} if this is already on the roadmap?"`. Do not use this if attendance, booth, side-event, or availability is unknown. If relevant assets exist, include at most one asset-backed CTA in the best-fit touch. If no assets exist, do not mention assets.
 4. **Draft the touch** following the 4T framework, the channel-specific length rule, and the hard validator rules below.
-5. **Validate** by running `node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-touch --stdin` with the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, stop the sequence, report the failed rule names, and ask for the missing input or manual review. Do not include the failed copy in the final answer or final files.
+5. **Validate** by running `node "<absolute-skill-directory>/scripts/run.mjs" validate-touch --stdin` with the resolved absolute path and the touch as input. Include `strictAngleDiversity: true`, the current `painAngle`, and all `usedPainAngles` from prior touches. Do not invent, summarize, or approximate validator results. A touch only "passes" when the actual CLI returns `"isValid": true`. If it returns errors, **read the errors, revise the draft, and re-validate**. Up to 3 attempts. If still failing on attempt 3, stop the sequence, report the failed rule names, and ask for the missing input or manual review. Do not include the failed copy in the final answer or final files.
 6. **Score and band** the touch: 5/5 top-tier, 4/5 ship, 3/5 review, 1.5/5 rewrite (keyed to validator pass + specificity).
 7. **Append** to the sequence; move to the next touch.
 
 After all touches generate, run the sequence-level validator:
 
 ```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-sequence
+node "<absolute-skill-directory>/scripts/run.mjs" validate-sequence
 ```
 
 Pass the full `sequencer-output.json` on stdin or with `--sequence`. This catches pain-angle recycling across all channels. The sequence is not validator-clean unless both every touch validator and the sequence validator return `"isValid": true`.
@@ -150,7 +149,7 @@ The final JSON must include top-level `summary`, `event.startDate`, `event.endDa
 Then run the final artifact validator:
 
 ```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-artifact --sequence sequencer-output.json --final final_sequence.md
+node "<absolute-skill-directory>/scripts/run.mjs" validate-artifact --sequence sequencer-output.json --final final_sequence.md
 ```
 
 The sequence is not finished unless this returns `"isValid": true`. If any validator cannot run or any touch still fails after retries, do not write final sequence files. Write a QA report with failed rule names instead. Never call the sequence "ready to send" or "cleared for deployment"; use "ready for human review."
@@ -279,7 +278,7 @@ Every touch is run through [scripts/validate-touch.mjs](../../scripts/validate-t
 ## Validating a touch from inside this skill
 
 ```bash
-node "$EVENT_OUTBOUND_SKILL_ROOT/scripts/run.mjs" validate-touch --touch <(cat <<'JSON'
+node "<absolute-skill-directory>/scripts/run.mjs" validate-touch --touch <(cat <<'JSON'
 {
   "subject": "money20/20 chargeback prep",
   "body": "Neha, ...",
@@ -346,4 +345,4 @@ When you're unsure if a draft is good, read it aloud. If you'd be embarrassed se
 
 ## Optional: headless runs
 
-For CI, batch generation, or scheduled runs outside an installed plugin session, use `src/agents/sequencer.ts`, which exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM adapter. Interactive use in Claude, Codex, or ChatGPT requires no separate model API key.
+For CI, batch generation, or scheduled runs outside an installed plugin session, use `src/agents/sequencer.ts`, which exposes `generateSequence()` with an injectable `TouchGenerator`. Bring your own LLM adapter. Interactive use in Claude or Codex requires no separate model API key.

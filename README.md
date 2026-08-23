@@ -5,7 +5,7 @@
 # event-outbound
 
 Buyer-first email and LinkedIn outreach for B2B trade shows and conferences. <br/>
-Claude Code, Claude Cowork, Codex, and ChatGPT. Free, MIT, open source.
+Claude Code, Claude Cowork, and Codex. Free, MIT, open source.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-f63e8c.svg)](LICENSE)
 [![Claude plugin](https://img.shields.io/badge/Claude-plugin-1e1e1e.svg)](https://claude.com/docs/plugins/overview)
@@ -44,7 +44,7 @@ Install `event-outbound` from Cowork's plugin directory once listed. In Cowork, 
 
 The same plugin package is used for Claude Code and Cowork. The skill's client-neutral bridge resolves the canonical validator inside the installed plugin instead of depending on the current working directory.
 
-### Codex and ChatGPT
+### Codex
 
 Add Luminik's plugin marketplace and install the same package:
 
@@ -53,7 +53,9 @@ codex plugin marketplace add https://github.com/luminik-io/claude-plugins.git
 codex plugin add event-outbound@luminik-plugins
 ```
 
-Start a new task after installation so Codex or ChatGPT discovers `$event-outbound`. The Codex manifest and UI metadata are native to the package; the outreach workflow, data, examples, and validators remain the same files Claude uses.
+Start a new task after installation so Codex discovers `$event-outbound`. The Codex manifest and UI metadata are native to the package; the outreach workflow, data, examples, and validators remain the same files Claude uses.
+
+This release proves the Codex plugin marketplace, CLI installation, cache load, and fresh-task skill path. A standalone ChatGPT marketplace or catalog installation has not been proven. The included OpenAI skill metadata may be reusable by compatible ChatGPT surfaces, but it is not a claim of current ChatGPT availability.
 
 ## Who this is for
 
@@ -137,7 +139,7 @@ Every shipped sequence is hand-verified against the full validator stack: zero h
 
 ## Quickstart
 
-From Claude Code, Cowork, Codex, or ChatGPT after installing the plugin:
+From Claude Code, Cowork, or Codex after installing the plugin:
 
 ```
 Create an outbound sequence for Black Hat USA 2026 targeting Directors of Security Engineering at mid-market SaaS.
@@ -155,7 +157,7 @@ npm install
 claude --plugin-dir $(pwd)
 ```
 
-That's it. The installed skill runs inside Claude, Codex, or ChatGPT with no extra model API key. The active model reads the shared rules, generates each touch, calls the bundled client-neutral validator bridge, revises on failure, checks the full sequence, then runs the final artifact gate before writing deliverables.
+That's it. The installed skill runs inside Claude or Codex with no extra model API key. The active model reads the shared rules, generates each touch, calls the bundled client-neutral validator bridge, revises on failure, checks the full sequence, then runs the final artifact gate before writing deliverables.
 
 To validate a single hand-written touch against the rule set:
 
@@ -174,6 +176,18 @@ To verify both client manifests, Codex UI metadata, and validator execution from
 
 ```bash
 npm run check:clients
+```
+
+To exercise a real Codex marketplace add, plugin install, cache load, and installed validator bridge in an isolated `CODEX_HOME`:
+
+```bash
+npm run check:codex-install
+```
+
+Maintainers can additionally prove discovery and validator execution in a fresh authenticated task without exposing credentials:
+
+```bash
+CODEX_SMOKE_AUTH_FILE="$HOME/.codex/auth.json" npm run check:codex-install -- --forward-test
 ```
 
 ### Run the tests
@@ -234,7 +248,7 @@ Use `--command` for the authenticated Claude Code command on your machine. Run a
 
 ### Headless / batch generation (optional)
 
-If you want to generate sequences outside an interactive client (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. Interactive use in Claude, Codex, or ChatGPT needs no separate model API key, and the repo ships no default external-model dependency.
+If you want to generate sequences outside an interactive client (CI, scheduled cron, batch backfill), `src/agents/sequencer.ts` exposes `generateSequence()` with a required injectable `TouchGenerator`. Bring your own LLM adapter. Interactive use in Claude or Codex needs no separate model API key, and the repo ships no default external-model dependency.
 
 ## Parameters
 
@@ -324,7 +338,7 @@ Sources cited inline in [`data/llm-cliche-blocklist.md`](data/llm-cliche-blockli
 ├── scripts/                Run-example, scan-deliverables, install verification
 ├── marketplace/            Cover image (1200x630)
 ├── .claude-plugin/         Claude plugin descriptor
-└── .codex-plugin/          Codex and ChatGPT plugin descriptor
+└── .codex-plugin/          Codex plugin descriptor
 ```
 
 ## License

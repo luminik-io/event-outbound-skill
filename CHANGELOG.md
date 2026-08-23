@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 (2026-08-23)
 
 ### Added
-- First-class Codex and ChatGPT plugin metadata in `.codex-plugin/plugin.json` plus `agents/openai.yaml` discovery metadata for `$event-outbound`.
+- First-class Codex plugin metadata in `.codex-plugin/plugin.json` plus `agents/openai.yaml` discovery metadata for `$event-outbound`.
 - A client-neutral skill bridge that resolves canonical validators relative to the installed skill, independent of the caller's working directory.
 - Deterministic cross-client packaging and relocated-runtime smoke checks via `npm run check:clients`.
 - Final artifact validator via `scripts/validate-artifact.mjs`, covering required summary/date fields, per-touch `checks`, snake_case `pain_angle`, empty `validation_errors`, final markdown hygiene, and full `validate-sequence.mjs` status.
@@ -12,7 +12,7 @@
 - Matrix case corpus covering thin inputs, cadence feasibility, LinkedIn subjects, asset gating, event logistics, proof gaps, current-date planning, and pain-angle reuse.
 
 ### Changed
-- The canonical skill now uses only portable `name` and `description` frontmatter and runs in Claude Code, Claude Cowork, Codex, and compatible ChatGPT plugin surfaces without duplicating its workflow.
+- The canonical skill now uses only portable `name` and `description` frontmatter and runs in Claude Code, Claude Cowork, and Codex without duplicating its workflow. Standalone ChatGPT installation remains unproven.
 - Skill instructions now treat the local validator as a hard gate. If the validator cannot run, the skill blocks drafting instead of producing unchecked copy.
 - Touch validation now canonicalizes documented timeline aliases while rejecting improvised `touch_type` values.
 - LinkedIn touches now fail validation when a subject is present.
